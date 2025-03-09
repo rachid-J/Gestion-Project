@@ -1,0 +1,97 @@
+@startuml class
+class User {
+  +id: int
+  +name: string
+  +email: string
+  +password: string
+  +role: enum
+  +profile_photo: string
+  +created_at: timestamp
+  +updated_at: timestamp
+  +login()
+  +logout()
+  +resetPassword()
+}
+
+class Project {
+  +id: int
+  +name: string
+  +description: text
+  +start_date: date
+  +end_date: date
+  +status: enum
+  +created_by: int
+  +addTask()
+  +updateStatus()
+  +assignMembers()
+}
+
+class Task {
+  +id: int
+  +title: string
+  +description: text
+  +status: enum
+  +priority: enum
+  +due_date: date
+  +updatePriority()
+  +assignUser()
+  +addComment()
+}
+
+class Comment {
+  +id: int
+  +content: text
+  +addAttachment()
+  +editComment()
+}
+
+class Notification {
+  +id: int
+  +message: string
+  +is_read: boolean
+  +markAsRead()
+  +sendNotification()
+}
+
+class Attachment {
+  +id: int
+  +file_name: string
+  +file_path: string
+  +uploadFile()
+  +deleteFile()
+}
+
+User "1" *-- "0..*" Project : creates
+User "1" *-- "0..*" Task : assigned_to
+Project "1" *-- "0..*" Task : contains
+Task "1" *-- "0..*" Comment : has
+Task "1" *-- "0..*" Attachment : has
+User "1" *-- "0..*" Comment : writes
+User "1" *-- "0..*" Notification : receives
+User "1" *-- "0..*" Attachment : uploads
+
+class Dashboard {
+  +displayProjects()
+  +showStatistics()
+  +generateReport()
+}
+
+class AuthController {
+  +login()
+  +register()
+  +logout()
+  +me()
+}
+
+class ProjectController {
+  +index()
+  +store()
+  +update()
+  +destroy()
+}
+
+Dashboard --> Project : aggregates
+Dashboard --> Task : aggregates
+AuthController --> User : manages
+ProjectController --> Project : manages
+@enduml
