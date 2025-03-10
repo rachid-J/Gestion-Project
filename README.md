@@ -21,7 +21,7 @@ A modern project management dashboard with a clean UI, built using React and Tai
 - User Settings & Profile Management
 - Search Functionality
 - Notifications System
-- Role-based Access Control
+
 
 ## Tech Stack 🛠️
 
