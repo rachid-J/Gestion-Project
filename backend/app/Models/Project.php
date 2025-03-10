@@ -12,11 +12,16 @@ class Project extends Model
         'start_date',
         'end_date',
         'status',
+        'created_by',
     ];
 
+    protected $casts = [
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+    ];
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, "created_by");
     }
 
     public function tasks()
