@@ -6,7 +6,7 @@
 [![GitHub Forks](https://img.shields.io/github/forks/rachid-J/Gestion-Project)](https://github.com/rachid-J/Gestion-Project/network/members)
 [![GitHub Issues](https://img.shields.io/github/issues/rachid-J/Gestion-Project)](https://github.com/rachid-J/Gestion-Project/issues)
 
-![ProjectHub Screenshot](./screenshot.png)
+
 
 A modern project management dashboard with a clean UI, built using React and Tailwind CSS. Manage tasks, projects, and teams with an intuitive interface.
 
