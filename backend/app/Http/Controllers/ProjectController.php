@@ -15,7 +15,7 @@ class ProjectController extends Controller
             if(!$user){
                 return response()->json(["error" => "User not found"],404);
             }
-            $projects = Project::where("user_id", $user->id)->get();
+            $projects = Project::where("created_by", $user->id)->get();
             return response()->json(["projects" => $projects]);
         }catch(Exception $e){
             return response()->json(["error" => $e->getMessage()],500);
@@ -28,22 +28,25 @@ class ProjectController extends Controller
                 return response()->json(["error" => "User not found"],404);
             }
             $validatedData = $request->validate([
-                "user_id" => "required|exists:users,id",
+                "created_by" => "required|exists:users,id",
                 "name" => "required|string",
                 "description" => "required|string",
                 "start_date" => "required|date",
                 "end_date" => "required|date",
-                "status" => "required|in:pending,in progress,completed",
+                "status" => "required|in:pending,in_progress,completed",
             ]);
             $project = Project::create([
-                "user_id" => $user->id,
+                "created_by" => $user->id,
                 "name" => $validatedData["name"],
                 "description" => $validatedData["description"],
                 "start_date" => $validatedData["start_date"],
                 "end_date" => $validatedData["end_date"],
                 "status" => $validatedData["status"],
             ]);
-            return response()->json(["project" => $project]);
+            return response()->json([
+                "message" => "Project created",
+                "project" => $project
+            ]);
         }catch(Exception $e){
             return response()->json(["error" =>  $e->getMessage()],500);
         }
@@ -59,7 +62,7 @@ class ProjectController extends Controller
             if(!$project){
                 return response()->json(["error" => "Project not found"],404);
             }
-            if($project->user_id != $user->id){
+            if($project->created_by != $user->id){
                 return response()->json(["error" => "Unauthorized"],401);	
             }
             $validatedData = $request->validate([
@@ -67,7 +70,7 @@ class ProjectController extends Controller
                 "description" => "required|string",
                 "start_date" => "required|date",
                 "end_date" => "required|date",
-                "status" => "required|in:pending, in progress, completed",
+                "status" => "required|in:pending,in_progress,completed",
             ]);
             $project->name = $validatedData["name"];
             $project->description = $validatedData["description"];
@@ -75,7 +78,10 @@ class ProjectController extends Controller
             $project->end_date = $validatedData["end_date"];
             $project->status = $validatedData["status"];
             $project->save();
-            return response()->json(["project" => $project]);
+            return response()->json([
+                "message" => "Project updated",
+                "project" => $project
+            ]);
         }catch(Exception $e){
             return response()->json(["error" => $e->getMessage()],500);
         }	
@@ -91,7 +97,7 @@ class ProjectController extends Controller
             if(!$project){
                 return response()->json(["error" => "Project not found"],404);
             }
-            if($project->user_id != $user->id){
+            if($project->created_by != $user->id){
                 return response()->json(["error" => "Unauthorized"],401);
             }
             $project->delete();
