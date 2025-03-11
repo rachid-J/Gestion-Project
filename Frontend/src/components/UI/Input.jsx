@@ -1,8 +1,8 @@
-import React from "react";
+
 export const Input = ({
   type,
   name,
-  placholder,
+  placeholder,
   value,
   width,
   onChange,
@@ -18,14 +18,14 @@ export const Input = ({
     <input
       type={type}
       name={name}
-      placeholder={placholder}
+      placeholder={placeholder}
       value={value}
       readOnly={readOnly}
       onChange={onChange}
       required={required}
       maxLength={maxLength}
       checked={checked}
-      className={"w-full p-2 mb-4 border rounded-lg"}
+      className={"w-full p-2 mb-4 border border-gray-400 rounded-md"}
     />
   );
 };

@@ -1,11 +1,12 @@
 import { CircularProgress } from "@mui/material";
-import React from "react";
+
+
 export const Button = ({ type, loading, onClick, text, bg, color, width }) => {
   return (
     <button
       type={type}
       onClick={onClick}
-      className={`${color ? color : "text-white"} ${bg ? bg : "bg-blue-600"} ${
+      className={`${color ? color : "text-white"} ${bg ? bg : "bg-blue-900"} ${
         width ? `w-[${width}]` : "w-[100%]"
       } px-3 cursor-pointer ${
         loading ? "cursor-no-drop" : null

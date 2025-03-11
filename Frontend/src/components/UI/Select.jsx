@@ -1,4 +1,4 @@
-import React from "react";
+
 
 export const Select = ({name,options,title,value,onchange,width,ky,valueToSelect,bg,border}) => {
   
