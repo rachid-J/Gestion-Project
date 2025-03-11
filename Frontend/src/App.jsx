@@ -1,13 +1,10 @@
-import { BrowserRouter, Route , Routes } from "react-router-dom"
-import Auth from "./Pages/Auth"
+
+
+import { Router } from "./router/Routes"
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route index element={<Auth />}></Route>
-      </Routes>
-    </BrowserRouter>
+    Router()
   )
 }
 
