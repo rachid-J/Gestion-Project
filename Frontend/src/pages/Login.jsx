@@ -1,20 +1,31 @@
 import React, { useState } from 'react'
 import { Input } from '../components/UI/Input';
 import { Button } from '../components/UI/Button';
+import { login } from '../services/authServices';
+import {useNavigate} from "react-router-dom";
 
 export const Login = ({ onSwitch }) =>  {
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("")
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // Add your login logic here
-    console.log('Login data:', formData);
-    setTimeout(() => setLoading(false), 1000);
+    setError("")
+    try{
+      const response = await login(formData)
+      console.log(response.data)
+      localStorage.setItem("token",response.data.token)
+      navigate("/")
+    }catch(err){
+      setLoading(false)
+      setError(err.response?.data?.message || "Login failed. Please try again.");
+    }
   };
 
   const handleChange = (e) => {
