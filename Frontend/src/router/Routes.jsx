@@ -11,7 +11,8 @@ import { Reports } from '../pages/Reports';
 import { NotFound } from '../pages/NotFound';
 import { useSelector } from "react-redux";
 import { Auth } from "../pages/Auth";
-import { Default } from "../components/layouts/Default";
+import { Default } from "../pages/Default";
+
 
 export const Router = () => {
     const token = useSelector((state) => state.auth.token);
