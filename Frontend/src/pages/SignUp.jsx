@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { Input } from '../components/UI/Input';
 import { Button } from '../components/UI/Button';
 import { register } from '../services/authServices';
+import {useNavigate} from "react-router-dom";
 import { Notification } from '../Components/layouts/Notification';
+import { useDispatch } from 'react-redux';
+import { setAuth } from '../Redux/features/AuthSlice';
 export const  SignUp = ({ onSwitch }) => {
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState(null);
   const [formData, setFormData] = useState({
@@ -15,6 +19,7 @@ export const  SignUp = ({ onSwitch }) => {
     accountType: '',
     avatar: null
   });
+  const disp = useDispatch()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +28,8 @@ export const  SignUp = ({ onSwitch }) => {
     try{
       const response = await register(formData);
       console.log(response.data)
-      setNotification({type:"success",message:response.data.message});
+      disp(setAuth(response.data))
+      navigate("/redirect");
     }catch(err){
       console.error("Register failed. Please try again.",err)
       setLoading(false)

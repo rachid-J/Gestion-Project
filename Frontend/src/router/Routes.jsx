@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Dashboard } from '../pages/Dashboard';
 import { Project } from '../pages/Project';
 import { Team } from '../pages/Team';
@@ -14,25 +14,35 @@ import { Auth } from "../pages/Auth";
 import { Default } from "../pages/Default";
 import { DefaultSkeleton } from "../components/Skeleton/DefaultSkeleton";
 import { useEffect, useState } from "react";
-
+import Redirect from "../pages/Redirect";
 
 export const Router = () => {
     const token = useSelector((state) => state.auth.token);
-    const [isloading,setIsloding] = useState(false)
-    useEffect(()=>{
-        const fetch =()=>{
-            if(token){
-                setIsloding(true)
-            }
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+       
+        if (token) {
+           
+            const timer = setTimeout(() => {
+                setIsLoading(false);
+            }, 1000); // adjust timeout as needed
+            return () => clearTimeout(timer);
+        } else {
+            
+            setIsLoading(false);
         }
-        fetch()
-    },[token])
-    if(isloading){
-        return <DefaultSkeleton/>;  
+    }, [token]);
+
+    if (isLoading) {
+        return <DefaultSkeleton />;
     }
+
     const guestRoutes = [
-        { index : true, element: <Auth /> },
+        { index: true, element: <Auth /> },
         { path: "*", element: <NotFound /> },
+        { path: "/redirect", element: <Redirect /> },
+
     ];
 
     const authenticatedRoutes = [
@@ -60,7 +70,6 @@ export const Router = () => {
     ];
 
     const routes = token ? authenticatedRoutes : guestRoutes;
-
     const router = createBrowserRouter(routes);
 
     return <RouterProvider router={router} />;

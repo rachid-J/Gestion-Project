@@ -48,4 +48,28 @@ class AuthController extends Controller
             'token' => $token,
         ], 201);
     }
+
+    public function verifyToken(Request $request)
+    {
+        try {
+            
+            $user = JWTAuth::user();
+
+            if (!$user) {
+                return response()->json(['message' => 'User not found'], 404);
+            }
+        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+            return response()->json(['message' => 'Token expired'], 401);
+        } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+            return response()->json(['message' => 'Token invalid'], 401);
+        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+            return response()->json(['message' => 'Token not provided'], 401);
+        }
+
+        // If token is valid, return a success response along with user data
+        return response()->json([
+            'message' => 'Token is valid',
+            'user'    => $user
+        ], 200);
+    }
 }

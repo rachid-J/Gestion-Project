@@ -3,6 +3,8 @@ import { Input } from '../components/UI/Input';
 import { Button } from '../components/UI/Button';
 import { login } from '../services/authServices';
 import {useNavigate} from "react-router-dom";
+import { useDispatch } from 'react-redux';
+import { setAuth } from '../Redux/features/AuthSlice';
 
 export const Login = ({ onSwitch }) =>  {
   const navigate = useNavigate()
@@ -12,19 +14,21 @@ export const Login = ({ onSwitch }) =>  {
     email: '',
     password: ''
   });
-
+  const disp = useDispatch()
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("")
-    try{
-      const response = await login(formData)
-      console.log(response.data)
-      localStorage.setItem("token",response.data.token)
-      navigate("/")
-    }catch(err){
-      setLoading(false)
-      setError(err.response?.data?.message || "Login failed. Please try again.");
+    setError("");
+    try {
+      const response = await login(formData);
+      console.log(response.data);
+      disp(setAuth(response.data));
+      navigate("/redirect");
+    } catch (err) {
+      setLoading(false);
+      setError(
+        err.response?.data?.message || "Login failed. Please try again."
+      );
     }
   };
 
