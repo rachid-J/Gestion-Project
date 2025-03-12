@@ -59,7 +59,7 @@ export const Router = () => {
         { path: "*", element: <NotFound /> },
     ];
 
-    const routes = !token ? authenticatedRoutes : guestRoutes;
+    const routes = token ? authenticatedRoutes : guestRoutes;
 
     const router = createBrowserRouter(routes);
 
