@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import { Dashboard } from '../pages/Dashboard';
 import { Project } from '../pages/Project';
 import { Team } from '../pages/Team';
@@ -12,11 +12,24 @@ import { NotFound } from '../pages/NotFound';
 import { useSelector } from "react-redux";
 import { Auth } from "../pages/Auth";
 import { Default } from "../pages/Default";
+import { DefaultSkeleton } from "../components/Skeleton/DefaultSkeleton";
+import { useEffect, useState } from "react";
 
 
 export const Router = () => {
     const token = useSelector((state) => state.auth.token);
-
+    const [isloading,setIsloding] = useState(false)
+    useEffect(()=>{
+        const fetch =()=>{
+            if(token){
+                setIsloding(true)
+            }
+        }
+        fetch()
+    },[token])
+    if(isloading){
+        return <DefaultSkeleton/>;  
+    }
     const guestRoutes = [
         { path: "/auth", element: <Auth /> },
         { path: "*", element: <NotFound /> },
