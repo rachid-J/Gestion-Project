@@ -9,16 +9,31 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ProjectController extends Controller
 {
-    public function get(){
-        try{
-            $user = JWTAuth::parseToken()->authenticate();	
-            if(!$user){
-                return response()->json(["error" => "User not found"],404);
+    public function get() {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+            
+            if (!$user) {
+                return response()->json(["error" => "User not found"], 404);
             }
-            $projects = Project::where("created_by", $user->id)->get();
-            return response()->json(["projects" => $projects]);
-        }catch(Exception $e){
-            return response()->json(["error" => $e->getMessage()],500);
+    
+      
+            $createdProjects = Project::where("created_by", $user->id)
+                ->selectRaw('projects.*, "creator" as role');
+    
+      
+            $collaboratingProjects = $user->projects()
+                ->selectRaw('projects.*, project_user.role as role');
+    
+            // Combine results using SQL UNION
+            $allProjects = $createdProjects->union($collaboratingProjects)->get();
+    
+            return response()->json(["projects" => $allProjects]);
+    
+        } catch (Exception $e) {
+            return response()->json([
+                "error" => $e->getMessage()
+            ], 500);
         }
     }
     public function create(Request $request){
