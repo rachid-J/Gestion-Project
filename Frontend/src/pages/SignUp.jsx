@@ -1,25 +1,40 @@
 import React, { useState } from 'react';
 import { Input } from '../components/UI/Input';
 import { Button } from '../components/UI/Button';
-
+import { register } from '../services/authServices';
+import {useNavigate} from "react-router-dom";
+import { Notification } from '../Components/layouts/Notification';
+import { useDispatch } from 'react-redux';
+import { setAuth } from '../Redux/features/AuthSlice';
 export const  SignUp = ({ onSwitch }) => {
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false);
+  const [notification, setNotification] = useState(null);
   const [formData, setFormData] = useState({
-    fullName: '',
+    name: '',
     email: '',
     username: '',
     password: '',
-    confirmPassword: '',
+    password_confirmation: '',
     accountType: '',
     avatar: null
   });
+  const disp = useDispatch()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // Add your registration logic here
-    console.log('Registration data:', formData);
-    setTimeout(() => setLoading(false), 1000);
+    setNotification("")
+    try{
+      const response = await register(formData);
+      console.log(response.data)
+      disp(setAuth(response.data))
+      navigate("/redirect");
+    }catch(err){
+      console.error("Register failed. Please try again.",err)
+      setLoading(false)
+      setNotification({type:"error",message:"Register failed. Please try again."});
+    }
   };
 
   const handleChange = (e) => {
@@ -43,9 +58,9 @@ export const  SignUp = ({ onSwitch }) => {
           <Input
             type="text"
             id="fullName"
-            name="fullName"
+            name="name"
             placeholder="John Doe"
-            value={formData.fullName}
+            value={formData.name}
             onChange={handleChange}
             required
           />
@@ -103,9 +118,9 @@ export const  SignUp = ({ onSwitch }) => {
           <Input
             type="password"
             id="confirmPassword"
-            name="confirmPassword"
+            name="password_confirmation"
             placeholder="••••••••"
-            value={formData.confirmPassword}
+            value={formData.password_confirmation}
             onChange={handleChange}
             required
           />
@@ -132,6 +147,7 @@ export const  SignUp = ({ onSwitch }) => {
           Login
         </button>
       </p>
+      {notification && <Notification type={notification.type} message={notification.message} />}
     </div>
   );
 }

@@ -22,9 +22,7 @@ export const Login = ({ onSwitch }) =>  {
     try {
       const response = await login(formData);
       console.log(response.data);
-      // Dispatch the auth token and any other data to Redux
       disp(setAuth(response.data));
-      // Redirect to a protected route (e.g., dashboard)
       navigate("/redirect");
     } catch (err) {
       setLoading(false);
