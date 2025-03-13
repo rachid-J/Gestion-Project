@@ -35,9 +35,8 @@ class ProjectInvitationNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $acceptUrl = route('invitations.accept', [
-            'token' => $this->invitation->token
-        ]);
+        $frontendUrl = config('app.frontend_url').'/accept-invitation';
+        $acceptUrl = "{$frontendUrl}?token={$this->invitation->token}";
 
         return (new MailMessage)
             ->subject('You\'ve Been Invited to Join a Project')
