@@ -9,12 +9,12 @@ export const Notification = ({ message, type }) => {
 
     const interval = setInterval(() => {
       setProgress((prev) => Math.max(prev - 1, 0));
-    }, 30); // Decrease progress every 30ms for smooth animation
+    }, 30); 
 
     const timeout = setTimeout(() => {
       setOpen(false);
       clearInterval(interval);
-    }, 3000); // Close notification after 3 seconds
+    }, 3000); 
 
     return () => {
       clearInterval(interval);
