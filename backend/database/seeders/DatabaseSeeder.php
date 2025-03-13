@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Project;
+use App\Models\Task;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,13 +16,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $users = User::factory()->count(5)->create();
-
-        // Create projects for each user
-        $users->each(function ($user) {
-            Project::factory()
-                ->count(2)
-                ->create(['created_by' => $user->id]);
-        });
+        User::factory(20)->create();
+        Project::factory(20)->create();
+        Task::factory(20)->create();
     }
 }
