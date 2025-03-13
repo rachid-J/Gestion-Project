@@ -12,7 +12,7 @@ import {
   ChartPieIcon
 } from '@heroicons/react/24/outline';
 
-export const Sidebar = () => {
+export const Sidebar = ({user}) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const menuItems = [
@@ -81,11 +81,11 @@ export const Sidebar = () => {
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 
                 flex items-center justify-center text-white font-medium shadow-sm">
-                JD
+               {user.name.slice(0,2).toUpperCase()}
               </div>
               <div>
-                <p className="font-medium text-gray-900">John Doe</p>
-                <p className="text-sm text-gray-500">Project Manager</p>
+                <p className="font-medium text-gray-900">{user.name}</p>
+                <p className="text-sm text-gray-500">{user.email}</p>
               </div>
             </div>
           </div>

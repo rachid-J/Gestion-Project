@@ -9,37 +9,45 @@ import { Security } from '../pages/Security';
 import { Calendar } from '../pages/Calendar';
 import { Reports } from '../pages/Reports';
 import { NotFound } from '../pages/NotFound';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Auth } from "../pages/Auth";
 import { Default } from "../pages/Default";
 import { DefaultSkeleton } from "../components/Skeleton/DefaultSkeleton";
 import { useEffect, useState } from "react";
 import Redirect from "../pages/Redirect";
+import { setUser } from "../Redux/features/AuthSlice";
+import { user } from "../services/authServices";
 
 export const Router = () => {
     const token = useSelector((state) => state.auth.token);
     const [isLoading, setIsLoading] = useState(true);
+    const dispatch = useDispatch()
 
     useEffect(() => {
-       
-        if (token) {
-           
-            const timer = setTimeout(() => {
+        const fetchUser = async () => {
+            try {
+               const response = await user(token)
+                dispatch(setUser(response.data)); 
+            } catch (error) {
+                console.error("Error fetching user:", error);
+            } finally {
                 setIsLoading(false);
-            }, 1000); // adjust timeout as needed
-            return () => clearTimeout(timer);
+            }
+        };
+
+        if (token) {
+            fetchUser();
         } else {
-            
             setIsLoading(false);
         }
-    }, [token]);
+    }, [token, dispatch]);
 
     if (isLoading) {
         return <DefaultSkeleton />;
     }
 
     const guestRoutes = [
-        { index: true, element: <Auth /> },
+        { path: "/auth", element: <Auth /> },
         { path: "*", element: <NotFound /> },
         { path: "/redirect", element: <Redirect /> },
 
@@ -67,6 +75,7 @@ export const Router = () => {
             ]
         },
         { path: "*", element: <NotFound /> },
+        { path: "/redirect", element: <Redirect /> },
     ];
 
     const routes = token ? authenticatedRoutes : guestRoutes;

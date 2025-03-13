@@ -9,6 +9,8 @@ const Redirect = () => {
   useEffect(() => {
     if (token) {
       navigate("/");
+    }else{
+      navigate("/auth")
     }
   }, [token, navigate]);
 

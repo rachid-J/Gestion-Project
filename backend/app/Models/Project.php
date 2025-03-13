@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 
 class Project extends Model
 {
+    use HasFactory, Notifiable;
     protected $fillable = [
         'name',
         'description',
@@ -19,10 +22,15 @@ class Project extends Model
         'start_date' => 'datetime',
         'end_date' => 'datetime',
     ];
-    public function user()
-    {
-        return $this->belongsTo(User::class, "created_by");
+   
+    public function users() {
+        return $this->belongsToMany(User::class)->withPivot('role');
     }
+    
+    public function invitations() {
+        return $this->hasMany(Invitation::class);
+    }
+    
 
     public function tasks()
     {

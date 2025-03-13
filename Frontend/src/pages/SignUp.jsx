@@ -16,7 +16,6 @@ export const  SignUp = ({ onSwitch }) => {
     username: '',
     password: '',
     password_confirmation: '',
-    accountType: '',
     avatar: null
   });
   const disp = useDispatch()

@@ -11,14 +11,33 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline';
 import { PlusIcon, ChevronDownIcon } from '@heroicons/react/20/solid';
+import { logOut } from '../../Redux/features/AuthSlice';
 
-export const Header = ({ onCreateNew }) => {
+import { useNavigate } from 'react-router-dom';
+
+export const Header = ({ user ,disp}) => {
   const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const createRef = useRef(null);
   const profileRef = useRef(null);
   const searchRef = useRef(null);
+  
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const navigate = useNavigate();
+
+
+  const handleLogout = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      disp(logOut());
+      setIsLoading(false);
+      navigate('/redirect');
+    }, 1000);
+  };
+
+ 
 
 
   return (
@@ -92,7 +111,7 @@ export const Header = ({ onCreateNew }) => {
                   <span>New Project</span>
                 </button>
                 <button
-                  onClick={onCreateNew}
+                  // onClick={onCreateNew}
                   className="flex items-center w-full px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors gap-2"
                 >
                   <ClipboardDocumentIcon className="h-5 w-5 text-gray-600" />
@@ -125,10 +144,10 @@ export const Header = ({ onCreateNew }) => {
           <div className="flex items-center gap-1 md:gap-3">
             <div className="h-9 w-9 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 text-white 
               flex items-center justify-center font-medium shadow-sm transition-transform hover:scale-105">
-              JD
+              {user.name.slice(0,2).toUpperCase()}
             </div>
             <span className="hidden md:inline text-gray-700 font-medium group-hover:text-gray-900 transition-colors">
-              John Doe
+              {user.name}
             </span>
             <ChevronDownIcon className="hidden md:inline h-4 w-4 text-gray-500 ml-1" />
           </div>
@@ -152,7 +171,7 @@ export const Header = ({ onCreateNew }) => {
                 <span>Settings</span>
               </button>
               <button
-                onClick={() => { /* Add logout handler */ }}
+                onClick={() => { handleLogout()}}
                 className="flex items-center w-full px-3 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors gap-2"
               >
                 <ArrowLeftOnRectangleIcon className="h-5 w-5 text-red-600" />
