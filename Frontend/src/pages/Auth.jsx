@@ -14,7 +14,7 @@ const FeatureItem = ({ icon, title, description }) => (
   </div>
 );
 
-const Auth = () => {
+export const Auth = () => {
   const [activeTab, setActiveTab] = useState("login");
 
   const features = [
@@ -156,4 +156,3 @@ const Auth = () => {
   );
 };
 
-export default Auth;

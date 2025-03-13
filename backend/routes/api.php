@@ -1,15 +1,19 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProjectInviteController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
 
-Route::post("/login" ,[AuthController::class ,"login"]);
+Route::prefix("auth")->group(function(){
+    Route::post("/login" ,[AuthController::class ,"login"]);
+    Route::post("/register" ,[AuthController::class ,"register"]);
+    Route::get("/me" ,[AuthController::class ,"me"]);
+});
 
-Route::post("/register" ,[AuthController::class ,"register"]);
-
-
+Route::post('/projects/{project}/invite', [ProjectInviteController::class, 'invite']);
+Route::post('/invitations/accept', [ProjectInviteController::class, 'accept']);
 
 Route::prefix('project')->group(function(){
     Route::get('/getProjects', [ProjectController::class, 'get']);
