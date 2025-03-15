@@ -144,7 +144,7 @@ export const Header = ({ user ,disp}) => {
           <div className="flex items-center gap-1 md:gap-3">
             <div className="h-9 w-9 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 text-white 
               flex items-center justify-center font-medium shadow-sm transition-transform hover:scale-105">
-              {user.name.slice(0,2).toUpperCase()}
+              {user.name?.slice(0,2).toUpperCase()}
             </div>
             <span className="hidden md:inline text-gray-700 font-medium group-hover:text-gray-900 transition-colors">
               {user.name}

@@ -19,6 +19,7 @@
     "@tailwindcss/vite": "^4.0.12",
     "axios": "^1.8.3",
     "express": "^4.21.2",
+    "lucide-react": "^0.482.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",

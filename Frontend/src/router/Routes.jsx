@@ -68,12 +68,13 @@ export const Router = () => {
                     path: "setting",
                     element: <Setting />,
                     children: [
-                        { path: "profile", element: <Profile /> },
                         { path: "security", element: <Security /> }
                     ]
                 },
+                
             ]
         },
+        { path: "profile", element: <Profile /> },
         { path: "*", element: <NotFound /> },
         { path: "/redirect", element: <Redirect /> },
     ];

@@ -81,7 +81,7 @@ export const Sidebar = ({user}) => {
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 
                 flex items-center justify-center text-white font-medium shadow-sm">
-               {user.name.slice(0,2).toUpperCase()}
+               {user.name?.slice(0,2).toUpperCase()}
               </div>
               <div>
                 <p className="font-medium text-gray-900">{user.name}</p>
