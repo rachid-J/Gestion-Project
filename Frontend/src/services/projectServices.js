@@ -10,8 +10,8 @@ export const searchProjectbyName = async (name,page)=>{
     return response;
 }
 
-export const filterProjectsByStatus = async (status)=>{
-    const response = await axiosClient.get(`/project/filterProjectsByStatus/${status}`);
+export const filterProjectsByStatus = async (status,page=1)=>{
+    const response = await axiosClient.get(`/project/filterProjectsByStatus/${status}?page=${page}`);
     return response;
 }
 

@@ -27,7 +27,7 @@ class ProjectController extends Controller
                 ->selectRaw('projects.*, project_user.role as role');
     
             // Combine results using SQL UNION
-            $allProjects = $createdProjects->union($collaboratingProjects)->paginate(1);
+            $allProjects = $createdProjects->union($collaboratingProjects)->paginate(5);
     
             return response()->json(["projects" => $allProjects],200);
     
@@ -49,7 +49,7 @@ class ProjectController extends Controller
             $projects = Project::where('name', 'LIKE', "%$name%")
                 ->with(["users", "creator:id,email,name"])
                 ->where('created_by', $user->id)
-                ->paginate(1);
+                ->paginate(5);
 
             return response()->json([
                 "projects" => $projects
@@ -73,7 +73,7 @@ class ProjectController extends Controller
                 ->where("status",$status)
                 ->with(["users", "creator:id,email,name"])
                 ->latest()
-                ->get();
+                ->paginate(5);
             if(!$projects){
                 return response()->json([
                     "message" => "Not Found"

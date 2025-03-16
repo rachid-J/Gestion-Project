@@ -15,8 +15,14 @@ import { Default } from "../pages/Default";
 import { DefaultSkeleton } from "../components/Skeleton/DefaultSkeleton";
 import { useEffect, useState } from "react";
 import Redirect from "../pages/Redirect";
-import { setUser } from "../Redux/features/AuthSlice";
+
 import { user } from "../services/authServices";
+import { setUser } from "../Redux/features/authSlice";
+import { ProjectLayouts } from "../components/layouts/ProjectLayouts";
+import { Summary } from "../pages/Summary";
+import { Board } from "../pages/Board";
+import { List } from "../pages/List";
+
 
 export const Router = () => {
     const token = useSelector((state) => state.auth.token);
@@ -26,8 +32,8 @@ export const Router = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-               const response = await user(token)
-                dispatch(setUser(response.data)); 
+                const response = await user(token)
+                dispatch(setUser(response.data));
             } catch (error) {
                 console.error("Error fetching user:", error);
             } finally {
@@ -60,20 +66,21 @@ export const Router = () => {
             children: [
                 { path: "dashboard", element: <Dashboard /> },
                 { path: "task", element: <Task /> },
-                { path: "project", element: <Project /> },
-                { path: "calendar", element: <Calendar /> },
-                { path: "reports", element: <Reports /> },
+                { path: "projects", element: <Project /> },
                 { path: "team", element: <Team /> },
-                {
-                    path: "setting",
-                    element: <Setting />,
-                    children: [
-                        { path: "profile", element: <Profile /> },
-                        { path: "security", element: <Security /> }
-                    ]
-                },
             ]
         },
+        {
+            path: "projects/:id",
+            element: <ProjectLayouts />,
+            children: [
+                { path: "Summary", element: <Summary /> },
+                { path: "board", element: <Board /> },
+                { path: "List", element: <List /> },
+                { path: "reports", element: <Reports /> },
+            ]
+        },
+
         { path: "*", element: <NotFound /> },
         { path: "/redirect", element: <Redirect /> },
     ];
