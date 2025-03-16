@@ -1,18 +1,18 @@
 
 
-export const Select = ({name,options,title,value,onchange,width,ky,valueToSelect,bg,border}) => {
+export const Select = ({name,options,title,value,onChange,width,ky,valueToSelect,bg,border}) => {
   
-  return (<select className={`border ${border ? border : 'border-black'} px-3 py-1 rounded-sm ${bg ? bg : 'bg-gray-20'} ${width?`w-[${width}]`:'50%'}`}
+  return (<select className={`border ${border ? border : 'border-gray-700'} p-2 rounded-sm ${bg ? bg : 'bg-white-800'} ${width?`w-[${width}]`:'50%'}`}
     name={name}            
-    onChange={onchange}
+    onChange={onChange}
                 value={value}>
-                <option>{title}</option>
+                <option className="text-black-500 font-semibold bg-gray-20">{title}</option>
                 {
                     options ?
-                        options.map((option) =>{
-                            return <option value={valueToSelect ? option[valueToSelect] : option} className='text-lg'>
+                        options.map((option ,index) =>{
+                            return <option key={index} value={valueToSelect ? option[valueToSelect] : option} className='text-lg'>
                               {
-                                ky ? option[ky] : option
+                                ky ? option[ky] : option.label || option
                               }
                             </option>
                         })

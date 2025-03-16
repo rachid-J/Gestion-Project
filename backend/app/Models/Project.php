@@ -26,6 +26,9 @@ class Project extends Model
     public function users() {
         return $this->belongsToMany(User::class)->withPivot('role');
     }
+    public function creator() {
+        return $this->belongsTo(User::class, 'created_by')->select(["id",'email', 'name']);
+    }
     
     public function invitations() {
         return $this->hasMany(Invitation::class);

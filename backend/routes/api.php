@@ -16,6 +16,8 @@ Route::post('/invitations/accept', [ProjectInviteController::class, 'accept']);
 
 Route::prefix('project')->group(function(){
     Route::get('/getProjects', [ProjectController::class, 'get']);
+    Route::get("/searchProjectbyName/{name}",[ProjectController::class, 'searchProjectbyName']);
+    Route::get("/filterProjectsByStatus/{status}",[ProjectController::class, 'filterProjectsByStatus']);
     Route::post('/createProject', [ProjectController::class, 'create']);
     Route::put('/updateProject/{id}', [ProjectController::class, 'update']);
     Route::delete('/deleteProject/{id}', [ProjectController::class, 'delete']);

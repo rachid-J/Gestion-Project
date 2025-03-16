@@ -19,6 +19,7 @@ class ProjectController extends Controller
     
       
             $createdProjects = Project::where("created_by", $user->id)
+                ->with(["users", "creator:id,email,name"])
                 ->selectRaw('projects.*, "creator" as role');
     
       
@@ -26,9 +27,9 @@ class ProjectController extends Controller
                 ->selectRaw('projects.*, project_user.role as role');
     
             // Combine results using SQL UNION
-            $allProjects = $createdProjects->union($collaboratingProjects)->get();
+            $allProjects = $createdProjects->union($collaboratingProjects)->paginate(1);
     
-            return response()->json(["projects" => $allProjects]);
+            return response()->json(["projects" => $allProjects],200);
     
         } catch (Exception $e) {
             return response()->json([
@@ -36,6 +37,58 @@ class ProjectController extends Controller
             ], 500);
         }
     }
+
+    public function searchProjectbyName($name)
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+            if (!$user) {
+                return response()->json(["error" => "User not found"], 404);
+            }
+
+            $projects = Project::where('name', 'LIKE', "%$name%")
+                ->with(["users", "creator:id,email,name"])
+                ->where('created_by', $user->id)
+                ->paginate(1);
+
+            return response()->json([
+                "projects" => $projects
+            ], 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                "message" => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function filterProjectsByStatus($status){
+        try{
+            $user = JWTAuth::parseToken()->authenticate();
+            if (!$user) {
+                return response()->json(["error" => "User not found"], 404);
+            }
+
+            $projects = Project::where("created_by",$user->id)
+                ->where("status",$status)
+                ->with(["users", "creator:id,email,name"])
+                ->latest()
+                ->get();
+            if(!$projects){
+                return response()->json([
+                    "message" => "Not Found"
+                ],404);
+            }
+            return response()->json([
+                "projects" => $projects
+            ],200);
+        }catch(Exception $e){
+            return response()->json([
+                "message" => $e->getMessage()
+            ],500);
+        }
+    } 
+
     public function create(Request $request){
         try{
             $user = JWTAuth::parseToken()->authenticate();	
