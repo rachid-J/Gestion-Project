@@ -10,13 +10,16 @@ class Invitation extends Model
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['project_id', 'sender_id', 'email', 'token', 'status'];
+    protected $fillable = ['project_id', 'sender_id', 'email','receiver_id', 'token', 'status'];
 
-    public function project() {
-        return $this->belongsTo(Project::class);
+  
+    public function sender()
+    {
+        return $this->belongsTo(User::class, 'sender_id');
     }
     
-    public function sender() {
-        return $this->belongsTo(User::class, 'sender_id');
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
     }
 }

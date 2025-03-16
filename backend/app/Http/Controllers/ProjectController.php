@@ -25,7 +25,7 @@ class ProjectController extends Controller
             $collaboratingProjects = $user->projects()
                 ->selectRaw('projects.*, project_user.role as role');
     
-            // Combine results using SQL UNION
+    
             $allProjects = $createdProjects->union($collaboratingProjects)->get();
     
             return response()->json(["projects" => $allProjects]);

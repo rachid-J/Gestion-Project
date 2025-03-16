@@ -8,30 +8,42 @@ use App\Models\User;
 use App\Notifications\ProjectInvitationNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ProjectInviteController extends Controller
 {
+    public function index() {
+        $user = JWTAuth::user();
+    
+
+        return Invitation::with(['sender', 'project'])
+        ->where('sender_id', $user->id) 
+        ->orWhere('email', $user->email) 
+        ->paginate(10);
+    
+        
+    }
     public function invite(Project $project, Request $request) {
         $request->validate(['email' => 'required|email']);
     
-        // Check if user is already a collaborator
+      
         if ($project->users()->where('email', $request->email)->exists()) {
             return response()->json(['error' => 'User is already a collaborator.'], 400);
         }
     
-        // Check for existing invitation
+     
         if ($project->invitations()->where('email', $request->email)->exists()) {
             return response()->json(['error' => 'Invitation already sent.'], 400);
         }
     
-        // Create invitation
+
         $invitation = $project->invitations()->create([
             'sender_id' => auth('api')->id(),
             'email' => $request->email,
             'token' => Str::random(32),
         ]);
     
-        // Send email notification
+
         $invitation->notify(new ProjectInvitationNotification($invitation));
     
         return response()->json(['message' => 'Invitation sent.']);
@@ -44,12 +56,12 @@ class ProjectInviteController extends Controller
     
   
     
-        // Ensure logged-in user matches the invitation email
+    
         if ($invitation->email !== auth("api")->user()->email) {
             return response()->json(['error' => 'You are not the intended recipient'], 403);
         }
     
-        // Add user to project
+     
         $invitation->project->users()->attach(auth("api")->id(), ['role' => 'member']);
         $invitation->update(['status' => 'accepted']);
     

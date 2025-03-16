@@ -13,6 +13,7 @@ Route::prefix("auth")->group(function(){
 
 Route::post('/projects/{project}/invite', [ProjectInviteController::class, 'invite']);
 Route::post('/invitations/accept', [ProjectInviteController::class, 'accept']);
+Route::get('/invitations', [ProjectInviteController::class, 'index']);
 
 Route::prefix('project')->group(function(){
     Route::get('/getProjects', [ProjectController::class, 'get']);

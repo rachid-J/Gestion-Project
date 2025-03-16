@@ -70,7 +70,6 @@ class AuthController extends Controller
             return response()->json(['message' => 'Token not provided'], 401);
         }
 
-        // If token is valid, return a success response along with user data
         return response()->json([
             'message' => 'Token is valid',
             'user'    => $user
