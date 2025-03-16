@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProjectInviteController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\TaskController;
 
 Route::prefix("auth")->group(function(){
     Route::post("/login" ,[AuthController::class ,"login"]);
@@ -22,4 +23,12 @@ Route::prefix('project')->group(function(){
     Route::put('/updateProject/{id}', [ProjectController::class, 'update']);
     Route::delete('/deleteProject/{id}', [ProjectController::class, 'delete']);
 });
+
+Route::prefix('task')->group(function(){
+    Route::get('/getTasks',[TaskController::class,'getTasks']);
+    Route::post('/createTask/{id}',[TaskController::class,'create']);
+    Route::delete('/deleteTask/{id}',[TaskController::class,'deleteTask']);
+    Route::put('/updateTask/projects/{projectId}/tasks/{taskId}',[TaskController::class,'updateTask']);
+});
+
 

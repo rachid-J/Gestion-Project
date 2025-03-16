@@ -96,7 +96,6 @@ class ProjectController extends Controller
                 return response()->json(["error" => "User not found"],404);
             }
             $validatedData = $request->validate([
-                "created_by" => "required|exists:users,id",
                 "name" => "required|string",
                 "description" => "required|string",
                 "start_date" => "required|date",
