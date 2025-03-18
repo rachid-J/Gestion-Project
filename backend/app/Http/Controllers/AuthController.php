@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+
+use App\Models\UsersInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Tymon\JWTAuth\Contracts\Providers\JWT;
+
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
@@ -43,8 +45,12 @@ class AuthController extends Controller
             'username' => $validated['username'],
             'password' => Hash::make($validated['password']),
         ]);
+        UsersInfo::create([
+            'user_id' => $user->id,
+        ]);
 
         $token = JWTAuth::fromUser($user);
+        $user->load('usersInfo');
 
         return response()->json([
             'message' => 'User registered successfully',
@@ -56,8 +62,9 @@ class AuthController extends Controller
     public function verifyToken(Request $request)
     {
         try {
-            
-            $user = JWTAuth::user();
+
+            $user = JWTAuth::parseToken()->authenticate();
+
 
             if (!$user) {
                 return response()->json(['message' => 'User not found'], 404);
@@ -72,30 +79,33 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Token is valid',
-            'user'    => $user
+            'user' => $user,
         ], 200);
     }
 
     public function me()
-{
-    try {
-        $user = JWTAuth::parseToken()->authenticate();
-
-        if (!$user) {
-            return response()->json(["error" => "Unauthenticated"], 401);
+    {
+        try {
+            $user = JWTAuth::user();
+            
+            if (!$user) {
+                return response()->json(["error" => "Unauthenticated"], 401);
+            }
+            $user->load('usersInfo');
+            return response([
+                "user" => $user,
+               
+            ]);
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => "Token has expired"], 401);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => "Invalid token"], 401);
+        } catch (JWTException $e) {
+            return response()->json(["error" => "Token is missing"], 401);
+        } catch (\Exception $e) {
+            return response()->json(["error" => "Something went wrong"], 500);
         }
-
-        return response(["user" => $user]);
-    } catch (TokenExpiredException $e) {
-        return response()->json(["error" => "Token has expired"], 401);
-    } catch (TokenInvalidException $e) {
-        return response()->json(["error" => "Invalid token"], 401);
-    } catch (JWTException $e) {
-        return response()->json(["error" => "Token is missing"], 401);
-    } catch (\Exception $e) {
-        return response()->json(["error" => "Something went wrong"], 500);
     }
-}
 
     public function logout()
     {

@@ -23,7 +23,7 @@ export const CreatorHoverModal = ({ creator }) => {
           <h3 className="text-gray-900 font-semibold text-base">
             {creator.creator?.name || "Unknown User"}
           </h3>
-          <p className="text-gray-500 text-sm">{creator?.role || "Creator"}</p>
+          <p className="text-gray-500 text-sm">{creator?.creator.role || "Creator"}</p>
         </div>
       </div>
 
