@@ -1,188 +1,359 @@
-import { useState, useRef} from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
-  BellIcon, 
-  MagnifyingGlassIcon,
-  FolderPlusIcon,
-  ClipboardDocumentIcon,
+  ChevronDownIcon,
+  FolderIcon,
+  PlusCircleIcon,
+  UserPlusIcon,
   UserGroupIcon,
+  ChartBarIcon,
   UserCircleIcon,
   Cog6ToothIcon,
+  UserIcon,
   ArrowLeftOnRectangleIcon,
+  BellIcon,
+  CheckCircleIcon,
+  EnvelopeIcon,
+  UserPlusIcon as UserPlusSolid,
   XMarkIcon
 } from '@heroicons/react/24/outline';
-import { PlusIcon, ChevronDownIcon } from '@heroicons/react/20/solid';
-import { logOut } from '../../Redux/features/AuthSlice';
-
 import { useNavigate } from 'react-router-dom';
+import InviteModal from './InviteModal';
+import { ContactInvite } from '../../services/ContactService';
+import { logOut } from '../../Redux/features/authSlice';
+import { useDispatch } from 'react-redux';
+import { CreateProjectModal } from './CreateProjectModal';
+import { AcceptInvite, GetNotification, markRead } from '../../services/NotificationService';
+import { Logout } from '../../services/authServices';
 
-export const Header = ({ user ,disp}) => {
-  const [isCreateDropdownOpen, setIsCreateDropdownOpen] = useState(false);
-  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const [isSearchVisible, setIsSearchVisible] = useState(false);
-  const createRef = useRef(null);
+export const Header = ({ user }) => {
+  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const workRef = useRef(null);
+  const projectsRef = useRef(null);
+  const teamsRef = useRef(null);
   const profileRef = useRef(null);
-  const searchRef = useRef(null);
-  
-  const [isLoading, setIsLoading] = useState(false);
-  
+  const notificationsRef = useRef(null);
+  const disp = useDispatch();
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
 
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await GetNotification();
+        setNotifications(response.data.notifications);
+      } catch (err) {
+        console.error('Error fetching notifications:', err);
+      }
+    };
+    
+    const interval = setInterval(fetchNotifications, 30000); // Refresh every 30 seconds
+    fetchNotifications();
+    return () => clearInterval(interval);
+  }, []);
 
-  const handleLogout = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      disp(logOut());
-      setIsLoading(false);
-      navigate('/redirect');
-    }, 1000);
+  const handleDropdownToggle = (dropdownName) => {
+    setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
   };
 
- 
+  const handleLogout = async () => {
+    const response = await Logout()
+    if(response.status === 200){
+      disp(logOut());
+      navigate('/redirect');
+    }
+    
+  };
 
+  const handleMarkAsRead = async (ids, types) => {
+    try {
+      await markRead(ids, types);
+      setNotifications(prev => 
+        prev.map(n => 
+          ids.includes(n.id) ? { ...n, read: true } : n
+        )
+      );
+    } catch (err) {
+      console.error('Error marking as read:', err);
+    }
+  };
+
+  const markAsRead = (id, type) => {
+    handleMarkAsRead([id], [type]);
+  };
+
+  const markAllAsRead = () => {
+    const unread = notifications.filter(n => !n.read);
+    handleMarkAsRead(
+      unread.map(n => n.id),
+      unread.map(n => n.type)
+    );
+  };
+
+  const handleAcceptInvitation = async (token, type) => {
+    try {
+      await AcceptInvite(token, type);
+      setNotifications(prev => prev.filter(n => n.token !== token));
+      setSuccess(`${type === 'project' ? 'Project' : 'Contact'} invitation accepted!`);
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to accept invitation');
+      setTimeout(() => setError(''), 5000);
+    }
+  };
+
+  const handleInvite = async (email) => {
+    try {
+      await ContactInvite(email);
+      setSuccess('Contact invitation sent!');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to send invitation');
+      setTimeout(() => setError(''), 5000);
+    }
+  };
+
+  const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <header className="fixed top-0 right-0 left-0 md:left-64 h-16 bg-white/80 backdrop-blur-md border-b border-gray-100 
-      flex items-center justify-between px-4 md:px-6 z-30 gap-2 md:gap-6">
-      {/* Mobile Search Bar */}
-      <div className={`md:hidden absolute top-16 left-0 right-0 bg-white p-4 shadow-lg ${isSearchVisible ? 'block' : 'hidden'}`} ref={searchRef}>
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search projects, tasks..."
-            className="w-full pl-10 pr-6 py-2 rounded-lg bg-gray-50 border border-gray-200
-              focus:bg-white focus:border-gray-300 focus:ring-2 focus:ring-blue-500/30
-              placeholder:text-gray-400 text-gray-600 transition-all duration-300"
-          />
-          <XMarkIcon 
-            className="h-5 w-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer" 
-            onClick={() => setIsSearchVisible(false)}
-          />
-        </div>
-      </div>
+    <>
+      <CreateProjectModal
+        isOpen={isModalCreateOpen}
+        onClose={() => setIsModalCreateOpen(false)}
+        onCreate={(projectData) => {
+          // Handle project creation here
+          console.log("Creating project:", projectData);
+        }}
+      />
+      <header className="fixed top-0 right-0 left-0 h-16 bg-white/90 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-4 md:px-6 z-50 gap-4">
+        {/* Left Section */}
+        <div className="flex items-center gap-6">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            ProjectHub
+          </h1>
+          
+          {/* Projects Dropdown */}
+          <div className="relative" ref={projectsRef}>
+            <button
+              onClick={() => handleDropdownToggle('projects')}
+              className="flex items-center text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md transition-colors"
+            >
+              Projects
+              <ChevronDownIcon className="h-4 w-4 ml-1" />
+            </button>
 
-      {/* Left Section (Mobile Menu and Search) */}
-      <div className="flex items-center ml-10 gap-2 md:hidden">
-        <button
-          className="p-2  hover:bg-gray-100 rounded-lg"
-          onClick={() => setIsSearchVisible(true)}
-        >
-          <MagnifyingGlassIcon className="h-6 w-6  text-gray-600" />
-        </button>
-      </div>
-
-      {/* Desktop Search Bar */}
-      <div className="hidden md:flex flex-1">
-        <div className="relative w-full max-w-4xl">
-          <MagnifyingGlassIcon className="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search tasks, projects..."
-            className="w-full pl-12 pr-6 py-2.5 rounded-xl bg-gray-50/70 border border-gray-200
-              focus:bg-white focus:border-gray-300 focus:ring-2 focus:ring-blue-500/30
-              placeholder:text-gray-400 text-gray-600 transition-all duration-300"
-          />
-        </div>
-      </div>
-
-      {/* Right Section */}
-      <div className="flex items-center gap-2 md:gap-5 ml-auto">
-        {/* Create New Button */}
-        <div className="relative" ref={createRef}>
-          <button
-            onClick={() => setIsCreateDropdownOpen(!isCreateDropdownOpen)}
-            className="flex items-center bg-gradient-to-r from-blue-600 to-blue-500 text-white
-              px-3 md:px-5 py-2 md:py-2.5 rounded-lg md:rounded-xl hover:from-blue-700 hover:to-blue-600 transition-all
-              shadow-lg shadow-blue-500/20 hover:shadow-blue-600/20 active:scale-[0.98]"
-          >
-            <PlusIcon className="h-5 w-5" />
-            <span className="hidden md:inline font-medium ml-2.5">Create New</span>
-            <ChevronDownIcon className="hidden md:inline h-4 w-4 ml-1.5" />
-          </button>
-
-          {/* Create Dropdown */}
-          {isCreateDropdownOpen && (
-            <div className="absolute right-0 md:right-auto top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100">
-              <div className="p-2 space-y-1">
-                <button
-                  onClick={() => { /* Add new project handler */ }}
-                  className="flex items-center w-full px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors gap-2"
-                >
-                  <FolderPlusIcon className="h-5 w-5 text-gray-600" />
-                  <span>New Project</span>
-                </button>
-                <button
-                  // onClick={onCreateNew}
-                  className="flex items-center w-full px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors gap-2"
-                >
-                  <ClipboardDocumentIcon className="h-5 w-5 text-gray-600" />
-                  <span>New Task</span>
-                </button>
-                <button
-                  onClick={() => { /* Add new team handler */ }}
-                  className="flex items-center w-full px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors gap-2"
-                >
-                  <UserGroupIcon className="h-5 w-5 text-gray-600" />
-                  <span>New Team</span>
-                </button>
+            {activeDropdown === 'projects' && (
+              <div className="absolute left-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100">
+                <div className="p-2 space-y-1">
+                  <button 
+                    onClick={() => navigate('/projects')}
+                    className="w-full px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
+                  >
+                    <FolderIcon className="h-4 w-4" />
+                    All Projects
+                  </button>
+                  <button 
+                    onClick={() => setIsModalCreateOpen(true)}
+                    className="w-full px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
+                  >
+                    <PlusCircleIcon className="h-4 w-4" />
+                    New Project
+                  </button>
+                </div>
               </div>
+            )}
+          </div>
+
+          {/* Teams Dropdown */}
+          <div className="relative" ref={teamsRef}>
+            <button
+              onClick={() => handleDropdownToggle('teams')}
+              className="flex items-center text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md transition-colors"
+            >
+              Network
+              <ChevronDownIcon className="h-4 w-4 ml-1" />
+            </button>
+
+            {activeDropdown === 'teams' && (
+              <div className="absolute left-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100">
+                <div className="p-2 space-y-1">
+                  <button 
+                    onClick={() => navigate("/contact")}
+                    className="w-full px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
+                  >
+                    <UserGroupIcon className="h-4 w-4" />
+                    My Contacts
+                  </button>
+                  <button 
+                    onClick={() => setShowModal(true)}
+                    className="w-full px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
+                  >
+                    <UserPlusIcon className="h-4 w-4" />
+                    Invite People
+                  </button>
+                </div>
               </div>
-          )}
+            )}
+          </div>
         </div>
 
-        {/* Notification Bell */}
-        <button className="p-2 hover:bg-gray-100 rounded-lg md:rounded-xl relative transition-colors">
-          <BellIcon className="h-6 w-6 text-gray-600" />
-          <span className="absolute top-1.5 right-1 md:right-2.5 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-white" />
-        </button>
+        {/* Right Section */}
+        <div className="flex items-center gap-4 ml-auto">
+          {/* Notifications Dropdown */}
+          <div className="relative" ref={notificationsRef}>
+            <button
+              onClick={() => handleDropdownToggle('notifications')}
+              className="p-2 hover:bg-gray-100 rounded-full relative"
+            >
+              <BellIcon className="h-6 w-6 text-gray-600" />
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 h-2.5 w-2.5 bg-blue-500 rounded-full border-2 border-white"></span>
+              )}
+            </button>
 
-        {/* Profile Section */}
-        <div 
-          className="relative cursor-pointer"
-          ref={profileRef}
-          onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-        >
-          <div className="flex items-center gap-1 md:gap-3">
-            <div className="h-9 w-9 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 text-white 
-              flex items-center justify-center font-medium shadow-sm transition-transform hover:scale-105">
-              {user.name.slice(0,2).toUpperCase()}
-            </div>
-            <span className="hidden md:inline text-gray-700 font-medium group-hover:text-gray-900 transition-colors">
-              {user.name}
-            </span>
-            <ChevronDownIcon className="hidden md:inline h-4 w-4 text-gray-500 ml-1" />
+            {activeDropdown === 'notifications' && (
+              <div className="absolute right-0 top-full mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-100">
+                <div className="p-4 border-b border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-semibold text-gray-900">Notifications</h3>
+                    <button
+                      onClick={markAllAsRead}
+                      className="text-sm text-blue-600 hover:text-blue-700"
+                    >
+                      Mark all as read
+                    </button>
+                  </div>
+                </div>
+                <div className="max-h-96 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <div className="p-4 text-center text-gray-500">
+                      No new notifications
+                    </div>
+                  ) : (
+                    notifications.map(notification => (
+                      <div
+                        key={`${notification.type}-${notification.id}`}
+                        className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${
+                          !notification.read ? 'bg-blue-50' : ''
+                        }`}
+                        onClick={() => !notification.read && markAsRead(notification.id, notification.type)}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0 pt-1">
+                            {notification.type === 'project' ? (
+                              <FolderIcon className="h-5 w-5 text-purple-600" />
+                            ) : notification.type === 'contact' ? (
+                              <UserPlusSolid className="h-5 w-5 text-blue-600" />
+                            ) : (
+                              <XMarkIcon className="h-5 w-5 text-red-600" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm text-gray-900">
+                              {notification.type === 'declined' ? 
+                                `Invitation declined: ${notification.details}` : 
+                                notification.message}
+                            </p>
+                            <div className="flex items-center justify-between mt-2">
+                              <p className="text-xs text-gray-500">{notification.timestamp}</p>
+                              {!notification.read && notification.type !== 'declined' && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAcceptInvitation(notification.token, notification.type);
+                                  }}
+                                  className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs"
+                                >
+                                  Accept
+                                </button>
+                              )}
+                              {notification.type === 'declined' && (
+                                <span className="text-red-600 text-xs font-medium">Declined</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Profile Dropdown */}
-          {isProfileDropdownOpen && (
-            <div className="absolute right-0 md:left-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100">
-            <div className="p-2 space-y-1">
-              <button
-                onClick={() => { /* Add profile handler */ }}
-                className="flex items-center w-full px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors gap-2"
-              >
-                <UserCircleIcon className="h-5 w-5 text-gray-600" />
-                <span>Profile</span>
-              </button>
-              <button
-                onClick={() => { /* Add settings handler */ }}
-                className="flex items-center w-full px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors gap-2"
-              >
-                <Cog6ToothIcon className="h-5 w-5 text-gray-600" />
-                <span>Settings</span>
-              </button>
-              <button
-                onClick={() => { handleLogout()}}
-                className="flex items-center w-full px-3 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors gap-2"
-              >
-                <ArrowLeftOnRectangleIcon className="h-5 w-5 text-red-600" />
-                <span>Log out</span>
-              </button>
+          <div className="relative cursor-pointer" ref={profileRef}>
+            <div 
+              className="flex items-center gap-2"
+              onClick={() => handleDropdownToggle('profile')}
+            >
+              <div className="h-9 w-9 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 text-white flex items-center justify-center font-medium shadow-sm">
+                {user.name?.slice(0,2).toUpperCase()}
+              </div>
             </div>
+
+            {activeDropdown === 'profile' && (
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100">
+                <div className="p-2 space-y-1">
+                  <button 
+                    onClick={() => navigate('/profile')}
+                    className="w-full px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
+                  >
+                    <UserCircleIcon className="h-4 w-4" />
+                    Profile
+                  </button>
+                  <button 
+                    onClick={() => navigate('/settings')}
+                    className="w-full px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
+                  >
+                    <Cog6ToothIcon className="h-4 w-4" />
+                    Settings
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full px-3 py-2 text-left text-red-600 hover:bg-red-50 rounded-md flex items-center gap-2"
+                  >
+                    <ArrowLeftOnRectangleIcon className="h-4 w-4" />
+                    Log out
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        )}
-      </div>
-      </div>
-    </header>
+        </div>
+      </header>
+
+      {/* Status Messages */}
+      {(error || success) && (
+        <div className="fixed top-16 right-4 z-50">
+          {error && (
+            <div className="p-4 mb-2 bg-red-50/90 backdrop-blur-sm rounded-xl border border-red-100 flex items-center gap-3 text-red-700 animate-fade-in">
+              <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
+              </svg>
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="p-4 bg-green-50/90 backdrop-blur-sm rounded-xl border border-green-100 flex items-center gap-3 text-green-700 animate-fade-in">
+              <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+              </svg>
+              {success}
+            </div>
+          )}
+        </div>
+      )}
+
+      <InviteModal 
+        show={showModal}
+        handleClose={() => setShowModal(false)}
+        handleInvite={handleInvite}
+      />
+    </>
   );
 };
-

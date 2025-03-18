@@ -1,5 +1,6 @@
 
 export const Input = ({
+  className,
   type,
   name,
   placeholder,
@@ -25,7 +26,8 @@ export const Input = ({
       required={required}
       maxLength={maxLength}
       checked={checked}
-      className={"w-full p-2 mb-4 border border-gray-400 rounded-md"}
+      className={`w-full p-2 border border-gray-400 rounded-md ${className}`}
     />
+    
   );
 };

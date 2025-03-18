@@ -39,20 +39,16 @@ class User extends Authenticatable implements JWTSubject
     public function collaboratingProjects()
     {
         return $this->belongsToMany(Project::class, 'project_user', 'user_id', 'project_id')
-            ->withPivot('role');
-    }
-    public function sentInvitations()
-    {
-        return $this->hasMany(Invitation::class, 'sender_id');
+            ->withPivot('role'); // Include role if needed
     }
 
-
+    // Combine both relationships
     public function allProjects()
     {
-        $created = $this->createdProjects()->selectRaw('projects.*, "creator" as role')->getQuery();
-        $collaborating = $this->collaboratingProjects()->selectRaw('projects.*, project_user.role as role')->getQuery();
+        $created = $this->createdProjects()->selectRaw('projects.*, "creator" as role');
+        $collaborating = $this->collaboratingProjects()->selectRaw('projects.*, project_user.role as role');
 
-        return $this->newQuery()->fromSub($created->union($collaborating), 'projects')->latest();
+        return $created->union($collaborating)->latest();
     }
     public function tasks()
     {
@@ -72,6 +68,18 @@ class User extends Authenticatable implements JWTSubject
     public function notifications()
     {
         return $this->hasMany(Notification::class);
+    }
+
+    public function contacts()
+    {
+        return $this->belongsToMany(User::class, 'user_contacts', 'user_id', 'contact_id')
+            ->withPivot('status')
+            ->withTimestamps();
+    }
+
+    public function acceptedContacts()
+    {
+        return $this->contacts()->wherePivot('status', 'accepted');
     }
 
     /**

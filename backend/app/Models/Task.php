@@ -10,12 +10,12 @@ class Task extends Model
 {
     use HasFactory, Notifiable;
     protected $fillable = [
-        'name',
         'title',
         'description',
         'status',
         'priority',
         'due_date',
+        'project_id'
     ];
 
     public function project()

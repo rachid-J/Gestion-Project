@@ -5,11 +5,12 @@ import { login } from '../services/authServices';
 import {useNavigate} from "react-router-dom";
 import { useDispatch } from 'react-redux';
 import { setAuth } from '../Redux/features/AuthSlice';
+import { Notification } from '../Components/layouts/Notification';
 
 export const Login = ({ onSwitch }) =>  {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("")
+  const [notification, setNotification] = useState(null);
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -18,17 +19,16 @@ export const Login = ({ onSwitch }) =>  {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    setNotification("");
     try {
       const response = await login(formData);
       console.log(response.data);
       disp(setAuth(response.data));
       navigate("/redirect");
     } catch (err) {
+      console.error("login failed. Please try again.",err)
       setLoading(false);
-      setError(
-        err.response?.data?.message || "Login failed. Please try again."
-      );
+      setNotification({type:"error",message:"login failed. Please try again."});
     }
   };
 
@@ -91,6 +91,7 @@ export const Login = ({ onSwitch }) =>  {
           Register
         </button>
       </p>
+      {notification && <Notification type={notification.type} message={notification.message} />}
     </div>
   );
 }

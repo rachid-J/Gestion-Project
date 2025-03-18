@@ -23,15 +23,21 @@ class Project extends Model
         'end_date' => 'datetime',
     ];
    
-    public function users() {
-        return $this->belongsToMany(User::class)->withPivot('role');
+    public function users()
+    {
+        return $this->belongsToMany(User::class)
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+    public function creator() {
+        return $this->belongsTo(User::class, 'created_by')->select(["id",'email', 'name']);
     }
     
     public function invitations() {
         return $this->hasMany(Invitation::class);
     }
     
-
+  
     public function tasks()
     {
         return $this->hasMany(Task::class);
