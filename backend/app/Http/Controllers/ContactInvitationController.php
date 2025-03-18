@@ -62,33 +62,45 @@ class ContactInvitationController extends Controller
 
         return response()->json(['message' => 'Contact added successfully.']);
     }
-    public function receivedInvitations()
-    {
-        $user = auth("api")->user();
+    public function receivedInvitations(Request $request)
+{
+    $user = auth("api")->user();
+    $perPage = $request->input('per_page', 5);
 
-        $invitations = ContactInvitations::with('sender')
-            ->where('recipient_email', $user->email)
-            ->where('status', 'pending')
-            ->orderBy('created_at', 'desc')
-            ->get();
+    $invitations = ContactInvitations::with('sender')
+        ->where('recipient_email', $user->email)
+        ->where('status', 'pending')
+        ->when($request->search, function($query) use ($request) {
+            $query->whereHas('sender', function($q) use ($request) {
+                $q->where('name', 'like', '%'.$request->search.'%')
+                  ->orWhere('email', 'like', '%'.$request->search.'%');
+            });
+        })
+        ->orderBy('created_at', 'desc')
+        ->paginate($perPage);
 
-        return response()->json($invitations);
-    }
-    public function sentInvitations()
-    {
-        $user = auth("api")->user();
+    return response()->json($invitations);
+}
+public function sentInvitations(Request $request)
+{
+    $user = auth("api")->user();
+    $perPage = $request->input('per_page', 5);
 
-        $invitations = ContactInvitations::with([
-            'recipient' => function ($query) {
-                $query->select('id', 'name', 'email');
-            }
-        ])
-            ->where('sender_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+    $invitations = ContactInvitations::with(['recipient' => function ($query) {
+            $query->select('id', 'name', 'email');
+        }])
+        ->where('sender_id', $user->id)
+        ->when($request->search, function($query) use ($request) {
+            $query->where('recipient_email', 'like', '%'.$request->search.'%')
+                  ->orWhereHas('recipient', function($q) use ($request) {
+                      $q->where('name', 'like', '%'.$request->search.'%');
+                  });
+        })
+        ->orderBy('created_at', 'desc')
+        ->paginate($perPage);
 
-        return response()->json($invitations);
-    }
+    return response()->json($invitations);
+}
  
     public function verifyInvitation(Request $request)
     {

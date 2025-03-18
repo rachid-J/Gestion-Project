@@ -2,45 +2,105 @@ import { useState, useEffect } from 'react';
 import { 
   MagnifyingGlassIcon,
   CheckCircleIcon,
-  UserPlusIcon,
   UserIcon,
-  XMarkIcon
+  XMarkIcon,
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { 
   ContactReceived, 
   ContactSent, 
   getContact, 
   ContactAccept,
-
 } from '../services/ContactService';
 
 export const ContactsPage = () => {
   const [tabValue, setTabValue] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
-  const [contacts, setContacts] = useState([]);
-  const [receivedInvites, setReceivedInvites] = useState([]);
-  const [sentInvites, setSentInvites] = useState([]);
+  const [contacts, setContacts] = useState({ data: [], current_page: 1, last_page: 1 });
+  const [receivedInvites, setReceivedInvites] = useState({ data: [], current_page: 1, last_page: 1 });
+  const [sentInvites, setSentInvites] = useState({ data: [], current_page: 1, last_page: 1 });
   const [processingId, setProcessingId] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Fetch all endpoints concurrently on mount or when the search query changes
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAllData = async () => {
+      setLoading(true);
       try {
         const [contactsRes, receivedRes, sentRes] = await Promise.all([
-          getContact(),
-          ContactReceived(),
-          ContactSent()
+          getContact(1, searchQuery),
+          ContactReceived(1, searchQuery),
+          ContactSent(1, searchQuery)
         ]);
         setContacts(contactsRes.data);
         setReceivedInvites(receivedRes.data);
         setSentInvites(sentRes.data);
       } catch (error) {
         console.error('Error fetching data:', error);
+        setError('Failed to load data');
+      } finally {
+        setLoading(false);
       }
     };
-    
-    fetchData();
-  }, []);
+
+    fetchAllData();
+  }, [searchQuery]);
+
+  // Function to load more for the current active tab
+  const loadData = async (tab, page = 1, search = '') => {
+    setLoading(true);
+    try {
+      let response;
+      switch (tab) {
+        case 0:
+          response = await getContact(page, search);
+          setContacts(prev => ({
+            ...response.data,
+            data: page === 1 ? response.data.data : [...prev.data, ...response.data.data]
+          }));
+          break;
+        case 1:
+          response = await ContactReceived(page, search);
+          setReceivedInvites(prev => ({
+            ...response.data,
+            data: page === 1 ? response.data.data : [...prev.data, ...response.data.data]
+          }));
+          break;
+        case 2:
+          response = await ContactSent(page, search);
+          setSentInvites(prev => ({
+            ...response.data,
+            data: page === 1 ? response.data.data : [...prev.data, ...response.data.data]
+          }));
+          break;
+        default:
+          break;
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setError('Failed to load data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLoadMore = () => {
+    const currentTab = tabValue;
+    const currentPage = 
+      currentTab === 0 ? contacts.current_page :
+      currentTab === 1 ? receivedInvites.current_page :
+      sentInvites.current_page;
+    const nextPage = currentPage + 1;
+
+    if (currentTab === 0 && contacts.current_page < contacts.last_page) {
+      loadData(0, nextPage, searchQuery);
+    } else if (currentTab === 1 && receivedInvites.current_page < receivedInvites.last_page) {
+      loadData(1, nextPage, searchQuery);
+    } else if (currentTab === 2 && sentInvites.current_page < sentInvites.last_page) {
+      loadData(2, nextPage, searchQuery);
+    }
+  };
 
   const handleAcceptInvitation = async (inviteId, token) => {
     setProcessingId(inviteId);
@@ -48,9 +108,12 @@ export const ContactsPage = () => {
     
     try {
       await ContactAccept(token);
-      // Update state after successful acceptance
-      setReceivedInvites(prev => prev.filter(invite => invite.id !== inviteId));
-      // Optionally refresh contacts list
+      // Remove the accepted invitation from the receivedInvites state
+      setReceivedInvites(prev => ({
+        ...prev,
+        data: prev.data.filter(invite => invite.id !== inviteId)
+      }));
+      // Optionally, refresh the contacts list
       const contactsRes = await getContact();
       setContacts(contactsRes.data);
     } catch (err) {
@@ -59,25 +122,6 @@ export const ContactsPage = () => {
       setProcessingId(null);
     }
   };
-
-  // const handleDeclineInvitation = async (inviteId) => {
-  //   setProcessingId(inviteId);
-  //   setError(null);
-    
-  //   try {
-  //     await ContactDecline(inviteId);
-  //     setReceivedInvites(prev => prev.filter(invite => invite.id !== inviteId));
-  //   } catch (err) {
-  //     setError(err.response?.data?.message || 'Failed to decline invitation');
-  //   } finally {
-  //     setProcessingId(null);
-  //   }
-  // };
-
-  const filteredContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
     <div className="p-6 max-w-6xl mx-auto bg-gray-50 min-h-screen">
@@ -90,8 +134,7 @@ export const ContactsPage = () => {
           <input
             type="text"
             placeholder="Search contacts..."
-            className="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-full md:w-80 
-                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -109,7 +152,7 @@ export const ContactsPage = () => {
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            Contacts ({contacts.length})
+            Contacts ({contacts.data.length})
           </button>
           <button
             onClick={() => setTabValue(1)}
@@ -119,7 +162,7 @@ export const ContactsPage = () => {
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            Pending Requests ({receivedInvites.length})
+            Pending Requests ({receivedInvites.data.length})
           </button>
           <button
             onClick={() => setTabValue(2)}
@@ -129,7 +172,7 @@ export const ContactsPage = () => {
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            Sent Invitations ({sentInvites.length})
+            Sent Invitations ({sentInvites.data.length})
           </button>
         </div>
       </div>
@@ -143,9 +186,8 @@ export const ContactsPage = () => {
       {/* Contacts Tab */}
       {tabValue === 0 && (
         <div className="space-y-2">
-          {filteredContacts.map(contact => (
-            <div key={contact.id} className="flex items-center justify-between p-4 bg-white rounded-md 
-              border border-gray-200 hover:border-blue-200 hover:shadow-sm transition-all">
+          {contacts.data.map(contact => (
+            <div key={contact.id} className="flex items-center justify-between p-4 bg-white rounded-md border border-gray-200 hover:border-blue-200 hover:shadow-sm transition-all">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
                   {contact.avatar ? (
@@ -165,15 +207,27 @@ export const ContactsPage = () => {
               </span>
             </div>
           ))}
+          {contacts.data.length > 0 && contacts.current_page < contacts.last_page && (
+            <button 
+              onClick={handleLoadMore}
+              disabled={loading}
+              className="w-full p-3 flex items-center justify-center gap-2 text-blue-600 hover:bg-blue-50 rounded-md"
+            >
+              {loading ? (
+                <ArrowPathIcon className="w-5 h-5 animate-spin" />
+              ) : (
+                'Load More Contacts'
+              )}
+            </button>
+          )}
         </div>
       )}
 
       {/* Pending Requests Tab */}
       {tabValue === 1 && (
         <div className="space-y-2">
-          {receivedInvites.map(invite => (
-            <div key={invite.id} className="flex items-center justify-between p-4 bg-white rounded-md 
-              border border-gray-200 hover:border-blue-200 hover:shadow-sm transition-all">
+          {receivedInvites.data.map(invite => (
+            <div key={invite.id} className="flex items-center justify-between p-4 bg-white rounded-md border border-gray-200 hover:border-blue-200 hover:shadow-sm transition-all">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
                   {invite.sender.avatar ? (
@@ -215,13 +269,26 @@ export const ContactsPage = () => {
               </div>
             </div>
           ))}
+          {receivedInvites.data.length > 0 && receivedInvites.current_page < receivedInvites.last_page && (
+            <button 
+              onClick={handleLoadMore}
+              disabled={loading}
+              className="w-full p-3 flex items-center justify-center gap-2 text-blue-600 hover:bg-blue-50 rounded-md"
+            >
+              {loading ? (
+                <ArrowPathIcon className="w-5 h-5 animate-spin" />
+              ) : (
+                'Load More Requests'
+              )}
+            </button>
+          )}
         </div>
       )}
 
       {/* Sent Invitations Tab */}
       {tabValue === 2 && (
         <div className="space-y-2">
-          {sentInvites.map(invite => (
+          {sentInvites.data.map(invite => (
             <div key={invite.id} className="p-4 bg-white rounded-md border border-gray-200 hover:shadow-sm">
               <div className="flex justify-between items-center">
                 <div>
@@ -241,6 +308,19 @@ export const ContactsPage = () => {
               </div>
             </div>
           ))}
+          {sentInvites.data.length > 0 && sentInvites.current_page < sentInvites.last_page && (
+            <button 
+              onClick={handleLoadMore}
+              disabled={loading}
+              className="w-full p-3 flex items-center justify-center gap-2 text-blue-600 hover:bg-blue-50 rounded-md"
+            >
+              {loading ? (
+                <ArrowPathIcon className="w-5 h-5 animate-spin" />
+              ) : (
+                'Load More Invitations'
+              )}
+            </button>
+          )}
         </div>
       )}
     </div>

@@ -37,6 +37,7 @@ export const Router = () => {
         const fetchUser = async () => {
             try {
                 const response = await user(token)
+                console.log(response)
                 dispatch(setUser(response.data));
             } catch (error) {
                 console.error("Error fetching user:", error);

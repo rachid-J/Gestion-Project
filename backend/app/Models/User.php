@@ -87,6 +87,12 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var list<string>
      */
+
+     public function usersInfo()
+     {
+         return $this->hasOne(UsersInfo::class);
+     }
+
     protected $hidden = [
         'password'
     ];

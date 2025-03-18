@@ -19,9 +19,10 @@ class Project extends Model
     ];
 
     protected $casts = [
-        'start_date' => 'datetime',
-        'end_date' => 'datetime',
+        'start_date' => 'date:Y-m-d',
+        'end_date' => 'date:Y-m-d',
     ];
+ 
    
     public function users()
     {
@@ -30,7 +31,7 @@ class Project extends Model
             ->withTimestamps();
     }
     public function creator() {
-        return $this->belongsTo(User::class, 'created_by')->select(["id",'email', 'name']);
+        return $this->belongsTo(User::class, 'created_by')->select(["id",'email', 'name','role']);
     }
     
     public function invitations() {

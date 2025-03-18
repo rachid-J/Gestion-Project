@@ -5,6 +5,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ContactInvitationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProjectInviteController;
+use App\Http\Controllers\UserInfoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
@@ -15,6 +16,12 @@ Route::prefix("auth")->group(function(){
     Route::get("/me" ,[AuthController::class ,"me"]);
     Route::post("/logout" ,[AuthController::class ,"logout"]);
 });
+
+Route::prefix('user-info')->group(function () {
+Route::get('/projects', [UserInfoController::class, 'showindex']);
+    Route::put('/', [UserInfoController::class, 'update']);
+});
+
 Route::get('/projects/{project}/users', [ProjectController::class, 'getUsers']);
 Route::get('/project-invitations/verify', [ProjectInviteController::class, 'verify']);
 Route::post('/projects/{project}/invite', [ProjectInviteController::class, 'invite']);
