@@ -11,17 +11,17 @@ import {
   ClipboardDocumentIcon,
   ChartPieIcon
 } from '@heroicons/react/24/outline';
+import { ListBulletIcon, UserGroupIcon } from '@heroicons/react/24/solid';
 
 export const Sidebar = ({user}) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const menuItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: ChartPieIcon },
-    { name: 'My Tasks', path: '/task', icon: ClipboardDocumentIcon },
-    { name: 'Project', path: '/project', icon: FolderIcon },
-    { name: 'Calendar', path: '/calendar', icon: CalendarIcon },
-    { name: 'Reports', path: '/reports', icon: ChartBarIcon },
-    { name: 'Setting', path: '/setting', icon: Cog6ToothIcon },
+    { name: 'Summary', path: 'Summary', icon: ChartPieIcon },
+    { name: 'board', path: 'board', icon: ClipboardDocumentIcon },
+    { name: 'List', path: 'List', icon: ListBulletIcon },
+    { name: 'Collaboration', path: 'Collaboration', icon: UserGroupIcon },
+    { name: 'Setting', path: 'setting', icon: Cog6ToothIcon },
   ];
 
   return (
@@ -37,21 +37,10 @@ export const Sidebar = ({user}) => {
 
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white/95  shadow-lg backdrop-blur-lg transition-transform duration-300
-          border-r border-gray-100 ${isMobileMenuOpen ? 'translate-x-0 shadow-xl' : '-translate-x-full md:translate-x-0'}`}
-      >
+    className={`fixed top-16 left-0 z-40 w-64 h-[calc(100vh-4rem)] bg-white/95 shadow-lg backdrop-blur-lg transition-transform duration-300 border-r border-gray-100 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
+>
         <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between p-4 h-16 border-b border-gray-100">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              ProjectHub
-            </h1>
-            <button
-              className="md:hidden text-gray-500 hover:bg-gray-100 p-1 rounded-full transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <XMarkIcon className="h-6 w-6" />
-            </button>
-          </div>
+          
 
           <nav className="p-4 space-y-2 flex-1">
             {menuItems.map((item) => (

@@ -11,16 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('invitations', function (Blueprint $table) {
+        Schema::create('contact_invitations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('project_id')->constrained();
             $table->foreignId('sender_id')->constrained('users');
-            $table->string('email'); 
+            $table->string('recipient_email');
             $table->string('token')->unique();
             $table->enum('status', ['pending', 'accepted', 'declined'])->default('pending');
             $table->timestamps();
-        
-            $table->index(['sender_id']);
         });
     }
 
@@ -29,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('invitations');
+        Schema::dropIfExists('contact_invitations');
     }
 };

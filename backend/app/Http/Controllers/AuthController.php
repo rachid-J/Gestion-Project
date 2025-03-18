@@ -70,7 +70,6 @@ class AuthController extends Controller
             return response()->json(['message' => 'Token not provided'], 401);
         }
 
-        // If token is valid, return a success response along with user data
         return response()->json([
             'message' => 'Token is valid',
             'user'    => $user
@@ -97,5 +96,15 @@ class AuthController extends Controller
         return response()->json(["error" => "Something went wrong"], 500);
     }
 }
+
+    public function logout()
+    {
+        try {
+            JWTAuth::parseToken()->invalidate();
+            return response()->json(['message' => 'User logged out successfully']);
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'Failed to logout'], 500);
+        }
+    }
 
 }

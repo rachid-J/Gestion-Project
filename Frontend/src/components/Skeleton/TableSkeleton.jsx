@@ -2,37 +2,28 @@ import React from 'react';
 
 export const TableSkeleton = ({ heads }) => {
   return (
-    <div className="w-full  mt-6 rounded overflow-hidden">
-      {/* Table Header Skeleton */}
-      <div className="bg-white text-gray shadow-md">
-        <div className="flex">
-          {heads.map((header, index) => (
-            <div
-              key={index}
-              className=" px-4 py-3 flex-1 text-center font-bold"
-            >
-              {header}
-              
-            </div>
-          ))}
-        </div>
-      </div>
-      
-      {/* Table Body Skeleton */}
-      <div className="animate-pulse space-y-2 p-2">
-        {[...Array(5)].map((_, rowIndex) => (
-          <div key={rowIndex} className="flex ">
-            {heads.map((_, colIndex) => (
-              <div
-                key={colIndex}
-                className="  px-4 py-3 flex-1 text-center"
-              >
-                <div className="h-4 bg-gray-300 rounded w-3/4 mx-auto transition-opacity duration-500 opacity-75"></div>
-              </div>
-            ))}
-          </div>
+    <div className="animate-pulse p-6 space-y-4">
+      {/* Header */}
+      <div className="hidden md:grid grid-cols-4 gap-4 mb-4">
+        {heads.map((_, i) => (
+          <div key={i} className="h-4 bg-gray-200 rounded-full w-1/4" />
         ))}
+        <div className="h-4 bg-gray-200 rounded-full w-1/4" />
       </div>
+
+      {/* Rows */}
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="grid grid-cols-4 gap-4 py-4">
+          {heads.map((_, j) => (
+            <div key={j} className="h-4 bg-gray-100 rounded-full" />
+          ))}
+          <div className="flex space-x-3">
+            <div className="h-6 w-6 bg-gray-100 rounded-full" />
+            <div className="h-6 w-6 bg-gray-100 rounded-full" />
+            <div className="h-6 w-6 bg-gray-100 rounded-full" />
+          </div>
+        </div>
+      ))}
     </div>
   );
 };

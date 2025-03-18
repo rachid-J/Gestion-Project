@@ -29,22 +29,25 @@ class User extends Authenticatable implements JWTSubject
     public function projects()
     {
         return $this->belongsToMany(Project::class, 'project_user', 'user_id', 'project_id')
-            ->withPivot('role'); 
+            ->withPivot('role');
     }
-    public function createdProjects() {
+    public function createdProjects()
+    {
         return $this->hasMany(Project::class, 'created_by');
     }
-    
-    public function collaboratingProjects() {
+
+    public function collaboratingProjects()
+    {
         return $this->belongsToMany(Project::class, 'project_user', 'user_id', 'project_id')
             ->withPivot('role'); // Include role if needed
     }
-    
+
     // Combine both relationships
-    public function allProjects() {
+    public function allProjects()
+    {
         $created = $this->createdProjects()->selectRaw('projects.*, "creator" as role');
         $collaborating = $this->collaboratingProjects()->selectRaw('projects.*, project_user.role as role');
-        
+
         return $created->union($collaborating)->latest();
     }
     public function tasks()
@@ -67,6 +70,18 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Notification::class);
     }
 
+    public function contacts()
+    {
+        return $this->belongsToMany(User::class, 'user_contacts', 'user_id', 'contact_id')
+            ->withPivot('status')
+            ->withTimestamps();
+    }
+
+    public function acceptedContacts()
+    {
+        return $this->contacts()->wherePivot('status', 'accepted');
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -76,7 +91,7 @@ class User extends Authenticatable implements JWTSubject
         'password'
     ];
 
-   
+
 
     public function getJWTIdentifier()
     {

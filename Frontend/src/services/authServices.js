@@ -17,3 +17,7 @@ export const user = async(token)=>{
     });
     return response
 }
+export const Logout = async()=>{
+    const response = await axiosClient.post("/auth/logout");
+    return response
+}
