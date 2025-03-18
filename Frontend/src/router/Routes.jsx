@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import Redirect from "../pages/Redirect";
 
 import { user } from "../services/authServices";
-import { setUser } from "../Redux/features/authSlice";
+
 import { ProjectLayouts } from "../components/layouts/ProjectLayouts";
 import { Summary } from "../pages/Summary";
 import { Board } from "../pages/Board";
@@ -26,6 +26,7 @@ import { ContactsPage } from "../pages/ContactPage";
 
 
 import { Collaboration } from "../pages/Colaboration";
+import { setUser } from "../Redux/features/AuthSlice";
 
 
 export const Router = () => {
