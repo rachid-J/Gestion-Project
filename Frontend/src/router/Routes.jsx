@@ -1,12 +1,11 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import { Dashboard } from '../pages/Dashboard';
 import { Project } from '../pages/Project';
 import { Team } from '../pages/Team';
 import { Task } from '../pages/Task';
 import { Profile } from '../pages/Profile';
-import { Setting } from '../pages/Setting';
-import { Security } from '../pages/Security';
-import { Calendar } from '../pages/Calendar';
+
+
 import { Reports } from '../pages/Reports';
 import { NotFound } from '../pages/NotFound';
 import { useDispatch, useSelector } from "react-redux";
@@ -22,6 +21,11 @@ import { ProjectLayouts } from "../components/layouts/ProjectLayouts";
 import { Summary } from "../pages/Summary";
 import { Board } from "../pages/Board";
 import { List } from "../pages/List";
+
+import { ContactsPage } from "../pages/ContactPage";
+
+
+import { Collaboration } from "../pages/Colaboration";
 
 
 export const Router = () => {
@@ -53,6 +57,10 @@ export const Router = () => {
     }
 
     const guestRoutes = [
+        { 
+            index: true, 
+            element: <Navigate to="/auth" replace /> 
+          },
         { path: "/auth", element: <Auth /> },
         { path: "*", element: <NotFound /> },
         { path: "/redirect", element: <Redirect /> },
@@ -64,22 +72,33 @@ export const Router = () => {
             path: "/",
             element: <Default />,
             children: [
+                { 
+                    index: true, 
+                    element: <Navigate to="/projects" replace /> 
+                  },
                 { path: "dashboard", element: <Dashboard /> },
                 { path: "task", element: <Task /> },
                 { path: "projects", element: <Project /> },
                 { path: "team", element: <Team /> },
+                { path: "profile", element: <Profile /> },
+                { path: "/contact", element: <ContactsPage /> },
+              
+
             ]
         },
         {
-            path: "projects/:id",
+            path: "projects/:projectId",
             element: <ProjectLayouts />,
             children: [
                 { path: "Summary", element: <Summary /> },
                 { path: "board", element: <Board /> },
                 { path: "List", element: <List /> },
                 { path: "reports", element: <Reports /> },
+                { path: "collaboration", element: <Collaboration />,},
+
             ]
         },
+
 
         { path: "*", element: <NotFound /> },
         { path: "/redirect", element: <Redirect /> },

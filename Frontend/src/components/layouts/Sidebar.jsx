@@ -11,7 +11,7 @@ import {
   ClipboardDocumentIcon,
   ChartPieIcon
 } from '@heroicons/react/24/outline';
-import { ListBulletIcon } from '@heroicons/react/24/solid';
+import { ListBulletIcon, UserGroupIcon } from '@heroicons/react/24/solid';
 
 export const Sidebar = ({user}) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -20,7 +20,7 @@ export const Sidebar = ({user}) => {
     { name: 'Summary', path: 'Summary', icon: ChartPieIcon },
     { name: 'board', path: 'board', icon: ClipboardDocumentIcon },
     { name: 'List', path: 'List', icon: ListBulletIcon },
-    { name: 'Reports', path: 'reports', icon: ChartBarIcon },
+    { name: 'Collaboration', path: 'Collaboration', icon: UserGroupIcon },
     { name: 'Setting', path: 'setting', icon: Cog6ToothIcon },
   ];
 

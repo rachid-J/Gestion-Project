@@ -1,16 +1,15 @@
 import { Outlet } from "react-router-dom";
 import { Header } from "../components/layouts/Header";
-import { Sidebar } from "../components/layouts/Sidebar";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 
 export const Default = () => {
   const user = useSelector((state)=> state.auth.user)
-  const disp = useDispatch()
+ 
 
   return (
     <div className="min-h-screen flex">
-        <Header user={user} disp={disp} className="fixed top-0 right-0 z-30" />
+        <Header user={user}  className="fixed top-0 right-0 z-30" />
      
       <main className="flex-1 flex flex-col ">
 

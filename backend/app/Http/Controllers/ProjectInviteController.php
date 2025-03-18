@@ -11,27 +11,32 @@ use Illuminate\Support\Str;
 
 class ProjectInviteController extends Controller
 {
-    public function invite(Project $project, Request $request) {
+    public function invite(Project $project, Request $request)
+    {
         $request->validate(['email' => 'required|email']);
+        $sender = auth("api")->user();
     
-        // Check if user is already a collaborator
+        // Check if the invited user is in the sender's accepted contacts
+        if (!$sender->acceptedContacts()->where('email', $request->email)->exists()) {
+            return response()->json(['error' => 'User must be in your contacts to invite.'], 403);
+        }
+    
+        // Existing checks for collaborators and invitations
         if ($project->users()->where('email', $request->email)->exists()) {
             return response()->json(['error' => 'User is already a collaborator.'], 400);
         }
     
-        // Check for existing invitation
         if ($project->invitations()->where('email', $request->email)->exists()) {
             return response()->json(['error' => 'Invitation already sent.'], 400);
         }
     
-        // Create invitation
+        // Create and send project invitation
         $invitation = $project->invitations()->create([
-            'sender_id' => auth('api')->id(),
+            'sender_id' => $sender->id,
             'email' => $request->email,
             'token' => Str::random(32),
         ]);
     
-        // Send email notification
         $invitation->notify(new ProjectInvitationNotification($invitation));
     
         return response()->json(['message' => 'Invitation sent.']);
@@ -55,4 +60,37 @@ class ProjectInviteController extends Controller
     
         return response()->json(['message' => 'Invitation accepted!']);
     }
+    public function verify(Request $request) {
+        $request->validate(['token' => 'required|string']);
+        $invitation = Invitation::where('token', $request->token)->first();
+    
+        if (!$invitation) {
+            return response()->json(['error' => 'Invalid or expired invitation'], 404);
+        }
+    
+        return response()->json([
+            'sender' => [
+                'name' => $invitation->sender->name,
+                'email' => $invitation->sender->email,
+            ],
+            'project' => [
+                'name' => $invitation->project->name,
+                'id' => $invitation->project->id,
+            ],
+            'status' => $invitation->status
+        ]);
+    }
+
+    public function receivedInvitations()
+{
+    $user = auth("api")->user();
+
+    $invitations = Invitation::where('email', $user->email)
+        ->where('status', 'pending')
+        ->with('project', 'sender') // Load project & sender details
+        ->get();
+
+    return response()->json($invitations);
+}
+    
 }

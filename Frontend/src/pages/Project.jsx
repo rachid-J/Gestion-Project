@@ -9,6 +9,9 @@ import { useDebounce } from "../hooks/useDebounce";
 import { Table } from "../components/tables/Table";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useSelector } from "react-redux";
+import { CreateProjectModal } from "../components/layouts/CreateProjectModal";
+
+
 
 export const Project = () => {
   const user = useSelector(state => state.auth.user);
@@ -24,6 +27,7 @@ export const Project = () => {
     total: 0,
   });
 
+  const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
   
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -103,8 +107,17 @@ export const Project = () => {
   useEffect(() => {
     fetchProjects(debouncedSearchTerm, 1);
   }, [debouncedSearchTerm]);
-
+ 
   return (
+    <>
+        <CreateProjectModal
+  isOpen={isModalCreateOpen}
+  onClose={() => setIsModalCreateOpen(false)}
+  onCreate={(projectData) => {
+    // Handle project creation here
+    console.log("Creating project:", projectData);
+  }}
+/>
     <div className="p-6 bg-white-900 text-black min-h-screen">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-1">Projects</h1>
@@ -132,7 +145,11 @@ export const Project = () => {
           className="w-auto"
         />
 
-        <Button text="+ New Project" width="w-auto" />
+<Button 
+  text="+ New Project" 
+  width="w-auto" 
+  onClick={() => setIsModalCreateOpen(true)}
+/>
       </div>
 
       <div className="mt-4 px-2">
@@ -166,22 +183,25 @@ export const Project = () => {
           />
         ) : (
           !loading && (
-            <div className="mt-10 flex flex-col items-center justify-center border border-white-700 rounded-lg p-6 bg-white-800">
-              <div className="text-5xl">📁</div>
-              <p className="text-lg font-semibold mt-2">No projects found</p>
-              <p className="text-sm text-white-400">
-                {searchTerm
-                  ? "Try different search terms"
-                  : "Create your first project to get started"}
+            <div className="overflow-hidden rounded-xl border mt-3 border-gray-200 bg-white shadow-sm">
+              <div className="p-8 text-center">
+            <div className="mx-auto max-w-md">
+              <div className="mb-4 text-6xl">📭</div>
+              <h3 className="mb-2 text-xl font-semibold text-gray-900">No projects found</h3>
+              <p className="text-gray-500">
+                {searchTerm ? 
+                  "No results for your search criteria" : 
+                  "Get started by creating a new project"}
               </p>
-              <button className="mt-4 px-4 py-2 bg-blue-600 text-black rounded-md hover:bg-blue-700">
-                + Create Project
-              </button>
+            </div>
+          </div>
             </div>
           )
         )}
       </div>
+  
     </div>
+    </>
   );
 };
 
