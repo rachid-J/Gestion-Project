@@ -54,7 +54,8 @@ class UserInfoController extends Controller
                 ->selectRaw('projects.*, project_user.role as role');
 
             // Combine results using SQL UNION
-            $allProjects = $createdProjects->union($collaboratingProjects)->get(3);
+            $allProjects = $createdProjects->union($collaboratingProjects)->take(4) // <-- This limits to 4 results
+            ->get();
 
             return response()->json(["projects" => $allProjects], 200);
 
