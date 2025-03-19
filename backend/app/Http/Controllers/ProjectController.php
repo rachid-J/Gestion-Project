@@ -116,7 +116,7 @@ class ProjectController extends Controller
             return response()->json([
                 "message" => "Project created",
                 "project" => $project
-            ]);
+            ],200);
         } catch (Exception $e) {
             return response()->json(["error" => $e->getMessage()], 500);
         }
@@ -143,16 +143,11 @@ class ProjectController extends Controller
                 "end_date" => "required|date",
                 "status" => "required|in:pending,in_progress,completed",
             ]);
-            $project->name = $validatedData["name"];
-            $project->description = $validatedData["description"];
-            $project->start_date = $validatedData["start_date"];
-            $project->end_date = $validatedData["end_date"];
-            $project->status = $validatedData["status"];
-            $project->save();
+            $project->update($validatedData);
             return response()->json([
                 "message" => "Project updated",
                 "project" => $project
-            ]);
+            ],200);
         } catch (Exception $e) {
             return response()->json(["error" => $e->getMessage()], 500);
         }

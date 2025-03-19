@@ -8,6 +8,7 @@ import {
 import { Pagination } from "../UI/Paginations";
 import { useNavigate } from "react-router-dom";
 import { CreatorHoverModal } from "../layouts/CreatorHoverModal";
+import { Update } from "../modals/Update";
 
 export const Table = ({
   heads,
@@ -138,7 +139,7 @@ export const Table = ({
                 {updateButton && dataVar.creator?.id === currentUserId && (
                   <ButtonSvg
                     svg={<PencilSquareIcon className="w-5 h-5 text-gray-600 hover:text-green-600 transition-colors" />}
-                    onclick={() => setModal({ type: "update", data: dataVar })}
+                    onclick={() => setModal({ type: "update", data: dataVar,toUpdateOrDelete: toUpdateOrDelete })}
                   />
                 )}
                 
@@ -184,6 +185,8 @@ export const Table = ({
           previous={prevData}
         />
       )}
+      {modal && modal.type === "update" && <Update modal={modal} setModal={setModal} />}
+      
     </div>
   );
 };

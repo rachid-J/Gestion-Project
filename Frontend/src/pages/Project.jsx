@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Input } from "../components/UI/Input";
 import { Button } from "../components/UI/Button";
 import { DynamicSelect } from "../components/UI/Select";
-import { filterProjectsByStatus, getProject, searchProjectbyName } from "../services/projectServices";
+import { addProject, filterProjectsByStatus, getProject, searchProjectbyName } from "../services/projectServices";
 import { errors } from "../constants/Errors";
 import { TableSkeleton } from "../components/Skeleton/TableSkeleton";
 import { useDebounce } from "../hooks/useDebounce";
@@ -96,6 +96,33 @@ export const Project = () => {
     }
   };
 
+  const handleCreateProject = async(data) =>{
+    setErrorMessage(null);
+    setLoading(true);
+    try{
+      const response = await addProject(data);
+      console.log(response.data);
+      if(response.status === 200){
+        if(response.data.project){
+          setProjects(((prevProjects) => [...prevProjects, response.data.project]));
+          setErrorMessage("");
+        }else{
+          setProjects([]);
+          setErrorMessage(errors.notFound);
+        }
+      }
+    }catch (error) {
+      setErrorMessage(
+        error.response?.status === 404 ? errors.notFound : errors.tryAgain
+      );
+      setProjects([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+  
+  
+
   useEffect(() => {
     if (selectedStatus === "All Statuses") {
       fetchProjects("", 1);
@@ -114,7 +141,7 @@ export const Project = () => {
   isOpen={isModalCreateOpen}
   onClose={() => setIsModalCreateOpen(false)}
   onCreate={(projectData) => {
-    // Handle project creation here
+    handleCreateProject(projectData)
     console.log("Creating project:", projectData);
   }}
 />
@@ -176,10 +203,11 @@ export const Project = () => {
             }}
             paginate={paginate}
             pagination={pagination}
-            deleteButton={true}
             updateButton={true}
             viewButton={true}
+            deleteButton={true}
             currentUserId ={user.id}
+            toUpdateOrDelete={"project"}
           />
         ) : (
           !loading && (
