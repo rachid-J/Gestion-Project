@@ -18,9 +18,10 @@ class UsersInfoFactory extends Factory
     public function definition(): array
     {
         return [ 
-            // Pick a random user from the database; assumes users already exist.
+            
             'user_id'   => User::inRandomOrder()->first()->id, 
-            'background'=> $this->faker->sentence,
+            'background'=> $this->faker->imageUrl,
+            'profile_photo'=> $this->faker->imageUrl,
             'job'       => $this->faker->jobTitle,
             'phone'     => $this->faker->phoneNumber,
             'address'   => $this->faker->address,
