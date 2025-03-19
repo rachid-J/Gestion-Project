@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { axiosClient } from '../services/axiosClient';
 import { Userprojects } from '../services/ProfileUpdate';
 
 export const Profile = () => {

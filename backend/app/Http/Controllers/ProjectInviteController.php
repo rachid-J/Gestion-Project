@@ -88,7 +88,7 @@ class ProjectInviteController extends Controller
 
     $invitations = Invitation::where('email', $user->email)
         ->where('status', 'pending')
-        ->with('project', 'sender') // Load project & sender details
+        ->with('project', 'sender') 
         ->get();
 
     return response()->json($invitations);

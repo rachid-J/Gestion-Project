@@ -15,7 +15,7 @@ class ProjectFactory extends Factory
     
     public function definition(): array
     {
-        // Retrieve an existing user or create one to be the project creator.
+        
         $creator = User::inRandomOrder()->first() ?? User::factory()->create();
 
         return [
@@ -31,16 +31,15 @@ class ProjectFactory extends Factory
     public function configure()
     {
         return $this->afterCreating(function (Project $project) {
-            // Choose random users (excluding the creator) to attach as collaborators.
+         
             $userIds = User::where('id', '!=', $project->created_by)
                            ->inRandomOrder()
                            ->take(rand(1, 5))
                            ->pluck('id')
                            ->toArray();
-            // Optionally, include the creator as well.
+        
             $userIds[] = $project->created_by;
 
-            // Attach the users to the project via the pivot table with a default role.
             $project->users()->attach(array_unique($userIds), ['role' => 'member']);
         });
     }

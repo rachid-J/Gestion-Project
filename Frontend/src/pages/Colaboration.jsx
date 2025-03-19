@@ -21,6 +21,7 @@ export const Collaboration = () => {
                 ]);
                 
                 setCollaborators(collabRes.data);
+                console.log(collabRes.data)
                 setInvitations(invRes.data);
             } catch (err) {
                 setError(err.response?.data?.error || 'Failed to load data');
