@@ -38,32 +38,29 @@ class UserInfoController extends Controller
     public function showindex()
     {
         try {
-            $user = JWTAuth::parseToken()->authenticate();
+        $user = JWTAuth::parseToken()->authenticate();
 
-            if (!$user) {
-                return response()->json(["error" => "User not found"], 404);
-            }
+        $createdProjects = Project::where("created_by", $user->id)
+            ->where('status', 'in_progress')
+            ->with(["users", "creator:id,email,name"])
+            ->selectRaw('projects.*, "creator" as role');
 
+        $collaboratingProjects = $user->projects()
+            ->where('status', 'in_progress')
+            ->selectRaw('projects.*, project_user.role as role');
 
-            $createdProjects = Project::where("created_by", $user->id)
-                ->with(["users", "creator:id,email,name"])
-                ->selectRaw('projects.*, "creator" as role');
-
-
-            $collaboratingProjects = $user->projects()
-                ->selectRaw('projects.*, project_user.role as role');
-
-            // Combine results using SQL UNION
-            $allProjects = $createdProjects->union($collaboratingProjects)->take(4) // <-- This limits to 4 results
+        $allProjects = $createdProjects->union($collaboratingProjects)
+            ->orderBy('created_at', 'desc')
+            ->take(4)
             ->get();
 
-            return response()->json(["projects" => $allProjects], 200);
+        return response()->json(["projects" => $allProjects], 200);
 
-        } catch (Exception $e) {
-            return response()->json([
-                "error" => $e->getMessage()
-            ], 500);
-        }
+    } catch (Exception $e) {
+        return response()->json([
+            "error" => "Server error: " . $e->getMessage()
+        ], 500);
+    }
     }
     
 }
