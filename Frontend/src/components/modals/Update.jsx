@@ -12,9 +12,8 @@ export const Update = ({ modal, setModal }) => {
   const [projectData, setProjectData] = useState({
     name: "",
     description: "",
-    start_date: "",
     end_date: "",
-    status: "pending",
+    status: "",
   });
 
   useEffect(() => {
@@ -22,9 +21,8 @@ export const Update = ({ modal, setModal }) => {
       setProjectData({
         name: modal.data.name || "",
         description: modal.data.description || "",
-        start_date: modal.data.start_date || "",
         end_date: modal.data.end_date || "",
-        status: modal.data.status || "pending",
+        status: modal.data.status,
       });
     }
   }, [modal]);
@@ -42,7 +40,7 @@ export const Update = ({ modal, setModal }) => {
     try {
       if (modal.toUpdateOrDelete === "project") {
         const response = await updateProject(modal.data.id, projectData);
-
+        console.log(response)
         if (response.status === 200 && response.data.message) {
           setNotification({ type: "success", message: response.data.message });
           setTimeout(() => {
@@ -86,6 +84,7 @@ export const Update = ({ modal, setModal }) => {
           </div>
 
           <form className="space-y-8" onSubmit={update_FUNCTION}>
+          {modal.toUpdateOrDelete === "project" && (
             <div className="space-y-6">
               {/* Project Name Field */}
               <div className="group relative">
@@ -118,16 +117,6 @@ export const Update = ({ modal, setModal }) => {
 
               <Input
                 className="peer w-full rounded-xl border-0 bg-gray-100/50 px-4 py-3.5 text-gray-900 ring-1 ring-gray-200 transition-all placeholder:text-transparent focus:ring-2 focus:ring-blue-500 focus:bg-white"
-                name="start_date"
-                type="date"
-                value={projectData.start_date}
-                onChange={handleChangeProject}
-                placeholder="Start Date"
-                label="Start Date *"
-              />
-
-              <Input
-                className="peer w-full rounded-xl border-0 bg-gray-100/50 px-4 py-3.5 text-gray-900 ring-1 ring-gray-200 transition-all placeholder:text-transparent focus:ring-2 focus:ring-blue-500 focus:bg-white"
                 name="end_date"
                 type="date"
                 value={projectData.end_date}
@@ -137,17 +126,18 @@ export const Update = ({ modal, setModal }) => {
               />
 
               <div className="group relative">
-              <DynamicSelect
-  name="status" // Add this prop
-  title="Status"
-  value={projectData.status}
-  onChange={handleChangeProject}
-  options={["pending", "in_progress", "completed"]}
-  width={"w-152"}
-  className="w-auto"
-/>
+                <DynamicSelect
+                  name="status"
+                  title="Status"
+                  value={projectData.status}
+                  onChange={handleChangeProject}
+                  options={["pending", "in_progress", "completed"]}
+                  width={"w-152"}
+                  className="w-auto"
+                />
               </div>
             </div>
+          )}
 
             {/* Action Buttons */}
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

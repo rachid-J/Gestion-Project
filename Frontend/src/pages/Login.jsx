@@ -104,12 +104,12 @@ export const Login = ({ onSwitch }) =>  {
       </div>
 
       {notification && (
-        <Notification 
-          type={notification.type} 
-          message={notification.message}
-          className="mt-4 animate-fade-in-up"
-        />
-      )}
+  <Notification 
+    type={notification.type} 
+    message={notification.message}
+    className="fixed top-4 right-4 z-50"
+  />
+)}
     </div>
   );
 }

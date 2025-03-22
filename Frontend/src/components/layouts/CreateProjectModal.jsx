@@ -5,16 +5,13 @@ import { DynamicSelect } from "../UI/Select";
 
 export const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
   const [name, setName] = useState("");
-  const [start_date, setStardate] = useState("");
-  const [end_date, setEnddate] = useState("");
-  const [status,setStatus] = useState("")
   const [description, setDescription] = useState("");
   const [template, setTemplate] = useState("Kanban");
   const [type, setType] = useState("Team-managed");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onCreate({ name, description,start_date,end_date,status, template, type });
+    onCreate({ name, description, template, type });
     onClose();
   };
 
@@ -69,45 +66,6 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                 <label className="pointer-events-none absolute left-4 top-3.5 origin-[0] -translate-y-4 scale-75 transform text-sm text-gray-500 transition-all duration-200 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600">
                   Description
                 </label>
-              </div>
-
-              <div className="group relative">
-                <input
-                  type="date"
-                  required
-                  value={start_date}
-                  onChange={(e) => setStardate(e.target.value)}
-                  className="peer w-full rounded-xl border-0 bg-gray-100/50 px-4 py-3.5 text-gray-900 ring-1 ring-gray-200 transition-all placeholder:text-transparent focus:ring-2 focus:ring-blue-500 focus:bg-white"
-                  placeholder="Start Date"
-                />
-                <label className="pointer-events-none absolute left-4 top-3.5 origin-[0] -translate-y-4 scale-75 transform text-sm text-gray-500 transition-all duration-200 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600">
-                  Start Date *
-                </label>
-              </div>
-
-              <div className="group relative">
-                <input
-                  type="date"
-                  required
-                  value={end_date}
-                  onChange={(e) => setEnddate(e.target.value)}
-                  className="peer w-full rounded-xl border-0 bg-gray-100/50 px-4 py-3.5 text-gray-900 ring-1 ring-gray-200 transition-all placeholder:text-transparent focus:ring-2 focus:ring-blue-500 focus:bg-white"
-                  placeholder="End Date"
-                />
-                <label className="pointer-events-none absolute left-4 top-3.5 origin-[0] -translate-y-4 scale-75 transform text-sm text-gray-500 transition-all duration-200 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-blue-600">
-                  End Date *
-                </label>
-              </div>
-
-              <div className="group relative">
-                <DynamicSelect
-                  title="Status"
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                  options={["pending", "in_progress", "completed"]}
-                  width={"w-152"}
-                  className="w-auto"
-                />
               </div>
 
               {/* Template Selection */}

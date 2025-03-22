@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('contact_invitations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sender_id')->constrained('users');
+            $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
             $table->string('recipient_email');
             $table->string('token')->unique();
             $table->enum('status', ['pending', 'accepted', 'declined'])->default('pending');

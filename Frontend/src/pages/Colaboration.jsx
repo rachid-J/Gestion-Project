@@ -34,6 +34,7 @@ export const Collaboration = () => {
                 ]);
 
                 setCollaborators(collabRes.data);
+                console.log(collabRes)
                 setInvitations(invRes.data);
                 setIsCreator(selectedProject?.role === 'creator');
             } catch (err) {
@@ -130,7 +131,7 @@ export const Collaboration = () => {
                                         : 'text-gray-500 hover:text-gray-700'
                                     }`}
                             >
-                                Team ({collaborators.length + 1})
+                                Team ({collaborators.length })
                             </button>
                             <button
                                 onClick={() => setActiveTab('invitations')}
@@ -183,7 +184,7 @@ export const Collaboration = () => {
                         <div className="space-y-5">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-lg text-gray-900 font-[600]">
-                                    Team Members · <span className="text-blue-600">{collaborators.length}</span>
+                                    Team Members · <span className="text-blue-600">{collaborators.length -1}</span>
                                 </h3>
                                 {isCreator && (
                                     <button

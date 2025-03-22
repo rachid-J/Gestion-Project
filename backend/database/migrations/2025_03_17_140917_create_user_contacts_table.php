@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_contacts', function (Blueprint $table) {
-            $table->foreignId('user_id')->constrained();
-            $table->foreignId('contact_id')->constrained('users');
+           $table->foreignId('user_id')->constrained()->onDelete('cascade');
+    $table->foreignId('contact_id')->constrained('users')->onDelete('cascade');
             $table->enum('status', ['pending', 'accepted'])->default('pending');
             $table->primary(['user_id', 'contact_id']);
             $table->timestamps();

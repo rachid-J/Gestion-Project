@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\ContactInvitations;
 use App\Models\Invitation;
+use App\Notifications\ProjectDeletedNotification;
+use App\Notifications\ProjectUpdatedNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class NotificationController extends Controller
 {
@@ -46,12 +49,39 @@ class NotificationController extends Controller
                 ];
             })->all();
 
-        // Merge arrays
-        $notifications = array_merge($projectInvitations, $contactInvitations);
+        $dbNotifications = $user->notifications()
+            ->whereIn('type', [
+                ProjectDeletedNotification::class,
+                ProjectUpdatedNotification::class
+            ])
+            ->get()
+            ->map(function ($notification) {
+                return [
+                    'id' => $notification->id,
+                    'type' => $notification->data['type'],
+                    'message' => $notification->data['message'],
+                    'timestamp' => $notification->created_at->diffForHumans(),
+                    'read' => $notification->read_at !== null,
+                    'data' => $notification->data
+                ];
+            });
 
-        return response()->json([
-            'notifications' => $notifications
-        ]);
+        // Merge all notifications
+        $notifications = array_merge(
+            $projectInvitations,
+            $contactInvitations,
+            $dbNotifications->toArray()
+        );
+
+        // Sort by timestamp
+        usort(
+            $notifications,
+            fn($a, $b) =>
+            strtotime($b['timestamp']) <=> strtotime($a['timestamp'])
+        );
+
+
+        return response()->json(['notifications' => $notifications]);
     }
 
     public function markAsRead(Request $request)
@@ -60,22 +90,34 @@ class NotificationController extends Controller
             'ids' => 'required|array',
             'types' => 'required|array|size:' . count($request->ids)
         ]);
-
+    
+        $user = auth('api')->user();
+    
         foreach ($request->ids as $index => $id) {
             $type = $request->types[$index];
             
             try {
-                if ($type === 'project') {
-                    Invitation::where('id', $id)->update(['read' => true]);
-                } else {
-                    ContactInvitations::where('id', $id)->update(['read' => true]);
+                switch ($type) {
+                    case 'project':
+                        Invitation::where('id', $id)->update(['read' => true]);
+                        break;
+                    
+                    case 'contact':
+                        ContactInvitations::where('id', $id)->update(['read' => true]);
+                        break;
+                    
+                    case 'project_deleted':
+                    case 'project_updated':
+                        $user->notifications()
+                            ->where('id', $id)
+                            ->update(['read_at' => now()]);
+                        break;
                 }
             } catch (\Exception $e) {
-                report($e);
-                continue;
+                Log::error("Mark read failed: " . $e->getMessage());
             }
         }
-
+    
         return response()->json(['message' => 'Notifications marked as read']);
     }
 }

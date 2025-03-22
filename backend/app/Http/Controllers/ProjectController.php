@@ -3,8 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+
+use App\Notifications\ProjectDeletedNotification;
+use App\Notifications\ProjectUpdatedNotification;
+use DateTime;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ProjectController extends Controller
@@ -152,18 +157,15 @@ class ProjectController extends Controller
             $validatedData = $request->validate([
                 "name" => "required|string",
                 "description" => "required|string",
-                "start_date" => "required|date",
-                "end_date" => "required|date",
-                "status" => "required|in:pending,in_progress,completed",
             ]);
             $project = Project::create([
                 "created_by" => $user->id,
                 "name" => $validatedData["name"],
                 "description" => $validatedData["description"],
-                "start_date" => $validatedData["start_date"],
-                "end_date" => $validatedData["end_date"],
-                "status" => $validatedData["status"],
+                "start_date" => new DateTime(),
+                "status" => "pending",
             ]);
+            $project->users()->attach($user->id, ['role' => 'creator']);
             return response()->json([
                 "message" => "Project created",
                 "project" => $project
@@ -173,57 +175,64 @@ class ProjectController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
-    {
-        try {
-            $user = JWTAuth::parseToken()->authenticate();
-            if (!$user) {
-                return response()->json(["error" => "User not found"], 404);
-            }
-            $project = Project::find($id);
-            if (!$project) {
-                return response()->json(["error" => "Project not found"], 404);
-            }
-            if ($project->created_by != $user->id) {
-                return response()->json(["error" => "Unauthorized"], 401);
-            }
-            $validatedData = $request->validate([
-                "name" => "required|string",
-                "description" => "required|string",
-                "start_date" => "required|date",
-                "end_date" => "required|date",
-                "status" => "required|in:pending,in_progress,completed",
-            ]);
-            $project->update($validatedData);
-            return response()->json([
-                "message" => "Project updated",
-                "project" => $project
-            ],200);
-        } catch (Exception $e) {
-            return response()->json(["error" => $e->getMessage()], 500);
-        }
-    }
+   public function delete($id)
+{
+    try {
+        $user = JWTAuth::parseToken()->authenticate();
+        if (!$user) return response()->json(["error" => "User not found"], 404);
+        
+        $project = Project::find($id);
+        if (!$project) return response()->json(["error" => "Project not found"], 404);
+        if ($project->created_by != $user->id) return response()->json(["error" => "Unauthorized"], 401);
 
-    public function delete($id)
-    {
-        try {
-            $user = JWTAuth::parseToken()->authenticate();
-            if (!$user) {
-                return response()->json(["error" => "User not found"], 404);
-            }
-            $project = Project::find($id);
-            if (!$project) {
-                return response()->json(["error" => "Project not found"], 404);
-            }
-            if ($project->created_by != $user->id) {
-                return response()->json(["error" => "Unauthorized"], 401);
-            }
-            $project->delete();
-            return response()->json(["message" => "Project deleted"]);
-        } catch (Exception $e) {
-            return response()->json(["error" => $e->getMessage()], 500);
-        }
+
+        $project->delete();
+
+        return response()->json(["message" => "Project deleted",]);
+    } catch (Exception $e) {
+        return response()->json(["error" => $e->getMessage()], 500);
     }
+}
+
+public function update(Request $request, $id)
+{
+    try {
+        $user = JWTAuth::parseToken()->authenticate();
+        if (!$user) return response()->json(["error" => "User not found"], 404);
+        
+        $project = Project::find($id);
+        if (!$project) return response()->json(["error" => "Project not found"], 404);
+        if ($project->created_by != $user->id) return response()->json(["error" => "Unauthorized"], 401);
+
+        $validatedData = $request->validate([
+            "name" => "sometimes|string",
+            "description" => "sometimes|string",
+            "end_date" => "sometimes|date",
+            "status" => "sometimes|in:pending,in_progress,completed",
+        ]);
+        $project->update($validatedData);
+
+        $collaborators = $project->users()->get();
+
+            foreach ($collaborators as $collaborator) {
+                try {
+                    $collaborator->notify(
+                        new ProjectUpdatedNotification(
+                            $project, 
+                            $collaborator
+                        )
+                    );
+                } catch (Exception $e) {
+                    Log::error("Notification failed: " . $e->getMessage());
+                }
+            }
+
+        return response()->json(["message" => "Project updated", "project" => $project,
+    "colab"=>$collaborators], 200);
+    } catch (Exception $e) {
+        return response()->json(["error" => $e->getMessage()], 500);
+    }
+}
     public function getUsers(Project $project)
     {
         $users = $project->users()->withPivot('role')->get();

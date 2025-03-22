@@ -11,6 +11,7 @@ import { CreatorHoverModal } from "../layouts/CreatorHoverModal";
 import { Update } from "../modals/Update";
 import { useDispatch } from "react-redux";
 import { setselectedProject } from "../../Redux/features/projectSlice";
+import { Delete } from "../modals/Delete";
 
 export const Table = ({
   heads,
@@ -231,7 +232,7 @@ export const Table = ({
         </div>
       )}
 
-      {/* Pagination */}
+
       {paginate && (
         <div className="border-t border-gray-100 px-6 py-4">
           <Pagination
@@ -245,6 +246,8 @@ export const Table = ({
       )}
 
       {modal && modal.type === "update" && <Update modal={modal} setModal={setModal} />}
+      {modal && modal.type === "delete" && <Delete modal={modal} setModal={setModal} />}
+
     </div>
   );
 };

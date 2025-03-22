@@ -23,7 +23,6 @@ class UserInfoController extends Controller
         // Retrieve the authenticated user
         $user = JWTAuth::user();
     
-        // Validate incoming data
         $validated = $request->validate([
             'background'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -33,41 +32,41 @@ class UserInfoController extends Controller
             'city'          => 'nullable|string|max:255',
         ]);
     
-        // Get existing user info; if none, create a new instance
+      
         $userInfo = $user->usersInfo;
         if (!$userInfo) {
             $userInfo = new UsersInfo();
             $userInfo->user_id = $user->id;
         }
     
-        // Update text fields using validated data, converting empty strings to null
+       
         foreach (['job', 'phone', 'address', 'city'] as $field) {
             $userInfo->$field = array_key_exists($field, $validated) && $validated[$field] !== '' 
                 ? $validated[$field] 
                 : null;
         }
     
-        // Process background image upload
+        
         if ($request->hasFile('background')) {
-            // Delete old background if it exists
+            
             if ($userInfo->background) {
                 Storage::disk('public')->delete($userInfo->background);
             }
-            // Store the new background image
+           
             $userInfo->background = $request->file('background')->store('backgrounds', 'public');
         }
     
-        // Process profile photo upload
+        
         if ($request->hasFile('profile_photo')) {
-            // Delete old profile photo if it exists
+          
             if ($userInfo->profile_photo) {
                 Storage::disk('public')->delete($userInfo->profile_photo);
             }
-            // Store the new profile photo
+           
             $userInfo->profile_photo = $request->file('profile_photo')->store('profile_photos', 'public');
         }
     
-        // Save the user info using the save() method
+        
         $userInfo->save();
     
         return response()->json([

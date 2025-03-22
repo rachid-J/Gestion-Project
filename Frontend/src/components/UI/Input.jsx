@@ -23,7 +23,7 @@ export const Input = ({
       value={value}
       readOnly={readOnly}
       onChange={onChange}
-      required={required}
+    
       maxLength={maxLength}
       checked={checked}
       className={`w-full p-2 border border-gray-400 rounded-md ${className}`}

@@ -5,16 +5,15 @@ import {
   PlusCircleIcon,
   UserPlusIcon,
   UserGroupIcon,
-  ChartBarIcon,
   UserCircleIcon,
   Cog6ToothIcon,
-  UserIcon,
   ArrowLeftOnRectangleIcon,
   BellIcon,
   CheckCircleIcon,
   EnvelopeIcon,
   UserPlusIcon as UserPlusSolid,
-  XMarkIcon
+  XMarkIcon,
+  PencilIcon
 } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 import InviteModal from './InviteModal';
@@ -35,7 +34,6 @@ export const Header = ({ user }) => {
   const [notifications, setNotifications] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const workRef = useRef(null);
   const projectsRef = useRef(null);
   const teamsRef = useRef(null);
   const profileRef = useRef(null);
@@ -43,18 +41,19 @@ export const Header = ({ user }) => {
   const disp = useDispatch();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
-
+  console.log("notify",notifications)
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         const response = await GetNotification();
+       
         setNotifications(response.data.notifications);
       } catch (err) {
         console.error('Error fetching notifications:', err);
       }
     };
 
-    const interval = setInterval(fetchNotifications, 30000); // Refresh every 30 seconds
+    const interval = setInterval(fetchNotifications, 30000);
     fetchNotifications();
     return () => clearInterval(interval);
   }, []);
@@ -64,21 +63,18 @@ export const Header = ({ user }) => {
   };
 
   const handleLogout = async () => {
-    const response = await Logout()
+    const response = await Logout();
     if (response.status === 200) {
       disp(logOut());
       navigate('/redirect');
     }
-
   };
 
   const handleMarkAsRead = async (ids, types) => {
     try {
       await markRead(ids, types);
       setNotifications(prev =>
-        prev.map(n =>
-          ids.includes(n.id) ? { ...n, read: true } : n
-        )
+        prev.map(n => ids.includes(n.id) ? { ...n, read: true } : n)
       );
     } catch (err) {
       console.error('Error marking as read:', err);
@@ -108,9 +104,9 @@ export const Header = ({ user }) => {
       setTimeout(() => setError(''), 5000);
     }
   };
+
   const handleDeclineInvitation = async (token, type) => {
     try {
-      
       await ProjectDecline(token, type);
       setNotifications(prev => prev.filter(n => n.token !== token));
       setSuccess(`${type === 'project' ? 'Project' : 'Contact'} invitation declined`);
@@ -133,7 +129,6 @@ export const Header = ({ user }) => {
   };
 
   const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
-
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
@@ -141,9 +136,7 @@ export const Header = ({ user }) => {
       <CreateProjectModal
         isOpen={isModalCreateOpen}
         onClose={() => setIsModalCreateOpen(false)}
-        onCreate={(projectData) => {
-          console.log("Creating project:", projectData);
-        }}
+        onCreate={(projectData) => console.log("Creating project:", projectData)}
       />
       
       <header className="fixed top-0 right-0 left-0 h-16 bg-white/95 backdrop-blur-xl border-b border-gray-200/50 flex items-center justify-between px-4 md:px-6 z-50 gap-4 shadow-sm shadow-gray-100/50">
@@ -262,24 +255,36 @@ export const Header = ({ user }) => {
                       >
                         <div className="flex items-start gap-3">
                           <div className="flex-shrink-0 pt-1">
-                            {notification.type === 'project' ? (
-                              <FolderIcon className="h-5 w-5 text-purple-500" />
+                            {notification.type === 'project_deleted' ? (
+                              <XMarkIcon className="h-5 w-5 text-red-500" />
+                            ) : notification.type === 'project_updated' ? (
+                              <PencilIcon className="h-5 w-5 text-blue-500" />
                             ) : notification.type === 'contact' ? (
                               <UserPlusSolid className="h-5 w-5 text-blue-500" />
+                            ) : notification.type === 'project' ? (
+                              <FolderIcon className="h-5 w-5 text-purple-500" />
                             ) : (
-                              <XMarkIcon className="h-5 w-5 text-red-500" />
+                              <BellIcon className="h-5 w-5 text-gray-500" />
                             )}
                           </div>
                           <div className="flex-1">
                             <p className="text-sm text-gray-900 leading-snug">
-                              {notification.type === 'declined' ?
-                                `Invitation declined: ${notification.details}` :
-                                notification.message}
+                              {notification.message}
+                              {notification.data?.project && (
+                                <span className="block text-xs text-gray-500 mt-1">
+                                  {notification.type === 'project_deleted' && 
+                                    `Deleted by: ${notification.data.project.deleted_by}`}
+                                  {notification.type === 'project_updated' && 
+                                    `Updated by: ${notification.data.project.updated_by}`}
+                                </span>
+                              )}
                             </p>
                             <div className="flex items-center justify-between mt-2">
-                              <p className="text-xs text-gray-500">{notification.timestamp}</p>
+                              <p className="text-xs text-gray-500">
+                                {notification.timestamp}
+                              </p>
                               <div className="flex gap-2">
-                                {!notification.read && notification.type !== 'declined' && (
+                                {['project', 'contact'].includes(notification.type) && !notification.read && (
                                   <div className="flex gap-1.5">
                                     <button
                                       onClick={(e) => {
@@ -315,7 +320,7 @@ export const Header = ({ user }) => {
             )}
           </div>
 
-          {/* Profile */}
+          {/* Profile Section */}
           <div className="relative cursor-pointer" ref={profileRef}>
             <div
               className="flex items-center gap-2 group"
