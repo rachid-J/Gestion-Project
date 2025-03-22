@@ -11,28 +11,54 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class TaskController extends Controller
 {
-    public function getTasks(){
-        try{
+    public function getTasks($id){
+        try {
             $user = JWTAuth::parseToken()->authenticate();
-            if(!$user){
+            if (!$user) {
                 return response()->json([
-                    "message"=>"User not found"
-                ]);
+                    "message" => "User not found"
+                ], 404);
             }
-            $projects = Project::where("created_by",$user->id)
-                                ->with("tasks")                
-                                ->get();
-                                
-            return response()->json([
-                "projects" => $projects
-            ]);
 
-        }catch(Exception $e){
+            $project = Project::find($id);
+    
+            if (!$project) {
+                return response()->json([
+                    "message" => "Project not found"
+                ], 404);
+            }
+    
+            $isCreator = $project->created_by === $user->id;
+    
+            $isCollaborator = $project->users()->where('user_id', $user->id)->exists();
+    
+            if (!$isCreator && !$isCollaborator) {
+                return response()->json([
+                    "message" => "You do not have access to this project"
+                ], 403);
+            }
+    
+            $tasks = $project->tasks()->paginate(3);
+    
+            $tasks->getCollection()->transform(function ($task) use ($isCreator, $project) {
+                $task->role = $isCreator ? 'creator' : 'member';
+                $task->creator = [
+                    'id' => $project->created_by,
+                    'role' => 'creator'
+                ];
+                return $task;
+            });
+    
+            return response()->json([
+                "tasks" => $tasks
+            ]);
+    
+        } catch (Exception $e) {
             return response()->json([
                 "error" => $e->getMessage()
-            ]);
+            ], 500);
         }
-    } 
+    }
 
     public function create(Request $request,$id){
         try{
@@ -44,20 +70,20 @@ class TaskController extends Controller
             }
             $project = Project::where("created_by",$user->id)->find($id);
 
-            $valiadtion = $request->validate([
+            $validation = $request->validate([
                 "title"=>"string|required",
                 "description"=>"string|required",
-                "status"=>"string|in:to_do,in_progress,done",
                 "priority"=>"string|in:low,medium,high",
                 "due_date"=>"string|date",
+                "assigned_to" => "required|integer|exists:users,id"
             ]);
 
             Task::create([
-                "title"=>$valiadtion["title"],
-                "description"=>$valiadtion["description"],
-                "status"=> $valiadtion["status"],
-                "priority"=> $valiadtion["priority"],
-                "due_date"=> $valiadtion["due_date"],
+                "title"=>$validation["title"],
+                "description"=>$validation["description"],
+                "priority"=> $validation["priority"],
+                "due_date"=> $validation["due_date"],
+                "assigned_to"=>$validation["assigned_to"],
                 "project_id"=>$project->id
             ]);
             
@@ -134,4 +160,31 @@ class TaskController extends Controller
             ],500);
         }
     }
+    public function memberOfProject($id){
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+    
+            $project = Project::where("id", $id)
+                              ->whereHas("users", function ($query) use ($user) {
+                                  $query->where("created_by", $user->id);
+                              })
+                              ->with("users")
+                              ->first();
+    
+            if (!$project) {
+                return response()->json([
+                    "message" => "Project not found or you are not a member"
+                ], 404);
+            }
+    
+            return response()->json([
+                "members" => $project->users
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                "message" => $e->getMessage()
+            ], 500);
+        }
+    }
+    
 }

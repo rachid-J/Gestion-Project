@@ -49,10 +49,11 @@ Route::prefix('project')->group(function(){
 });
 
 Route::prefix('task')->group(function(){
-    Route::get('/getTasks',[TaskController::class,'getTasks']);
+    Route::get('/getTasks/{projectId}',[TaskController::class,'getTasks']);
     Route::post('/createTask/{id}',[TaskController::class,'create']);
     Route::delete('/deleteTask/{id}',[TaskController::class,'deleteTask']);
     Route::put('/updateTask/projects/{projectId}/tasks/{taskId}',[TaskController::class,'updateTask']);
+    Route::get('/memberOfProject/{id}',[taskController::class,"memberOfProject"]);
 });
 
 
