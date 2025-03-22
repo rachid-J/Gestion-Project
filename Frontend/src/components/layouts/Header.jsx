@@ -25,6 +25,10 @@ import { CreateProjectModal } from './CreateProjectModal';
 import { AcceptInvite, GetNotification, markRead } from '../../services/NotificationService';
 import { Logout } from '../../services/authServices';
 
+const getInitials = (name) => {
+  return name.split(' ').map(word => word[0]).join('');
+};
+
 export const Header = ({ user }) => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [notifications, setNotifications] = useState([]);
@@ -286,15 +290,26 @@ export const Header = ({ user }) => {
           </div>
 
           {/* Profile Dropdown */}
+         
           <div className="relative cursor-pointer" ref={profileRef}>
-            <div 
-              className="flex items-center gap-2"
-              onClick={() => handleDropdownToggle('profile')}
-            >
-              <div className="h-9 w-9 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 text-white flex items-center justify-center font-medium shadow-sm">
-                {user.name?.slice(0,2).toUpperCase()}
-              </div>
-            </div>
+      <div 
+        className="flex items-center gap-2"
+        onClick={() => handleDropdownToggle('profile')}
+      >
+        {user.users_info.profile_photo ? (
+          <img
+            src={`${import.meta.env.VITE_STORAGE_URL}/${user.users_info.profile_photo}`}
+            alt={`${user.name}'s profile`}
+            className="h-9 w-9 rounded-full object-cover shadow-sm"
+          />
+        ) : (
+          <div className="h-9 w-9 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 text-white flex items-center justify-center font-medium shadow-sm">
+            {getInitials(user.name)}
+          </div>
+        )}
+      
+    </div>
+
 
             {activeDropdown === 'profile' && (
               <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100">

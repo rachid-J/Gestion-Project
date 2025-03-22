@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { axiosClient } from '../services/axiosClient';
-import { Userprojects } from '../services/ProfileUpdate';
+import { updateUserInfo, Userprojects } from '../services/ProfileUpdate';
 
 export const Profile = () => {
 
   const [background, setBackground] = useState(null);
   const [profilePic, setProfilePic] = useState(null);
+
+  const [backgroundFile, setBackgroundFile] = useState(null);
+  const [profilePicFile, setProfilePicFile] = useState(null);
+
   const [hoverBg, setHoverBg] = useState(false);
   const [hoverProfile, setHoverProfile] = useState(false);
 
@@ -16,10 +19,8 @@ export const Profile = () => {
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
 
-
   const user = useSelector((state) => state.auth.user);
 
- 
   useEffect(() => {
     if (user && user.users_info) {
       setJob(user.users_info.job || '');
@@ -27,31 +28,75 @@ export const Profile = () => {
       setAddress(user.users_info.address || '');
       setCity(user.users_info.city || '');
       if (user.users_info.background) {
-        setBackground(user.users_info.background);
+        setBackground(`${import.meta.env.VITE_STORAGE_URL}/${user.users_info.background}`);
+      }
+      if (user.users_info.profile_photo) {
+        setProfilePic(`${import.meta.env.VITE_STORAGE_URL}/${user.users_info.profile_photo}`);
       }
     }
   }, [user]);
 
+
   const handleBackgroundUpload = (event) => {
     const file = event.target.files[0];
-    if (file) setBackground(URL.createObjectURL(file));
+    if (file) {
+      setBackgroundFile(file);
+      setBackground(URL.createObjectURL(file));
+    }
   };
 
   const handleProfileUpload = (event) => {
     const file = event.target.files[0];
-    if (file) setProfilePic(URL.createObjectURL(file));
+    if (file) {
+      setProfilePicFile(file);
+      setProfilePic(URL.createObjectURL(file));
+    }
   };
+
+ 
+  const handleEditProfile = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('_method', 'PUT');
+     
+      formData.append('job', job || '');
+      formData.append('phone', phone || '');
+      formData.append('address', address || '');
+      formData.append('city', city || '');
+      
+      if (backgroundFile) {
+        formData.append('background', backgroundFile);
+      }
+      if (profilePicFile) {
+        formData.append('profile_photo', profilePicFile);
+      }
+  
+      const response = await updateUserInfo(formData);
+      console.log('Profile updated:', response.data);
+      
+   
+      if (response.data.userInfo) {
+        setJob(response.data.userInfo.job || '');
+        setPhone(response.data.userInfo.phone || '');
+        setAddress(response.data.userInfo.address || '');
+        setCity(response.data.userInfo.city || '');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
+  };
+
   const [projects, setProjects] = useState([]);
 
   const fetchProjects = async () => {
-    const response = await Userprojects()
-    setProjects(response.data.projects)
-    console.log(response.data)
-  
-  }
- useEffect(() => {
-  fetchProjects();
- }, []);
+    const response = await Userprojects();
+    setProjects(response.data.projects);
+    console.log(response.data);
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#f8f9fc]">
@@ -170,8 +215,9 @@ export const Profile = () => {
                   </h1>
                   <p className="text-gray-500">Senior Product Designer</p>
                 </div>
-                <button className="px-5 py-2.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-all text-sm font-semibold flex items-center gap-2">
-                  <svg
+                <button onClick={handleEditProfile}
+  className="px-5 py-2.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-all text-sm font-semibold flex items-center gap-2" >
+                <svg
                     className="w-5 h-5"
                     fill="none"
                     stroke="currentColor"
@@ -192,6 +238,7 @@ export const Profile = () => {
                   </svg>
                   Edit Profile
                 </button>
+                
               </div>
 
               {/* About / Details Section */}

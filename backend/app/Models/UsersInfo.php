@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class UsersInfo extends Model
 {
-  
+  protected $table = 'users_infos';
     use HasFactory;
 
     protected $fillable = [
         'user_id',
         'background',
+        'profile_photo',
         'job',
         'phone',
         'address',

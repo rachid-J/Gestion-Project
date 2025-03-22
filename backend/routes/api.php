@@ -17,9 +17,9 @@ Route::prefix("auth")->group(function(){
     Route::post("/logout" ,[AuthController::class ,"logout"]);
 });
 
-Route::prefix('user-info')->group(function () {
+Route::middleware("api")->prefix('/user')->group(function () {
 Route::get('/projects', [UserInfoController::class, 'showindex']);
-    Route::put('/', [UserInfoController::class, 'update']);
+Route::put('/update', [UserInfoController::class, 'update']);
 });
 
 Route::get('/projects/{project}/users', [ProjectController::class, 'getUsers']);
