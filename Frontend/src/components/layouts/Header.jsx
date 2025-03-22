@@ -41,12 +41,12 @@ export const Header = ({ user }) => {
   const disp = useDispatch();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
-  console.log("notify",notifications)
+
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         const response = await GetNotification();
-       
+        
         setNotifications(response.data.notifications);
       } catch (err) {
         console.error('Error fetching notifications:', err);

@@ -35,3 +35,10 @@
   .animate-slide-in-right {
     animation: slide-in-right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
+  /* main.css */
+@layer utilities {
+  .portal-container {
+    position: relative;
+    z-index: 60;
+  }
+}
