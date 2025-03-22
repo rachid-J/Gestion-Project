@@ -9,6 +9,7 @@ import { Pagination } from "../UI/Paginations";
 import { useNavigate } from "react-router-dom";
 import { CreatorHoverModal } from "../layouts/CreatorHoverModal";
 import { Update } from "../modals/Update";
+import { Delete } from "../modals/Delete";
 
 export const Table = ({
   heads,
@@ -147,7 +148,7 @@ export const Table = ({
                 {deleteButton && dataVar.creator?.id === currentUserId && (
                   <ButtonSvg
                     svg={<TrashIcon className="w-5 h-5 text-gray-600 hover:text-red-600 transition-colors" />}
-                    onclick={() => setModal({ type: "delete", data: dataVar })}
+                    onclick={() => setModal({ type: "delete", data: dataVar,toUpdateOrDelete: toUpdateOrDelete })}
                   />
                 )}
               </div>
@@ -186,7 +187,7 @@ export const Table = ({
         />
       )}
       {modal && modal.type === "update" && <Update modal={modal} setModal={setModal} />}
-      
+      {modal && modal.type === "delete" && <Delete modal={modal} setModal={setModal} />}
     </div>
   );
 };

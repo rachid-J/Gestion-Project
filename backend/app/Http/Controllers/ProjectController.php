@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use DateTime;
 use Exception;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -101,17 +102,13 @@ class ProjectController extends Controller
             $validatedData = $request->validate([
                 "name" => "required|string",
                 "description" => "required|string",
-                "start_date" => "required|date",
-                "end_date" => "required|date",
-                "status" => "required|in:pending,in_progress,completed",
             ]);
             $project = Project::create([
                 "created_by" => $user->id,
                 "name" => $validatedData["name"],
                 "description" => $validatedData["description"],
-                "start_date" => $validatedData["start_date"],
-                "end_date" => $validatedData["end_date"],
-                "status" => $validatedData["status"],
+                "start_date" => new DateTime(),
+                "status" => "pending",
             ]);
             return response()->json([
                 "message" => "Project created",
@@ -137,11 +134,10 @@ class ProjectController extends Controller
                 return response()->json(["error" => "Unauthorized"], 401);
             }
             $validatedData = $request->validate([
-                "name" => "required|string",
-                "description" => "required|string",
-                "start_date" => "required|date",
-                "end_date" => "required|date",
-                "status" => "required|in:pending,in_progress,completed",
+                "name" => "sometimes|string",
+                "description" => "sometimes|string",
+                "end_date" => "sometimes|date",
+                "status" => "sometimes|in:pending,in_progress,completed",
             ]);
             $project->update($validatedData);
             return response()->json([
