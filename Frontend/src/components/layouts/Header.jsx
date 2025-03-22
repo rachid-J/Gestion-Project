@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { 
+import {
   ChevronDownIcon,
   FolderIcon,
   PlusCircleIcon,
@@ -24,9 +24,10 @@ import { useDispatch } from 'react-redux';
 import { CreateProjectModal } from './CreateProjectModal';
 import { AcceptInvite, GetNotification, markRead } from '../../services/NotificationService';
 import { Logout } from '../../services/authServices';
+import { ProjectDecline } from '../../services/ProjectCollab';
 
 const getInitials = (name) => {
-  return name.split(' ').map(word => word[0]).join('');
+  return name?.split(' ').map(word => word[0]).join('');
 };
 
 export const Header = ({ user }) => {
@@ -52,7 +53,7 @@ export const Header = ({ user }) => {
         console.error('Error fetching notifications:', err);
       }
     };
-    
+
     const interval = setInterval(fetchNotifications, 30000); // Refresh every 30 seconds
     fetchNotifications();
     return () => clearInterval(interval);
@@ -64,18 +65,18 @@ export const Header = ({ user }) => {
 
   const handleLogout = async () => {
     const response = await Logout()
-    if(response.status === 200){
+    if (response.status === 200) {
       disp(logOut());
       navigate('/redirect');
     }
-    
+
   };
 
   const handleMarkAsRead = async (ids, types) => {
     try {
       await markRead(ids, types);
-      setNotifications(prev => 
-        prev.map(n => 
+      setNotifications(prev =>
+        prev.map(n =>
           ids.includes(n.id) ? { ...n, read: true } : n
         )
       );
@@ -107,6 +108,18 @@ export const Header = ({ user }) => {
       setTimeout(() => setError(''), 5000);
     }
   };
+  const handleDeclineInvitation = async (token, type) => {
+    try {
+      
+      await ProjectDecline(token, type);
+      setNotifications(prev => prev.filter(n => n.token !== token));
+      setSuccess(`${type === 'project' ? 'Project' : 'Contact'} invitation declined`);
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to decline invitation');
+      setTimeout(() => setError(''), 5000);
+    }
+  };
 
   const handleInvite = async (email) => {
     try {
@@ -129,42 +142,42 @@ export const Header = ({ user }) => {
         isOpen={isModalCreateOpen}
         onClose={() => setIsModalCreateOpen(false)}
         onCreate={(projectData) => {
-          // Handle project creation here
           console.log("Creating project:", projectData);
         }}
       />
-      <header className="fixed top-0 right-0 left-0 h-16 bg-white/90 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-4 md:px-6 z-50 gap-4">
+      
+      <header className="fixed top-0 right-0 left-0 h-16 bg-white/95 backdrop-blur-xl border-b border-gray-200/50 flex items-center justify-between px-4 md:px-6 z-50 gap-4 shadow-sm shadow-gray-100/50">
         {/* Left Section */}
         <div className="flex items-center gap-6">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-500 bg-clip-text text-transparent tracking-tight">
             ProjectHub
           </h1>
-          
+
           {/* Projects Dropdown */}
           <div className="relative" ref={projectsRef}>
             <button
               onClick={() => handleDropdownToggle('projects')}
-              className="flex items-center text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md transition-colors"
+              className="flex items-center text-gray-600 hover:text-gray-900 px-3 py-2 rounded-lg transition-all hover:bg-gray-100/50 group"
             >
               Projects
-              <ChevronDownIcon className="h-4 w-4 ml-1" />
+              <ChevronDownIcon className="h-4 w-4 ml-1 transition-transform group-hover:-rotate-180" />
             </button>
 
             {activeDropdown === 'projects' && (
-              <div className="absolute left-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100">
+              <div className="absolute left-0 top-full mt-2 w-48 bg-white/95 backdrop-blur-xl rounded-xl shadow-lg border border-gray-200/50 animate-fade-in">
                 <div className="p-2 space-y-1">
-                  <button 
+                  <button
                     onClick={() => navigate('/projects')}
-                    className="w-full px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
+                    className="w-full px-3 py-2.5 text-left text-gray-700 hover:bg-gray-100 rounded-lg flex items-center gap-2 transition-colors"
                   >
-                    <FolderIcon className="h-4 w-4" />
+                    <FolderIcon className="h-5 w-5 text-gray-500" />
                     All Projects
                   </button>
-                  <button 
+                  <button
                     onClick={() => setIsModalCreateOpen(true)}
-                    className="w-full px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
+                    className="w-full px-3 py-2.5 text-left text-gray-700 hover:bg-gray-100 rounded-lg flex items-center gap-2 transition-colors"
                   >
-                    <PlusCircleIcon className="h-4 w-4" />
+                    <PlusCircleIcon className="h-5 w-5 text-gray-500" />
                     New Project
                   </button>
                 </div>
@@ -172,31 +185,31 @@ export const Header = ({ user }) => {
             )}
           </div>
 
-          {/* Teams Dropdown */}
+          {/* Network Dropdown */}
           <div className="relative" ref={teamsRef}>
             <button
               onClick={() => handleDropdownToggle('teams')}
-              className="flex items-center text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md transition-colors"
+              className="flex items-center text-gray-600 hover:text-gray-900 px-3 py-2 rounded-lg transition-all hover:bg-gray-100/50 group"
             >
               Network
-              <ChevronDownIcon className="h-4 w-4 ml-1" />
+              <ChevronDownIcon className="h-4 w-4 ml-1 transition-transform group-hover:-rotate-180" />
             </button>
 
             {activeDropdown === 'teams' && (
-              <div className="absolute left-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100">
+              <div className="absolute left-0 top-full mt-2 w-48 bg-white/95 backdrop-blur-xl rounded-xl shadow-lg border border-gray-200/50 animate-fade-in">
                 <div className="p-2 space-y-1">
-                  <button 
+                  <button
                     onClick={() => navigate("/contact")}
-                    className="w-full px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
+                    className="w-full px-3 py-2.5 text-left text-gray-700 hover:bg-gray-100 rounded-lg flex items-center gap-2 transition-colors"
                   >
-                    <UserGroupIcon className="h-4 w-4" />
+                    <UserGroupIcon className="h-5 w-5 text-gray-500" />
                     My Contacts
                   </button>
-                  <button 
+                  <button
                     onClick={() => setShowModal(true)}
-                    className="w-full px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
+                    className="w-full px-3 py-2.5 text-left text-gray-700 hover:bg-gray-100 rounded-lg flex items-center gap-2 transition-colors"
                   >
-                    <UserPlusIcon className="h-4 w-4" />
+                    <UserPlusIcon className="h-5 w-5 text-gray-500" />
                     Invite People
                   </button>
                 </div>
@@ -207,77 +220,90 @@ export const Header = ({ user }) => {
 
         {/* Right Section */}
         <div className="flex items-center gap-4 ml-auto">
-          {/* Notifications Dropdown */}
+          {/* Notifications */}
           <div className="relative" ref={notificationsRef}>
             <button
               onClick={() => handleDropdownToggle('notifications')}
-              className="p-2 hover:bg-gray-100 rounded-full relative"
+              className="p-2 hover:bg-gray-100/50 rounded-full relative transition-colors group"
             >
-              <BellIcon className="h-6 w-6 text-gray-600" />
+              <BellIcon className="h-6 w-6 text-gray-600 group-hover:text-gray-900" />
               {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 h-2.5 w-2.5 bg-blue-500 rounded-full border-2 border-white"></span>
+                <span className="absolute top-0 right-0 px-1.5 py-0.5 bg-red-500 text-white text-xs rounded-full border-2 border-white">
+                  {unreadCount}
+                </span>
               )}
             </button>
 
             {activeDropdown === 'notifications' && (
-              <div className="absolute right-0 top-full mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-100">
-                <div className="p-4 border-b border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-semibold text-gray-900">Notifications</h3>
-                    <button
-                      onClick={markAllAsRead}
-                      className="text-sm text-blue-600 hover:text-blue-700"
-                    >
-                      Mark all as read
-                    </button>
-                  </div>
+              <div className="absolute right-0 top-full mt-2 w-96 bg-white/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200/50 animate-fade-in">
+                <div className="p-4 border-b border-gray-200/50 flex items-center justify-between">
+                  <h3 className="font-semibold text-gray-900">Notifications</h3>
+                  <button
+                    onClick={markAllAsRead}
+                    className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                  >
+                    Mark all as read
+                  </button>
                 </div>
                 <div className="max-h-96 overflow-y-auto">
                   {notifications.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500">
+                    <div className="p-6 text-center text-gray-500">
+                      <EnvelopeIcon className="h-8 w-8 mx-auto text-gray-400 mb-2" />
                       No new notifications
                     </div>
                   ) : (
                     notifications.map(notification => (
                       <div
                         key={`${notification.type}-${notification.id}`}
-                        className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${
-                          !notification.read ? 'bg-blue-50' : ''
+                        className={`p-4 border-b border-gray-100/50 hover:bg-gray-50/50 cursor-pointer transition-colors ${
+                          !notification.read ? 'bg-blue-50/30' : ''
                         }`}
                         onClick={() => !notification.read && markAsRead(notification.id, notification.type)}
                       >
                         <div className="flex items-start gap-3">
                           <div className="flex-shrink-0 pt-1">
                             {notification.type === 'project' ? (
-                              <FolderIcon className="h-5 w-5 text-purple-600" />
+                              <FolderIcon className="h-5 w-5 text-purple-500" />
                             ) : notification.type === 'contact' ? (
-                              <UserPlusSolid className="h-5 w-5 text-blue-600" />
+                              <UserPlusSolid className="h-5 w-5 text-blue-500" />
                             ) : (
-                              <XMarkIcon className="h-5 w-5 text-red-600" />
+                              <XMarkIcon className="h-5 w-5 text-red-500" />
                             )}
                           </div>
                           <div className="flex-1">
-                            <p className="text-sm text-gray-900">
-                              {notification.type === 'declined' ? 
-                                `Invitation declined: ${notification.details}` : 
+                            <p className="text-sm text-gray-900 leading-snug">
+                              {notification.type === 'declined' ?
+                                `Invitation declined: ${notification.details}` :
                                 notification.message}
                             </p>
                             <div className="flex items-center justify-between mt-2">
                               <p className="text-xs text-gray-500">{notification.timestamp}</p>
-                              {!notification.read && notification.type !== 'declined' && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleAcceptInvitation(notification.token, notification.type);
-                                  }}
-                                  className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs"
-                                >
-                                  Accept
-                                </button>
-                              )}
-                              {notification.type === 'declined' && (
-                                <span className="text-red-600 text-xs font-medium">Declined</span>
-                              )}
+                              <div className="flex gap-2">
+                                {!notification.read && notification.type !== 'declined' && (
+                                  <div className="flex gap-1.5">
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleAcceptInvitation(notification.token, notification.type);
+                                      }}
+                                      className="px-2.5 py-1 bg-green-500/10 text-green-600 rounded-lg hover:bg-green-500/20 text-xs flex items-center gap-1.5 transition-colors"
+                                    >
+                                      <CheckCircleIcon className="h-3.5 w-3.5" />
+                                      Accept
+                                    </button>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeclineInvitation(notification.token, notification.type);
+                                      }}
+                                      className="px-2.5 py-1 bg-red-500/10 text-red-600 rounded-lg hover:bg-red-500/20 text-xs flex items-center gap-1.5 transition-colors"
+                                    >
+                                      <XMarkIcon className="h-3.5 w-3.5" />
+                                      Decline
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -289,50 +315,64 @@ export const Header = ({ user }) => {
             )}
           </div>
 
-          {/* Profile Dropdown */}
-         
+          {/* Profile */}
           <div className="relative cursor-pointer" ref={profileRef}>
-      <div 
-        className="flex items-center gap-2"
-        onClick={() => handleDropdownToggle('profile')}
-      >
-        {user.users_info.profile_photo ? (
-          <img
-            src={`${import.meta.env.VITE_STORAGE_URL}/${user.users_info.profile_photo}`}
-            alt={`${user.name}'s profile`}
-            className="h-9 w-9 rounded-full object-cover shadow-sm"
-          />
-        ) : (
-          <div className="h-9 w-9 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 text-white flex items-center justify-center font-medium shadow-sm">
-            {getInitials(user.name)}
-          </div>
-        )}
-      
-    </div>
-
+            <div
+              className="flex items-center gap-2 group"
+              onClick={() => handleDropdownToggle('profile')}
+            >
+              {user?.users_info?.profile_photo ? (
+                <img
+                  src={`${import.meta.env.VITE_STORAGE_URL}/${user?.users_info?.profile_photo}`}
+                  alt={`${user.name}'s profile`}
+                  className="h-10 w-10 rounded-full object-cover shadow-sm border-2 border-white hover:border-gray-200 transition-all"
+                />
+              ) : (
+                <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-500 text-white flex items-center justify-center font-medium shadow-sm group-hover:scale-105 transition-transform">
+                  {getInitials(user.name)}
+                </div>
+              )}
+            </div>
 
             {activeDropdown === 'profile' && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100">
+              <div className="absolute right-0 top-full mt-2 w-56 bg-white/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200/50 animate-fade-in">
                 <div className="p-2 space-y-1">
-                  <button 
-                    onClick={() => navigate('/profile')}
-                    className="w-full px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
+                  <div className="px-3 py-2.5 flex items-center gap-3">
+                    {user?.users_info?.profile_photo ? (
+                      <img
+                        src={`${import.meta.env.VITE_STORAGE_URL}/${user?.users_info?.profile_photo}`}
+                        className="h-9 w-9 rounded-full object-cover"
+                        alt="Profile"
+                      />
+                    ) : (
+                      <div className="h-9 w-9 rounded-full bg-gradient-to-r from-blue-600 to-purple-500 text-white flex items-center justify-center">
+                        {getInitials(user.name)}
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => navigate(`/profile/${user.username}`)}
+                    className="w-full px-3 py-2.5 text-left text-gray-700 hover:bg-gray-100 rounded-lg flex items-center gap-2 transition-colors"
                   >
-                    <UserCircleIcon className="h-4 w-4" />
+                    <UserCircleIcon className="h-5 w-5 text-gray-500" />
                     Profile
                   </button>
-                  <button 
+                  <button
                     onClick={() => navigate('/settings')}
-                    className="w-full px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
+                    className="w-full px-3 py-2.5 text-left text-gray-700 hover:bg-gray-100 rounded-lg flex items-center gap-2 transition-colors"
                   >
-                    <Cog6ToothIcon className="h-4 w-4" />
+                    <Cog6ToothIcon className="h-5 w-5 text-gray-500" />
                     Settings
                   </button>
                   <button
                     onClick={handleLogout}
-                    className="w-full px-3 py-2 text-left text-red-600 hover:bg-red-50 rounded-md flex items-center gap-2"
+                    className="w-full px-3 py-2.5 text-left text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-2 transition-colors"
                   >
-                    <ArrowLeftOnRectangleIcon className="h-4 w-4" />
+                    <ArrowLeftOnRectangleIcon className="h-5 w-5" />
                     Log out
                   </button>
                 </div>
@@ -342,29 +382,31 @@ export const Header = ({ user }) => {
         </div>
       </header>
 
-      {/* Status Messages */}
+      {/* Toast Notifications */}
       {(error || success) && (
-        <div className="fixed top-16 right-4 z-50">
+        <div className="fixed top-20 right-4 z-50 space-y-2">
           {error && (
-            <div className="p-4 mb-2 bg-red-50/90 backdrop-blur-sm rounded-xl border border-red-100 flex items-center gap-3 text-red-700 animate-fade-in">
-              <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
-              </svg>
-              {error}
+            <div className="p-4 pr-8 bg-red-50/90 backdrop-blur-sm rounded-xl border border-red-200 flex items-center gap-3 text-red-700 animate-slide-in">
+              <XMarkIcon className="h-5 w-5 flex-shrink-0" />
+              <span className="text-sm">{error}</span>
+              <button onClick={() => setError('')} className="absolute top-2 right-2 p-1 hover:bg-red-100 rounded-full">
+                <XMarkIcon className="h-4 w-4" />
+              </button>
             </div>
           )}
           {success && (
-            <div className="p-4 bg-green-50/90 backdrop-blur-sm rounded-xl border border-green-100 flex items-center gap-3 text-green-700 animate-fade-in">
-              <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-              </svg>
-              {success}
+            <div className="p-4 pr-8 bg-green-50/90 backdrop-blur-sm rounded-xl border border-green-200 flex items-center gap-3 text-green-700 animate-slide-in">
+              <CheckCircleIcon className="h-5 w-5 flex-shrink-0" />
+              <span className="text-sm">{success}</span>
+              <button onClick={() => setSuccess('')} className="absolute top-2 right-2 p-1 hover:bg-green-100 rounded-full">
+                <XMarkIcon className="h-4 w-4" />
+              </button>
             </div>
           )}
         </div>
       )}
 
-      <InviteModal 
+      <InviteModal
         show={showModal}
         handleClose={() => setShowModal(false)}
         handleInvite={handleInvite}

@@ -48,4 +48,5 @@ class Project extends Model
     {
         return $this->hasManyThrough(Comment::class, Task::class);
     }
+    
 }

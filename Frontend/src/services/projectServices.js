@@ -4,7 +4,10 @@ export const getProject = async (page) =>{
     const response = await axiosClient.get(`/project/getProjects?page=${page}`);
     return response;
 }
-
+export const getAllProject = async () =>{
+    const response = await axiosClient.get(`/project/getAllProject`);
+    return response;
+}
 export const searchProjectbyName = async (name,page)=>{
     const response = axiosClient.get(`/project/searchProjectbyName/${name}?page=${page}`);
     return response;

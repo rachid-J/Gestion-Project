@@ -9,6 +9,36 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ProjectController extends Controller
 {
+
+
+    public function getAll()
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+    
+            if (!$user) {
+                return response()->json(["error" => "User not found"], 404);
+            }
+    
+            $createdProjects = Project::where("created_by", $user->id)
+                ->with(["users", "creator:id,email,name"])
+                ->selectRaw('projects.*, "creator" as role');
+    
+            $collaboratingProjects = $user->projects()
+                ->selectRaw('projects.*, project_user.role as role');
+    
+            // Combine results using SQL UNION and get all records
+            $allProjects = $createdProjects->union($collaboratingProjects)->get();
+    
+            return response()->json(["projects" => $allProjects], 200);
+    
+        } catch (Exception $e) {
+            return response()->json([
+                "error" => $e->getMessage()
+            ], 500);
+        }
+    }
+    
     public function get()
     {
         try {
@@ -20,7 +50,7 @@ class ProjectController extends Controller
 
 
             $createdProjects = Project::where("created_by", $user->id)
-                ->with(["users", "creator:id,email,name"])
+                ->with(["users", "creator:id,email,name,username"])
                 ->selectRaw('projects.*, "creator" as role');
 
 
@@ -46,16 +76,30 @@ class ProjectController extends Controller
             if (!$user) {
                 return response()->json(["error" => "User not found"], 404);
             }
-
-            $projects = Project::where('name', 'LIKE', "%$name%")
-                ->with(["users", "creator:id,email,name"])
-                ->where('created_by', $user->id)
+    
+            $searchTerm = '%' . $name . '%';
+    
+            // Get projects created by user matching name
+            $createdProjects = Project::where("created_by", $user->id)
+                ->where("name", "LIKE", $searchTerm)
+                ->with(["users", "creator:id,email,name,username"])
+                ->selectRaw('projects.*, "creator" as role');
+    
+            // Get projects where user is collaborator matching name
+            $collaboratingProjects = $user->projects()
+                ->where("projects.name", "LIKE", $searchTerm)
+                ->with(["users", "creator:id,email,name,username"])
+                ->selectRaw('projects.*, project_user.role as role');
+    
+            // Combine results with union and paginate
+            $combinedProjects = $createdProjects->union($collaboratingProjects)
+                ->orderBy('created_at', 'desc')
                 ->paginate(5);
-
+    
             return response()->json([
-                "projects" => $projects
+                "projects" => $combinedProjects
             ], 200);
-
+    
         } catch (Exception $e) {
             return response()->json([
                 "message" => $e->getMessage()
@@ -71,25 +115,32 @@ class ProjectController extends Controller
                 return response()->json(["error" => "User not found"], 404);
             }
 
-            $projects = Project::where("created_by", $user->id)
-                ->where("status", $status)
-                ->with(["users", "creator:id,email,name"])
-                ->latest()
-                ->paginate(5);
-            if (!$projects) {
-                return response()->json([
-                    "message" => "Not Found"
-                ], 404);
-            }
-            return response()->json([
-                "projects" => $projects
-            ], 200);
-        } catch (Exception $e) {
-            return response()->json([
-                "message" => $e->getMessage()
-            ], 500);
-        }
-    }
+            $createdProjects = Project::where("created_by", $user->id)
+            ->where("status", "LIKE", $status)
+            ->with(["users", "creator:id,email,name,username"])
+            ->selectRaw('projects.*, "creator" as role');
+
+        // Get projects where user is collaborator matching name
+        $collaboratingProjects = $user->projects()
+            ->where("projects.status", "LIKE", $status)
+            ->with(["users", "creator:id,email,name,username"])
+            ->selectRaw('projects.*, project_user.role as role');
+
+        // Combine results with union and paginate
+        $combinedProjects = $createdProjects->union($collaboratingProjects)
+            ->orderBy('created_at', 'desc')
+            ->paginate(5);
+
+        return response()->json([
+            "projects" => $combinedProjects
+        ], 200);
+    
+} catch (Exception $e) {
+    return response()->json([
+        "message" => $e->getMessage()
+    ], 500);
+}
+}
 
     public function create(Request $request)
     {

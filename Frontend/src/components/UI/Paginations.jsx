@@ -21,7 +21,7 @@ export const Pagination = ({ currentPage, lastPage, previous, next, total }) => 
         <button
           onClick={next}
           disabled={currentPage >= lastPage}
-          className={`px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white transition-all ${
+          className={`px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-500 cursor-pointer text-white transition-all ${
             currentPage >= lastPage
               ? "opacity-50 cursor-not-allowed"
               : "hover:from-blue-700 hover:to-blue-600"

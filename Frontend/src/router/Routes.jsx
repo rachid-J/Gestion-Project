@@ -26,7 +26,8 @@ import { ContactsPage } from "../pages/ContactPage";
 
 
 import { Collaboration } from "../pages/Colaboration";
-import { setUser } from "../Redux/features/AuthSlice";
+import { logOut, setUser } from "../Redux/features/authSlice";
+
 
 
 export const Router = () => {
@@ -34,14 +35,23 @@ export const Router = () => {
     const [isLoading, setIsLoading] = useState(true);
     const dispatch = useDispatch()
 
+
+
+
+
+
+
+ 
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await user(token)
-                console.log(response)
+                const response = await user(token);
                 dispatch(setUser(response.data));
             } catch (error) {
                 console.error("Error fetching user:", error);
+                if (error.response && error.response.status === 401) {
+                    dispatch(logOut()); // Dispatch logout to clear invalid token
+                }
             } finally {
                 setIsLoading(false);
             }
@@ -59,10 +69,10 @@ export const Router = () => {
     }
 
     const guestRoutes = [
-        { 
-            index: true, 
-            element: <Navigate to="/auth" replace /> 
-          },
+        {
+            index: true,
+            element: <Navigate to="/auth" replace />
+        },
         { path: "/auth", element: <Auth /> },
         { path: "*", element: <NotFound /> },
         { path: "/redirect", element: <Redirect /> },
@@ -74,17 +84,17 @@ export const Router = () => {
             path: "/",
             element: <Default />,
             children: [
-                { 
-                    index: true, 
-                    element: <Navigate to="/projects" replace /> 
-                  },
+                {
+                    index: true,
+                    element: <Navigate to="/projects" replace />
+                },
                 { path: "dashboard", element: <Dashboard /> },
                 { path: "task", element: <Task /> },
                 { path: "projects", element: <Project /> },
                 { path: "team", element: <Team /> },
-                { path: "profile", element: <Profile /> },
-                { path: "/contact", element: <ContactsPage /> },
-              
+                { path: "profile/:username", element: <Profile /> },
+                { path: "contact", element: <ContactsPage /> },
+
 
             ]
         },
@@ -96,7 +106,7 @@ export const Router = () => {
                 { path: "board", element: <Board /> },
                 { path: "List", element: <List /> },
                 { path: "reports", element: <Reports /> },
-                { path: "collaboration", element: <Collaboration />,},
+                { path: "collaboration", element: <Collaboration />, },
 
             ]
         },

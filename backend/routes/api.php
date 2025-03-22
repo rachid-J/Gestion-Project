@@ -10,16 +10,17 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
 
-Route::prefix("auth")->group(function(){
-    Route::post("/login" ,[AuthController::class ,"login"]);
-    Route::post("/register" ,[AuthController::class ,"register"]);
-    Route::get("/me" ,[AuthController::class ,"me"]);
-    Route::post("/logout" ,[AuthController::class ,"logout"]);
+Route::prefix("auth")->group(function () {
+    Route::post("/login", [AuthController::class, "login"]);
+    Route::post("/register", [AuthController::class, "register"]);
+    Route::get("/me", [AuthController::class, "me"]);
+    Route::post("/logout", [AuthController::class, "logout"]);
 });
 
 Route::middleware("api")->prefix('/user')->group(function () {
-Route::get('/projects', [UserInfoController::class, 'showindex']);
-Route::put('/update', [UserInfoController::class, 'update']);
+    Route::get('/{username}/projects', [UserInfoController::class, 'showindex']);
+    Route::get('/{username}/profile', [UserInfoController::class, 'getUserProfile']);
+    Route::put('/update', [UserInfoController::class, 'update']);
 });
 
 Route::get('/projects/{project}/users', [ProjectController::class, 'getUsers']);
@@ -28,36 +29,44 @@ Route::post('/projects/{project}/invite', [ProjectInviteController::class, 'invi
 Route::post('/invitations/accept', [ProjectInviteController::class, 'accept']);
 Route::get('/invitations/received', [ProjectInviteController::class, 'receivedInvitations']);
 
-Route::post('/contact-invite', [ContactInvitationController::class, 'send']);
-Route::post('/contact-invite/accept', [ContactInvitationController::class, 'accept']);
 
-Route::middleware('auth:api')->group(function() {  
+
+Route::middleware('auth:api')->group(function () {
+    Route::post('/contact-invite', [ContactInvitationController::class, 'send']);
+    Route::post('/contact-invite/accept', [ContactInvitationController::class, 'accept']);
     Route::get('/contacts', [ContactController::class, 'index']);
     Route::get('/contact-invitations/verify', [ContactInvitationController::class, 'verifyInvitation']);
     Route::get('/contact-invitations/received', [ContactInvitationController::class, 'receivedInvitations']);
     Route::get('/contact-invitations/sent', [ContactInvitationController::class, 'sentInvitations']);
-   
+
 });
 
-Route::prefix('project')->group(function(){
+Route::middleware('auth:api')->prefix('project')->group(callback: function () {
+    Route::get("/searchProjectbyName/{name}", [ProjectController::class, 'searchProjectbyName']);
+    Route::get("/filterProjectsByStatus/{status}", [ProjectController::class, 'filterProjectsByStatus']);
+    Route::get('/getAllProject', [ProjectController::class, 'getAll']);
     Route::get('/getProjects', [ProjectController::class, 'get']);
-    Route::get("/searchProjectbyName/{name}",[ProjectController::class, 'searchProjectbyName']);
-    Route::get("/filterProjectsByStatus/{status}",[ProjectController::class, 'filterProjectsByStatus']);
+  
     Route::post('/createProject', [ProjectController::class, 'create']);
     Route::put('/updateProject/{id}', [ProjectController::class, 'update']);
     Route::delete('/deleteProject/{id}', [ProjectController::class, 'delete']);
 });
 
-Route::prefix('task')->group(function(){
-    Route::get('/getTasks',[TaskController::class,'getTasks']);
-    Route::post('/createTask/{id}',[TaskController::class,'create']);
-    Route::delete('/deleteTask/{id}',[TaskController::class,'deleteTask']);
-    Route::put('/updateTask/projects/{projectId}/tasks/{taskId}',[TaskController::class,'updateTask']);
+Route::prefix('task')->group(function () {
+    Route::get('/getTasks', [TaskController::class, 'getTasks']);
+    Route::post('/createTask/{id}', [TaskController::class, 'create']);
+    Route::delete('/deleteTask/{id}', [TaskController::class, 'deleteTask']);
+    Route::put('/updateTask/projects/{projectId}/tasks/{taskId}', [TaskController::class, 'updateTask']);
 });
 
 
 Route::middleware('auth:api')->group(function () {
-    // Notifications
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::put('/notifications/mark-read', [NotificationController::class, 'markAsRead']);
+});
+
+Route::prefix('invitations/project')->group(function () {
+    Route::get('{projectId}/sent', [ProjectInviteController::class, 'sentInvitations']);
+    Route::post('/decline', [ProjectInviteController::class, 'decline']);
+    Route::delete('/{invitation}', [ProjectInviteController::class, 'cancel']);
 });

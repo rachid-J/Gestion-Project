@@ -1,6 +1,9 @@
-import { BriefcaseIcon, CalendarIcon, EnvelopeIcon, UserCircleIcon } from "@heroicons/react/24/solid";
+import {  CalendarIcon, EnvelopeIcon, UserCircleIcon } from "@heroicons/react/24/solid";
+import { useNavigate } from "react-router-dom";
 
 export const CreatorHoverModal = ({ creator }) => {
+  const navigate = useNavigate()
+  console.log(creator)
   return (
     <div className="w-72 bg-white shadow-xl border border-gray-200">
       {/* Header Section */}
@@ -8,7 +11,7 @@ export const CreatorHoverModal = ({ creator }) => {
         <div className="relative mr-4">
           {creator?.avatar ? (
             <img
-              src={creator.avatar}
+              src={creator.user_info.profile_photo}
               alt={creator.creator?.name}
               className="h-12 w-12 rounded-sm object-cover"
             />
@@ -41,7 +44,7 @@ export const CreatorHoverModal = ({ creator }) => {
 
       {/* Footer Section */}
       <div className="border-t border-gray-200 p-2">
-        <button className="w-full flex items-center justify-center px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 transition-colors">
+        <button onClick={()=> navigate(`/profile/${creator.creator.username}`)} className="w-full flex items-center justify-center px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 transition-colors">
           <UserCircleIcon className="h-4 w-4 mr-2" />
           View Full Profile
         </button>

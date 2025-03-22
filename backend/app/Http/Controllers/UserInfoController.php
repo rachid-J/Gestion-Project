@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
-
+use App\Models\User;
 use App\Models\UsersInfo;
 use Exception;
 use Illuminate\Http\Request;
@@ -77,10 +77,15 @@ class UserInfoController extends Controller
     }
     
 
-    public function showindex()
+    public function showindex($username)
     {
         try {
-        $user = JWTAuth::parseToken()->authenticate();
+       
+        $user = User::where('username', $username)->first();
+        if (!$user) {
+            return response()->json(["error" => "User not found"], 404);
+        }
+        
 
         $createdProjects = Project::where("created_by", $user->id)
             ->where('status', 'in_progress')
@@ -103,6 +108,16 @@ class UserInfoController extends Controller
             "error" => "Server error: " . $e->getMessage()
         ], 500);
     }
+    }
+    public function getUserProfile($username){
+        $user = User::where('username', $username)->first();
+        if (!$user) {
+            return response()->json(["error" => "User not found"], 404);
+        }
+        $user->load('usersInfo');
+        return response()->json([
+            'user' => $user,
+        ]);
     }
     
 }

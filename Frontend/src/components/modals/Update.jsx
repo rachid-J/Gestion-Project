@@ -137,14 +137,15 @@ export const Update = ({ modal, setModal }) => {
               />
 
               <div className="group relative">
-                <DynamicSelect
-                  title="Status"
-                  value={projectData.status}
-                  onChange={handleChangeProject}
-                  options={["pending", "in_progress", "completed"]}
-                  width={"w-152"}
-                  className="w-auto"
-                />
+              <DynamicSelect
+  name="status" // Add this prop
+  title="Status"
+  value={projectData.status}
+  onChange={handleChangeProject}
+  options={["pending", "in_progress", "completed"]}
+  width={"w-152"}
+  className="w-auto"
+/>
               </div>
             </div>
 

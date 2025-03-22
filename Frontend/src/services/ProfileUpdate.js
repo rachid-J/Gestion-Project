@@ -1,7 +1,11 @@
 import { axiosClient } from "./axiosClient"
 
-export const Userprojects = async()=>{
-    const response = await axiosClient.get("/user/projects")
+export const Userprojects = async(username)=>{
+    const response = await axiosClient.get(`/user/${username}/projects`)
+    return response
+}
+export const getUserProfile = async(username)=>{
+    const response = await axiosClient.get(`/user/${username}/profile`)
     return response
 }
 export const updateUserInfo = async (formData) => {
@@ -12,4 +16,6 @@ export const updateUserInfo = async (formData) => {
     });
     return response;
   };
+  
+
   

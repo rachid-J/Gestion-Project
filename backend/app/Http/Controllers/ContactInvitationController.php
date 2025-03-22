@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Notifications\ContactInvitationNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ContactInvitationController extends Controller
 {
@@ -47,7 +48,7 @@ class ContactInvitationController extends Controller
     {
         $request->validate(['token' => 'required|string']);
         $invitation = ContactInvitations::where('token', $request->token)->firstOrFail();
-        $recipient = auth("api")->user();
+        $recipient = JWTAuth::user();
 
         if ($recipient->email !== $invitation->recipient_email) {
             return response()->json(['error' => 'Unauthorized'], 403);

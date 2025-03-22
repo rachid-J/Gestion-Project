@@ -23,7 +23,7 @@ export const ContactsPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch all endpoints concurrently on mount or when the search query changes
+
   useEffect(() => {
     const fetchAllData = async () => {
       setLoading(true);
@@ -122,6 +122,7 @@ export const ContactsPage = () => {
       setProcessingId(null);
     }
   };
+  
 
   return (
     <div className="p-6 max-w-6xl mx-auto bg-gray-50 min-h-screen">
