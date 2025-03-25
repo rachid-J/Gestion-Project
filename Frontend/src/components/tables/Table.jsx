@@ -40,7 +40,7 @@ export const Table = ({
   const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
   const [currentCreator, setCurrentCreator] = useState({});
   const hideTimeoutRef = useRef(null);
- 
+
   const dispatch = useDispatch()
   const nextData = async () => {
     if (pagination.lastPage <= pagination.currentPage) return;
@@ -54,14 +54,14 @@ export const Table = ({
 
   // Handle hover on creator name
   const handleCreatorHover = (creator, event) => {
-   
+
     if (hideTimeoutRef.current) {
       clearTimeout(hideTimeoutRef.current);
     }
     const rect = event.currentTarget.getBoundingClientRect();
     setModalPosition({
-      top: rect.top + window.scrollY - 240, 
-      left: rect.left + window.scrollX + rect.width / 2, 
+      top: rect.top + window.scrollY - 240,
+      left: rect.left + window.scrollX + rect.width / 2,
     });
     setCurrentCreator(creator);
     setModalVisible(true);
@@ -123,11 +123,11 @@ export const Table = ({
                         onMouseLeave={handleMouseLeave}
                       >
                         <span className="cursor-pointer text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-1.5">
-                        <div className="shrink-0">
+                          <div className="shrink-0">
                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
                               {dataVar.creator?.avatar ? (
-                                <img 
-                                  src={dataVar.creator.avatar} 
+                                <img
+                                  src={dataVar.creator.avatar}
                                   className="w-full h-full rounded-full object-cover"
                                   alt="Creator avatar"
                                 />
@@ -143,20 +143,19 @@ export const Table = ({
                             ↗
                           </span>
                         </span>
-                        
+
                       </td>
                     );
                   }
-                  
+
                   // Add special formatting for status
                   if (key === "status") {
                     return (
                       <td key={colIndex} className="px-6 py-4 text-sm">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                          dataVar.status === 'completed' ? 'bg-green-100 text-green-800' :
-                          dataVar.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                          'bg-orange-100 text-orange-800'
-                        }`}>
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${dataVar.status === 'completed' ? 'bg-green-100 text-green-800' :
+                            dataVar.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                              'bg-orange-100 text-orange-800'
+                          }`}>
                           {dataVar.status.replace('_', ' ')}
                         </span>
                       </td>
@@ -173,21 +172,21 @@ export const Table = ({
                 {(viewButton || updateButton || deleteButton) && (
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center justify-center space-x-3">
-                  
-  {viewButton && (
-    <button
-      onClick={() => {
-        dispatch(setselectedProject(dataVar)); // Dispatch action to set selected project
-        navigate(`/projects/${dataVar.id}/board`); // Navigate to the project board
-      }}
-      className="p-2 hover:bg-gray-100 rounded-lg transition-colors tooltip"
-      data-tip="View"
-    >
-      <EyeIcon className="w-5 h-5 text-gray-600 hover:text-blue-600" />
-    </button>
-  )}
 
-                      
+                      {viewButton && (
+                        <button
+                          onClick={() => {
+                            dispatch(setselectedProject(dataVar)); // Dispatch action to set selected project
+                            navigate(`/projects/${dataVar.id}/board`); // Navigate to the project board
+                          }}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors tooltip"
+                          data-tip="View"
+                        >
+                          <EyeIcon className="w-5 h-5 text-gray-600 hover:text-blue-600" />
+                        </button>
+                      )}
+
+
                       {updateButton && dataVar.creator?.id === currentUserId && (
                         <button
                           onClick={() => setModal({ type: "update", data: dataVar, toUpdateOrDelete: toUpdateOrDelete })}
@@ -197,7 +196,7 @@ export const Table = ({
                           <PencilSquareIcon className="w-5 h-5 text-gray-600 hover:text-green-600" />
                         </button>
                       )}
-                      
+
                       {deleteButton && dataVar.creator?.id === currentUserId && (
                         <button
                           onClick={() => setModal({ type: "delete", data: dataVar })}

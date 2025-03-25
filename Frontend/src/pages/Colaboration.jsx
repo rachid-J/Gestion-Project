@@ -9,6 +9,7 @@ import {
 import { useSelector } from 'react-redux';
 
 import { ColaabInvite } from '../components/layouts/ColaabInvite';
+import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
 export const Collaboration = () => {
     const { projectId } = useParams();
@@ -72,49 +73,13 @@ export const Collaboration = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
-                <header className="bg-white shadow-xl">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 animate-pulse">
-                        <div className="h-8 bg-gray-200 rounded w-48"></div>
-                    </div>
-                </header>
-
-                <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-100">
-                        <div className="max-w-2xl">
-                            <div className="h-6 bg-gray-200 rounded w-64 mb-6"></div>
-                            <div className="flex gap-3">
-                                <div className="flex-1 h-12 bg-gray-200 rounded-lg"></div>
-                                <div className="w-32 h-12 bg-gray-200 rounded-lg"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex border-b border-gray-200/80 mb-8 animate-pulse">
-                        <div className="w-32 h-10 bg-gray-200 mr-4 rounded-t-lg"></div>
-                        <div className="w-32 h-10 bg-gray-200 rounded-t-lg"></div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-full bg-gray-200"></div>
-                                    <div className="flex-1 space-y-2">
-                                        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                                        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                                    </div>
-                                </div>
-                                <div className="mt-4 flex items-center justify-between">
-                                    <div className="h-6 bg-gray-200 rounded w-16"></div>
-                                    <div className="w-5 h-5 bg-gray-200 rounded"></div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </main>
+            <div className="p-8 flex items-center justify-center gap-3 text-indigo-600">
+            <div className="animate-spin">
+              <ArrowPathIcon className="w-6 h-6" />
             </div>
-        );
+            <span className="font-medium">Loading Teams...</span>
+          </div>
+        )
     }
 
     return (

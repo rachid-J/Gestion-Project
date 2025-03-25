@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\ContactInvitations;
 use App\Models\Invitation;
+use App\Notifications\AttachmentAddedNotification;
+use App\Notifications\CommentAddedNotification;
 use App\Notifications\ProjectDeletedNotification;
 use App\Notifications\ProjectUpdatedNotification;
+use App\Notifications\TaskCreatedNotification;
+use App\Notifications\TaskUpdatedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -65,12 +69,32 @@ class NotificationController extends Controller
                     'data' => $notification->data
                 ];
             });
+            $TaskNotifications = $user->notifications()
+            ->whereIn('type', [
+               
+                TaskCreatedNotification::class,       // Added
+                TaskUpdatedNotification::class,       // Added
+                CommentAddedNotification::class,      // Added
+                AttachmentAddedNotification::class    // Added
+            ])
+            ->get()
+            ->map(function ($notification) {
+                return [
+                    'id' => $notification->id,
+                    'type' => $notification->data['type'],
+                    'message' => $notification->data['message'],
+                    'timestamp' => $notification->created_at->diffForHumans(),
+                    'read' => $notification->read_at !== null,
+                    'data' => $notification->data
+                ];
+            });
 
         // Merge all notifications
         $notifications = array_merge(
             $projectInvitations,
             $contactInvitations,
-            $dbNotifications->toArray()
+            $dbNotifications->toArray(),
+            $TaskNotifications->toArray()
         );
 
         // Sort by timestamp
@@ -83,7 +107,6 @@ class NotificationController extends Controller
 
         return response()->json(['notifications' => $notifications]);
     }
-
     public function markAsRead(Request $request)
     {
         $request->validate([
@@ -106,8 +129,8 @@ class NotificationController extends Controller
                         ContactInvitations::where('id', $id)->update(['read' => true]);
                         break;
                     
-                    case 'project_deleted':
-                    case 'project_updated':
+                    // Handle all database notifications (including new task notifications)
+                    default:
                         $user->notifications()
                             ->where('id', $id)
                             ->update(['read_at' => now()]);

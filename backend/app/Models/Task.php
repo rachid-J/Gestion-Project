@@ -15,7 +15,9 @@ class Task extends Model
         'status',
         'priority',
         'due_date',
-        'project_id'
+        'project_id',
+        'assigned_to',
+        'created_by' // Add this line
     ];
 
     public function project()
@@ -23,10 +25,15 @@ class Task extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public function user()
+    public function assignedTo()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'assigned_to');
     }
+
+    public function creator()
+{
+    return $this->belongsTo(User::class, 'created_by');
+}
 
     public function comments()
     {

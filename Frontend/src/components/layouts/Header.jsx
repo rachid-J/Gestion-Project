@@ -13,7 +13,9 @@ import {
   EnvelopeIcon,
   UserPlusIcon as UserPlusSolid,
   XMarkIcon,
-  PencilIcon
+  PencilIcon,
+  ChatBubbleOvalLeftIcon,
+  PaperClipIcon
 } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 import InviteModal from './InviteModal';
@@ -41,7 +43,7 @@ export const Header = ({ user }) => {
   const disp = useDispatch();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
-
+console.log(notifications)
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
@@ -255,21 +257,56 @@ export const Header = ({ user }) => {
                       >
                         <div className="flex items-start gap-3">
                           <div className="flex-shrink-0 pt-1">
-                            {notification.type === 'project_deleted' ? (
-                              <XMarkIcon className="h-5 w-5 text-red-500" />
-                            ) : notification.type === 'project_updated' ? (
+                            {/* Add task-related icons */}
+                            {notification.type === 'task_updated' && (
                               <PencilIcon className="h-5 w-5 text-blue-500" />
-                            ) : notification.type === 'contact' ? (
+                            )} {notification.type === 'task_created' && (
+                              <PlusCircleIcon className="h-5 w-5 text-green-500" />
+                            )}
+                            {notification.type === 'task_assigned' && (
+                              <UserPlusIcon className="h-5 w-5 text-blue-500" />
+                            )}
+                            {notification.type === 'task_completed' && (
+                              <DocumentCheckIcon className="h-5 w-5 text-purple-500" />
+                            )}
+                            {notification.type === 'comment_added' && (
+                              <ChatBubbleOvalLeftIcon className="h-5 w-5 text-green-500" />
+                            )}
+                            {notification.type === 'attachment_added' && (
+                              <PaperClipIcon className="h-5 w-5 text-purple-500" />
+                            )}
+                            {/* Keep existing icons */}
+                            {notification.type === 'project_deleted' && (
+                              <XMarkIcon className="h-5 w-5 text-red-500" />
+                            )}
+                            {notification.type === 'project_updated' && (
+                              <PencilIcon className="h-5 w-5 text-blue-500" />
+                            )}
+                            {notification.type === 'contact_invitation' && (
                               <UserPlusSolid className="h-5 w-5 text-blue-500" />
-                            ) : notification.type === 'project' ? (
+                            )}
+                            {notification.type === 'project_invitation' && (
                               <FolderIcon className="h-5 w-5 text-purple-500" />
-                            ) : (
-                              <BellIcon className="h-5 w-5 text-gray-500" />
                             )}
                           </div>
                           <div className="flex-1">
                             <p className="text-sm text-gray-900 leading-snug">
                               {notification.message}
+                              {/* Add task-related metadata */}
+                              {(notification.type === 'task_updated' || 
+                                notification.type === 'comment_added' ||
+                                notification.type === 'attachment_added') && (
+                                <button 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/projects/${notification.data.meta.project_id}/board`);
+                                  }}
+                                  className="block text-xs text-blue-600 hover:text-blue-700 mt-1"
+                                >
+                                  View Task
+                                </button>
+                              )}
+                              {/* Existing metadata */}
                               {notification.data?.project && (
                                 <span className="block text-xs text-gray-500 mt-1">
                                   {notification.type === 'project_deleted' && 
@@ -284,12 +321,13 @@ export const Header = ({ user }) => {
                                 {notification.timestamp}
                               </p>
                               <div className="flex gap-2">
-                                {['project', 'contact'].includes(notification.type) && !notification.read && (
+                                {/* Show action buttons only for invitations */}
+                                {['project_invitation', 'contact_invitation'].includes(notification.type) && !notification.read && (
                                   <div className="flex gap-1.5">
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleAcceptInvitation(notification.token, notification.type);
+                                        handleAcceptInvitation(notification.meta.token, notification.type);
                                       }}
                                       className="px-2.5 py-1 bg-green-500/10 text-green-600 rounded-lg hover:bg-green-500/20 text-xs flex items-center gap-1.5 transition-colors"
                                     >
@@ -299,7 +337,7 @@ export const Header = ({ user }) => {
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleDeclineInvitation(notification.token, notification.type);
+                                        handleDeclineInvitation(notification.meta.token, notification.type);
                                       }}
                                       className="px-2.5 py-1 bg-red-500/10 text-red-600 rounded-lg hover:bg-red-500/20 text-xs flex items-center gap-1.5 transition-colors"
                                     >
