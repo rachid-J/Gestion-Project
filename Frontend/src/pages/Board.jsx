@@ -81,6 +81,7 @@ export const Board = () => {
         onClose={() => setIsModalCreateOpen(false)}
         onCreate={handleCreateTask}
         projectId={projectId}
+        getData={fetchTasks}
       />
 
       <div className="p-8 bg-gray-50 min-h-screen">

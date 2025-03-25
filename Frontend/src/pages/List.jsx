@@ -133,7 +133,7 @@ export const List = () => {
                         </div>
                         <div>
                           <div className="text-sm text-slate-900">{task.assignee}</div>
-                          <div className="text-xs text-slate-400">Developer</div>
+                          <div className="text-xs text-slate-400">{task.assigneejob}</div>
                         </div>
                       </div>
                     ) : (
@@ -188,9 +188,13 @@ export const List = () => {
               </div>
               <h3 className="text-lg font-semibold text-slate-900 mb-2">No tasks found</h3>
               <p className="text-slate-500 mb-6">Get started by creating your first task</p>
-              <button className="bg-indigo-600 text-white px-6 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors">
+              {isCreator && (
+              <button 
+                onClick={() => setIsModalCreateOpen(true)} 
+               className="bg-indigo-600 text-white px-6 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors">
                 Create Task
               </button>
+              )}
             </div>
           )}
         </div>

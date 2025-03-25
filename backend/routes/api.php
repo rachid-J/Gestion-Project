@@ -38,10 +38,10 @@ Route::middleware('auth:api')->prefix('project')->group(function () {
     Route::middleware('project.owner')->group(function () {
         Route::put('/updateProject/{id}', [ProjectController::class, 'update']);
         Route::delete('/deleteProject/{id}', [ProjectController::class, 'delete']);
-        Route::post('/projects/{project}/invite', [ProjectInviteController::class, 'invite']);
+       
     });
 });
-
+Route::middleware('project.owner')->post('/projects/{project}/invite', [ProjectInviteController::class, 'invite']);
 // Project Collaboration Routes
 Route::get('/projects/{project}/users', [ProjectController::class, 'getUsers']);
 Route::get('/project-invitations/verify', [ProjectInviteController::class, 'verify']);

@@ -282,10 +282,10 @@ console.log(notifications)
                             {notification.type === 'project_updated' && (
                               <PencilIcon className="h-5 w-5 text-blue-500" />
                             )}
-                            {notification.type === 'contact_invitation' && (
+                            {notification.type === 'contact' && (
                               <UserPlusSolid className="h-5 w-5 text-blue-500" />
                             )}
-                            {notification.type === 'project_invitation' && (
+                            {notification.type === 'project' && (
                               <FolderIcon className="h-5 w-5 text-purple-500" />
                             )}
                           </div>
@@ -321,13 +321,13 @@ console.log(notifications)
                                 {notification.timestamp}
                               </p>
                               <div className="flex gap-2">
-                                {/* Show action buttons only for invitations */}
-                                {['project_invitation', 'contact_invitation'].includes(notification.type) && !notification.read && (
+                               
+                                {['project', 'contact'].includes(notification.type) && (
                                   <div className="flex gap-1.5">
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleAcceptInvitation(notification.meta.token, notification.type);
+                                        handleAcceptInvitation(notification.token, notification.type);
                                       }}
                                       className="px-2.5 py-1 bg-green-500/10 text-green-600 rounded-lg hover:bg-green-500/20 text-xs flex items-center gap-1.5 transition-colors"
                                     >
@@ -337,7 +337,7 @@ console.log(notifications)
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleDeclineInvitation(notification.meta.token, notification.type);
+                                        handleDeclineInvitation(notification.token, notification.type);
                                       }}
                                       className="px-2.5 py-1 bg-red-500/10 text-red-600 rounded-lg hover:bg-red-500/20 text-xs flex items-center gap-1.5 transition-colors"
                                     >

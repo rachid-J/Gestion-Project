@@ -113,7 +113,14 @@ export const Summary = () => {
 
   const assigneeStats = tasks.reduce((acc, task) => {
     if (task.assignee) {
-      acc[task.assignee] = (acc[task.assignee] || 0) + 1;
+      if (!acc[task.assignee]) {
+        acc[task.assignee] = { 
+          count: 1,
+          job: task.assigneejob 
+        };
+      } else {
+        acc[task.assignee].count++;
+      }
     }
     return acc;
   }, {});
@@ -227,7 +234,7 @@ export const Summary = () => {
               <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200/60">
                 <h3 className="text-lg font-semibold text-slate-900 mb-5">Team Workload</h3>
                 <div className="space-y-4">
-                  {Object.entries(assigneeStats).map(([assignee, count]) => (
+                  {Object.entries(assigneeStats).map(([assignee, { count, job } ]) => (
                     <div key={assignee} className="flex items-center justify-between group hover:bg-slate-50/50 p-3 rounded-lg transition-colors">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -237,7 +244,7 @@ export const Summary = () => {
                         </div>
                         <div>
                           <p className="text-sm font-medium text-slate-800">{assignee}</p>
-                          <p className="text-xs text-slate-500">Developer</p>
+                          <p className="text-xs text-slate-500">{job}</p>
                         </div>
                       </div>
                       <span className="text-sm font-medium text-slate-800">

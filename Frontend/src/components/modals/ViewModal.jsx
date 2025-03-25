@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { attachmentsTask, commentsTask, deleteAttachmentTask, GetattachmentsTaskk, GetcommentsTask } from "../../services/tasksServices";
 import { Notification } from "../layouts/Notification";
 
-export const ViewModal = ({ task, statusGroups, onClose }) => {
+export const ViewModal = ({ task, statusGroups, onClose}) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [attachments, setAttachments] = useState([]);

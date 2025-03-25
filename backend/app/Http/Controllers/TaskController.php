@@ -78,11 +78,20 @@ class TaskController extends Controller
                 return response()->json(["message" => "Access denied"], 403);
             }
     
+            // $tasks = $project->tasks()
+            //     ->with(['assignedTo', 'creator' => function($q) {
+            //         $q->select('id', 'name', 'email');
+            //     }])
+            //     ->get();
+
             $tasks = $project->tasks()
-                ->with(['assignedTo', 'creator' => function($q) {
-                    $q->select('id', 'name', 'email');
-                }])
-                ->get();
+            ->with([
+                'assignedTo:id,name,email',
+                'assignedTo.usersInfo:job,user_id',
+                'creator:id,name,email',
+                'creator.usersInfo:job,user_id'
+            ])
+            ->get();  
     
             $transformedTasks = $tasks->map(function ($task) use ($isCreator) {
                 return [
@@ -91,6 +100,7 @@ class TaskController extends Controller
                     'status' => $task->status,
                     'priority' => $task->priority,
                     'assignee' => $task->assignedTo ? $task->assignedTo->name : null,
+                    'assigneejob' => optional($task->assignedTo->usersInfo)->job,
                     'key' => $task->key,
                     'created_at'=>$task->created_at,
                     'updated_at'=>$task->updated_at,
@@ -98,7 +108,8 @@ class TaskController extends Controller
                     'creator' => $task->creator ? [
                         'id' => $task->creator->id,
                         'name' => $task->creator->name,
-                        'email' => $task->creator->email
+                        'email' => $task->creator->email,
+                        
                     ] : null
                 ];
             });

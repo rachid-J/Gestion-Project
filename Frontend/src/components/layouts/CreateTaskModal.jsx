@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { XMarkIcon, ChevronDownIcon, CalendarDaysIcon, UserCircleIcon, FlagIcon } from "@heroicons/react/24/solid";
 import { members } from "../../services/tasksServices";
 
-export const CreateTaskModal = ({ isOpen, onClose, onCreate, projectId }) => {
+export const CreateTaskModal = ({ isOpen, onClose, onCreate, projectId ,getData }) => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -31,9 +31,11 @@ export const CreateTaskModal = ({ isOpen, onClose, onCreate, projectId }) => {
       priority: formData.priority.toLowerCase(),
       assigned_to: Number(formData.assigned_to)
     });
+    getData(1)
     onClose();
   };
 
+  
   if (!isOpen) return null;
 
   return (

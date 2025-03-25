@@ -177,6 +177,7 @@ console.log("modal",modal)
           task={modal.data}
           statusGroups={statusGroups}
           onClose={() => setModal({ type: "", data: {} })}
+          
         />
       )}
 
