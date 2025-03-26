@@ -27,6 +27,7 @@ import { ContactsPage } from "../pages/ContactPage";
 
 import { Collaboration } from "../pages/Colaboration";
 import { logOut, setUser } from "../Redux/features/authSlice";
+import { Setting } from "../pages/Setting";
 
 
 
@@ -93,6 +94,7 @@ export const Router = () => {
                 { path: "projects", element: <Project /> },
                 { path: "team", element: <Team /> },
                 { path: "profile/:username", element: <Profile /> },
+                { path :"settings", element : <Setting/>},
                 { path: "contact", element: <ContactsPage /> },
 
 

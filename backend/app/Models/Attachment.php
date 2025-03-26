@@ -15,6 +15,7 @@ class Attachment extends Model
         'file_path',
         'user_id',
         'task_id',
+        'project_id',
         'mime_type',
         'size'
     ];
@@ -31,6 +32,12 @@ class Attachment extends Model
     {
         return $this->belongsTo(Task::class);
     }
+    public function project()
+{
+    return $this->belongsTo(Project::class);
+}
+
+
 
     // Add URL accessor
     public function getUrlAttribute()

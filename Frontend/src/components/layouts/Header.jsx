@@ -322,7 +322,7 @@ console.log(notifications)
                               </p>
                               <div className="flex gap-2">
                                
-                                {['project', 'contact'].includes(notification.type) && (
+                                {['project', 'contact'].includes(notification.type) && !notification.read && (
                                   <div className="flex gap-1.5">
                                     <button
                                       onClick={(e) => {

@@ -12,7 +12,8 @@ class Comment extends Model
     protected $fillable = [
         'content',
         'user_id',
-        'task_id'
+        'task_id',
+       
     ];
 
     public function user()
@@ -27,6 +28,11 @@ class Comment extends Model
     {
         return $this->belongsTo(Task::class);
     }
+    public function project()
+{
+    return $this->belongsTo(Project::class);
+}
+
 
     // Add validation rules
     public static function rules()

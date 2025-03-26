@@ -30,8 +30,8 @@ class User extends Authenticatable implements JWTSubject
     ];
     public function projects()
     {
-        return $this->belongsToMany(Project::class, 'project_user', 'user_id', 'project_id')
-            ->withPivot('role');
+        return $this->belongsToMany(Project::class, 'project_user', 'user_id', 'project_id');
+       
     }
     public function createdProjects()
     {
@@ -54,8 +54,13 @@ class User extends Authenticatable implements JWTSubject
     }
     public function tasks()
     {
-        return $this->hasMany(Task::class);
+        return $this->hasMany(Task::class, 'created_by');
     }
+
+    public function assignedTasks()
+{
+    return $this->hasMany(Task::class, 'assigned_to');
+}
 
     public function comments()
     {

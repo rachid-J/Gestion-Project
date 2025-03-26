@@ -18,13 +18,17 @@ Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    
 });
 
 // User Profile Routes
 Route::middleware('api')->prefix('/user')->group(function () {
     Route::get('/{username}/projects', [UserInfoController::class, 'showindex']);
     Route::get('/{username}/profile', [UserInfoController::class, 'getUserProfile']);
+    Route::get('/{username}/activity', [UserInfoController::class, 'getRecentActivity']);
     Route::put('/update', [UserInfoController::class, 'update']);
+    Route::get('/getContact', [UserInfoController::class, 'getContact']);
+
 });
 
 // Project Management Routes
@@ -72,6 +76,7 @@ Route::prefix('task')->group(function () {
 // Contact Management Routes
 Route::middleware('auth:api')->group(function () {
     Route::post('/contact-invite', [ContactInvitationController::class, 'send']);
+
     Route::post('/contact-invite/accept', [ContactInvitationController::class, 'accept']);
     Route::get('/contacts', [ContactController::class, 'index']);
     Route::get('/contact-invitations/verify', [ContactInvitationController::class, 'verifyInvitation']);

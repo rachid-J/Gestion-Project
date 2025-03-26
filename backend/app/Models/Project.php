@@ -54,5 +54,10 @@ class Project extends Model
     {
         return $this->hasManyThrough(Comment::class, Task::class);
     }
-    
+
+
+public function attachments()
+{
+    return $this->hasMany(Attachment::class);
+}
 }

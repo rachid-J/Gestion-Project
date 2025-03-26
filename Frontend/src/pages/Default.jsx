@@ -13,7 +13,7 @@ export const Default = () => {
      
       <main className="flex-1 flex flex-col ">
 
-        <div className="pt-16 flex-1 overflow-auto bg-gray-50">
+        <div className="pt-10 flex-1 overflow-auto bg-gray-50">
           <div className="mx-auto p-4 md:p-6">
             <Outlet />
           </div>
