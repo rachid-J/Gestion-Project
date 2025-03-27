@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Comment;
-use App\Models\Notification;
+
 use App\Models\Task;
 use App\Notifications\CommentAddedNotification;
 use Illuminate\Http\Request;

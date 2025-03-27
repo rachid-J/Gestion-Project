@@ -121,4 +121,22 @@ public function sentInvitations(Request $request)
 
         return response()->json($invitation);
     }
+    public function decline(Request $request)
+{
+    $request->validate(['token' => 'required|string']);
+    $invitation = ContactInvitations::where('token', $request->token)->firstOrFail();
+    $recipient = JWTAuth::user();
+
+    if ($recipient->email !== $invitation->recipient_email) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    if ($invitation->status !== 'pending') {
+        return response()->json(['error' => 'Invitation already processed'], 400);
+    }
+
+    $invitation->update(['status' => 'declined']);
+
+    return response()->json(['message' => 'Invitation declined successfully']);
+}
 }

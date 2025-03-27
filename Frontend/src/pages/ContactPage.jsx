@@ -11,6 +11,7 @@ import {
   ContactSent, 
   getContact, 
   ContactAccept,
+  ContactDecline,
 } from '../services/ContactService';
 
 export const ContactsPage = () => {
@@ -118,6 +119,22 @@ export const ContactsPage = () => {
       setContacts(contactsRes.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to accept invitation');
+    } finally {
+      setProcessingId(null);
+    }
+  };
+  const handleDeclineInvitation = async (inviteId, token) => {
+    setProcessingId(inviteId);
+    setError(null);
+    
+    try {
+      await ContactDecline(token); 
+      setReceivedInvites(prev => ({
+        ...prev,
+        data: prev.data.filter(invite => invite.id !== inviteId)
+      }));
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to decline invitation');
     } finally {
       setProcessingId(null);
     }
@@ -261,7 +278,7 @@ export const ContactsPage = () => {
                   )}
                 </button>
                 <button
-                  // onClick={() => handleDeclineInvitation(invite.id)}
+                  onClick={() => handleDeclineInvitation(invite.id,invite.token)}
                   disabled={processingId === invite.id}
                   className="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50"
                 >

@@ -116,5 +116,71 @@ class AuthController extends Controller
             return response()->json(['error' => 'Failed to logout'], 500);
         }
     }
+ 
 
+    public function deleteAccount(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|string', // Ensure validation passes
+        ]);
+    
+        $user = JWTAuth::user();
+    
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Password is incorrect'], 401);
+        }
+    
+        JWTAuth::invalidate(JWTAuth::getToken());
+        $user->delete();
+    
+        return response()->json(['message' => 'Account deleted successfully']);
+    }
+public function updateAccount(Request $request)
+{
+    $user = JWTAuth::user();
+    $validated = $request->validate([
+        'name' => 'sometimes|string|max:255',
+        'email' => 'sometimes|email|max:255|unique:users,email,' . $user->id,
+        'username' => 'sometimes|string|max:255|unique:users,username,' . $user->id,
+        'job' => 'nullable|string|max:255',
+        'phone' => 'nullable|string|max:20',
+        'address' => 'nullable|string|max:255',
+        'city' => 'nullable|string|max:255',
+    ]);
+
+    // Update User model
+    $user->update($request->only(['name', 'email', 'username']));
+
+    // Update UsersInfo using updateOrCreate to handle missing records
+    $user->usersInfo()->updateOrCreate(
+        ['user_id' => $user->id],
+        $request->only(['job', 'phone', 'address', 'city'])
+    );
+
+    $user->load('usersInfo');
+
+    return response()->json([
+        'message' => 'Account updated successfully',
+        'user' => $user
+    ]);
+}
+
+public function changePassword(Request $request)
+{
+    $request->validate([
+        'current_password' => 'required|string',
+        'new_password' => 'required|string|min:8|confirmed',
+    ]);
+
+    $user = JWTAuth::user();
+
+    if (!Hash::check($request->current_password, $user->password)) {
+        return response()->json(['message' => 'Current password is incorrect'], 401);
+    }
+
+    $user->password = Hash::make($request->new_password);
+    $user->save();
+
+    return response()->json(['message' => 'Password updated successfully']);
+}
 }

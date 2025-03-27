@@ -1,24 +1,33 @@
 <?php
 
+use App\Http\Controllers\AttachmentController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\UserInfoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserInfoController;
+
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectInviteController;
 use App\Http\Controllers\TaskController;
-use App\Http\Controllers\CommentController;
-use App\Http\Controllers\AttachmentController;
+
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ContactInvitationController;
 use App\Http\Controllers\NotificationController;
 
 // Authentication Routes
 Route::prefix('auth')->group(function () {
+    // Public routes
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
-    Route::get('/me', [AuthController::class, 'me']);
-    Route::post('/logout', [AuthController::class, 'logout']);
-    
+
+    // Authenticated routes
+    Route::middleware('api')->group(function () {
+        Route::post('/logout', [AuthController::class,'logout']);
+        Route::get('/me', [AuthController::class,'me']);
+        Route::put('/account/update', [AuthController::class, 'updateAccount']);
+        Route::post('/password/change', [AuthController::class, 'changePassword']);
+        Route::delete('/account/delete', [AuthController::class, 'deleteAccount']);
+    });
 });
 
 // User Profile Routes
@@ -50,6 +59,7 @@ Route::middleware('project.owner')->post('/projects/{project}/invite', [ProjectI
 Route::get('/projects/{project}/users', [ProjectController::class, 'getUsers']);
 Route::get('/project-invitations/verify', [ProjectInviteController::class, 'verify']);
 Route::post('/invitations/accept', [ProjectInviteController::class, 'accept']);
+Route::delete('/invitations/cancel/{invitation}', [ProjectInviteController::class, 'cancel']);
 Route::get('/invitations/received', [ProjectInviteController::class, 'receivedInvitations']);
 
 // Task Management Routes
@@ -82,6 +92,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/contact-invitations/verify', [ContactInvitationController::class, 'verifyInvitation']);
     Route::get('/contact-invitations/received', [ContactInvitationController::class, 'receivedInvitations']);
     Route::get('/contact-invitations/sent', [ContactInvitationController::class, 'sentInvitations']);
+    Route::post('/contact-invitations/decline', [ContactInvitationController::class, 'decline']);
 });
 
 // Notification Routes

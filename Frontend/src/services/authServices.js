@@ -21,3 +21,23 @@ export const Logout = async()=>{
     const response = await axiosClient.post("/auth/logout");
     return response
 }
+export const updateProfile = async (userData) => {
+    const response = await axiosClient.put('auth/account/update', userData);
+    return response;
+  }
+  
+  export const updatePassword = async ({ currentPassword, newPassword, confirmPassword }) => {
+    const response = await axiosClient.post('auth/password/change', {
+      current_password: currentPassword,
+      new_password: newPassword,
+      new_password_confirmation: confirmPassword
+    });
+    return response;
+  }
+  
+  export const deleteAccount = async (password) => {
+    const response = await axiosClient.delete('auth/account/delete', { 
+      data: { password: password } 
+    });
+    return response;
+  }

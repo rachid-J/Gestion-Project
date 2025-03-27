@@ -29,3 +29,7 @@ export const ContactAccept = async(token) =>{
 
     return response;
 }
+export const ContactDecline = async (token) => {
+    const response = await axiosClient.post('contact-invitations/decline', { token });
+    return response;
+  };

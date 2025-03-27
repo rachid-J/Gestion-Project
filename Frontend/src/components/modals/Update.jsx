@@ -89,7 +89,7 @@ export const Update = ({ modal, setModal }) => {
               {/* Project Name Field */}
               <div className="group relative">
                 <Input
-                  className="peer w-full rounded-xl border-0 bg-gray-100/50 px-4 py-3.5 text-gray-900 ring-1 ring-gray-200 transition-all placeholder:text-transparent focus:ring-2 focus:ring-blue-500 focus:bg-white"
+                  className="peer w-full rounded-xl border-0 outline-none bg-gray-100/50 px-4 py-3.5 text-gray-900 ring-1 ring-gray-200 transition-all placeholder:text-transparent focus:ring-2 focus:ring-blue-500 focus:bg-white"
                   name="name"
                   type="text"
                   value={projectData.name}
@@ -102,7 +102,7 @@ export const Update = ({ modal, setModal }) => {
               {/* Description Field */}
               <div className="group relative">
                 <textarea
-                  className="peer w-full rounded-xl border-0 bg-gray-100/50 px-4 py-3.5 text-gray-900 ring-1 ring-gray-200 transition-all placeholder:text-transparent focus:ring-2 focus:ring-blue-500 focus:bg-white"
+                  className="peer w-full rounded-xl border-0 outline-none bg-gray-100/50 px-4 py-3.5 text-gray-900 ring-1 ring-gray-200 transition-all placeholder:text-transparent focus:ring-2 focus:ring-blue-500 focus:bg-white"
                   name="description"
                   type="text"
                   value={projectData.description}
@@ -116,13 +116,15 @@ export const Update = ({ modal, setModal }) => {
               </div>
 
               <Input
-                className="peer w-full rounded-xl border-0 bg-gray-100/50 px-4 py-3.5 text-gray-900 ring-1 ring-gray-200 transition-all placeholder:text-transparent focus:ring-2 focus:ring-blue-500 focus:bg-white"
+                className="peer w-full rounded-xl border-0 bg-gray-100/50 px-4 py-3.5 outline-none text-gray-900 ring-1 ring-gray-200 transition-all placeholder:text-transparent focus:ring-2 focus:ring-blue-500 focus:bg-white"
                 name="end_date"
                 type="date"
                 value={projectData.end_date}
                 onChange={handleChangeProject}
                 placeholder="End Date"
                 label="End Date *"
+         
+
               />
 
               <div className="group relative">
@@ -133,7 +135,7 @@ export const Update = ({ modal, setModal }) => {
                   onChange={handleChangeProject}
                   options={["pending", "in_progress", "completed"]}
                   width={"w-152"}
-                  className="w-auto"
+                  className="w-auto "
                 />
               </div>
             </div>

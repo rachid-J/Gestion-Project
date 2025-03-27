@@ -19,7 +19,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 import InviteModal from './InviteModal';
-import { ContactInvite } from '../../services/ContactService';
+import { ContactDecline, ContactInvite } from '../../services/ContactService';
 import { logOut } from '../../Redux/features/authSlice';
 import { useDispatch } from 'react-redux';
 import { CreateProjectModal } from './CreateProjectModal';
@@ -106,10 +106,14 @@ console.log(notifications)
       setTimeout(() => setError(''), 5000);
     }
   };
-
   const handleDeclineInvitation = async (token, type) => {
     try {
-      await ProjectDecline(token, type);
+      if (type === 'contact') {
+        await ContactDecline(token);
+      } else if (type === 'project') {
+        await ProjectDecline(token);
+      }
+      
       setNotifications(prev => prev.filter(n => n.token !== token));
       setSuccess(`${type === 'project' ? 'Project' : 'Contact'} invitation declined`);
       setTimeout(() => setSuccess(''), 3000);
@@ -118,7 +122,7 @@ console.log(notifications)
       setTimeout(() => setError(''), 5000);
     }
   };
-
+  
   const handleInvite = async (email) => {
     try {
       await ContactInvite(email);
@@ -141,7 +145,7 @@ console.log(notifications)
         onCreate={(projectData) => console.log("Creating project:", projectData)}
       />
       
-      <header className="fixed top-0 right-0 left-0 h-16 bg-white/95 backdrop-blur-xl border-b border-gray-200/50 flex items-center justify-between px-4 md:px-6 z-50 gap-4 shadow-sm shadow-gray-100/50">
+      <header className="fixed top-0 right-0 left-0 h-16  bg-white/95 backdrop-blur-xl border-b border-gray-200/50 flex items-center justify-between px-4 md:px-6 z-50 gap-4 shadow-sm shadow-gray-100/50">
         {/* Left Section */}
         <div className="flex items-center gap-6">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-500 bg-clip-text text-transparent tracking-tight">

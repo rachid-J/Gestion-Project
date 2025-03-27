@@ -279,7 +279,7 @@ export const Profile = () => {
             </div>
 
             {/* Teams Card */}
-            <TeamSection contacts={contacts} />
+            <TeamSection contacts={contacts} isMyProfile={isMyProfile} />
           </div>
 
           {/* Main Content */}
