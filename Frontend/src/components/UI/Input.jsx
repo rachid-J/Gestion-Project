@@ -37,7 +37,7 @@ export const Input = forwardRef(
           checked={checked}
           className={`w-full px-4 py-2 ${
             icon ? 'pl-10' : 'pl-4'
-          } border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+          } border border-gray-300 outline-none rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all ${
             className || ''
           }`}
           style={style}

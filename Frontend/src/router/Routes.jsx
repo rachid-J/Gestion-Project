@@ -4,7 +4,6 @@ import { Project } from '../pages/Project';
 import { Profile } from '../pages/Profile';
 
 
-import { Reports } from '../pages/Reports';
 import { NotFound } from '../pages/NotFound';
 import { useDispatch, useSelector } from "react-redux";
 import { Auth } from "../pages/Auth";
@@ -103,7 +102,6 @@ export const Router = () => {
                 { path: "Summary", element: <Summary /> },
                 { path: "board", element: <Board /> },
                 { path: "List", element: <List /> },
-                { path: "reports", element: <Reports /> },
                 { path: "collaboration", element: <Collaboration />, },
 
             ]
