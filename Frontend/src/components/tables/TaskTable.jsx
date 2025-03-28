@@ -1,14 +1,11 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { EyeIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
-
 import { ViewModal } from "../modals/ViewModal";
 import { UpdateModal } from "../modals/UpdateModal";
 import { Pagination } from "../UI/Paginations";
 import { updateTaskStatus } from "../../services/tasksServices";
 import { DeleteTask } from "../modals/DeleteTask";
-
-
 
 const statusGroups = {
   to_do: { title: "To Do", color: "bg-gray-100" },
@@ -26,11 +23,21 @@ export const TaskTable = ({
   updateButton = true,
   deleteButton = true
 }) => {
- 
   const [draggedTask, setDraggedTask] = useState(null);
   const [modal, setModal] = useState({ type: "", data: {} });
-console.log("modal",modal)
+
+  const canDragTask = (task) => {
+    return (
+      task.creator?.id === currentUserId ||
+      task.assigned_to?.id === currentUserId
+    );
+  };
+
   const handleDragStart = (e, task) => {
+    if (!canDragTask(task)) {
+      e.preventDefault();
+      return;
+    }
     setDraggedTask(task);
     e.dataTransfer.effectAllowed = "move";
     e.currentTarget.style.opacity = "0.5";
@@ -81,78 +88,87 @@ console.log("modal",modal)
               <div className="mt-2 space-y-2">
                 {data
                   .filter(task => task.status === status)
-                  .map((task) => (
-                    <div
-                      key={task.id}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, task)}
-                      onDragEnd={handleDragEnd}
-                      className="bg-white rounded-lg shadow-sm p-3 border border-gray-200 cursor-move transition-transform hover:scale-[1.005] active:scale-100"
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="text-gray-400">⁝</div>
-                        <div className="flex space-x-1">
-                          {viewButton && (
-                            <button
-                              onClick={() => setModal({ type: "view", data: task })}
-                              className="p-1 hover:bg-gray-100 rounded"
-                            >
-                              <EyeIcon className="w-4 h-4 text-gray-600" />
-                            </button>
-                          )}
-                          {updateButton && task.creator?.id === currentUserId && (
-                            <button
-                              onClick={() => setModal({ type: "update", data: task })}
-                              className="p-1 hover:bg-gray-100 rounded"
-                            >
-                              <PencilSquareIcon className="w-4 h-4 text-gray-600" />
-                            </button>
-                          )}
-                          {deleteButton && task.creator?.id === currentUserId && (
-                            <button
-                              onClick={() => setModal({ type: "delete", data: task })}
-                              className="p-1 hover:bg-gray-100 rounded"
-                            >
-                              <TrashIcon className="w-4 h-4 text-gray-600" />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-
-                      <h4 className="text-sm font-medium text-gray-900 mb-1">
-                        {task.title}
-                      </h4>
-                      <p className="text-sm text-gray-600 line-clamp-2 mb-3">{task.description}</p>
-
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center space-x-2">
-                          <div className="shrink-0">
-                            <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                              {task.creator?.avatar ? (
-                                <img
-                                  src={task.creator.avatar}
-                                  className="w-full h-full rounded-full object-cover"
-                                  alt="Avatar"
-                                />
-                              ) : (
-                                <span className="text-xs text-blue-800">
-                                  {task.creator?.name?.charAt(0) || '?'}
-                                </span>
-                              )}
-                            </div>
+                  .map((task) => {
+                    const isDraggable = canDragTask(task);
+                    return (
+                      <div
+                        key={task.id}
+                        draggable={isDraggable}
+                        onDragStart={(e) => isDraggable && handleDragStart(e, task)}
+                        onDragEnd={handleDragEnd}
+                        className={`bg-white rounded-lg shadow-sm p-3 border border-gray-200 transition-transform ${
+                          isDraggable 
+                            ? "cursor-move hover:scale-[1.005] active:scale-100"
+                            : "cursor-not-allowed opacity-75"
+                        }`}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="text-gray-400">⁝</div>
+                          <div className="flex space-x-1">
+                            {viewButton && (
+                              <button
+                                onClick={() => setModal({ type: "view", data: task })}
+                                className="p-1 hover:bg-gray-100 rounded"
+                              >
+                                <EyeIcon className="w-4 h-4 text-gray-600" />
+                              </button>
+                            )}
+                            {updateButton && task.creator?.id === currentUserId && (
+                              <button
+                                onClick={() => setModal({ type: "update", data: task })}
+                                className="p-1 hover:bg-gray-100 rounded"
+                              >
+                                <PencilSquareIcon className="w-4 h-4 text-gray-600" />
+                              </button>
+                            )}
+                            {deleteButton && task.creator?.id === currentUserId && (
+                              <button
+                                onClick={() => setModal({ type: "delete", data: task })}
+                                className="p-1 hover:bg-gray-100 rounded"
+                              >
+                                <TrashIcon className="w-4 h-4 text-gray-600" />
+                              </button>
+                            )}
                           </div>
-                          <span className="text-gray-600">
-                            {task.assigned_to?.name || "Unassigned"}
-                          </span>
                         </div>
-                        {task.due_date && (
-                          <span className="text-xs px-2 py-1 bg-orange-100 text-orange-800 rounded-full">
-                            {new Date(task.due_date).toLocaleDateString()}
-                          </span>
-                        )}
+
+                        <h4 className="text-sm font-medium text-gray-900 mb-1">
+                          {task.title}
+                        </h4>
+                        <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                          {task.description}
+                        </p>
+
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center space-x-2">
+                            <div className="shrink-0">
+                              <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
+                                {task.creator?.avatar ? (
+                                  <img
+                                    src={task.creator.avatar}
+                                    className="w-full h-full rounded-full object-cover"
+                                    alt="Avatar"
+                                  />
+                                ) : (
+                                  <span className="text-xs text-blue-800">
+                                    {task.creator?.name?.charAt(0) || '?'}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <span className="text-gray-600">
+                              {task.assigned_to?.name || "Unassigned"}
+                            </span>
+                          </div>
+                          {task.due_date && (
+                            <span className="text-xs px-2 py-1 bg-orange-100 text-orange-800 rounded-full">
+                              {new Date(task.due_date).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
               </div>
             </div>
           </div>
@@ -176,7 +192,6 @@ console.log("modal",modal)
           task={modal.data}
           statusGroups={statusGroups}
           onClose={() => setModal({ type: "", data: {} })}
-          
         />
       )}
 
@@ -189,8 +204,13 @@ console.log("modal",modal)
         />
       )}
 
-      {modal && modal.type === "delete" && <DeleteTask modal={modal} setModal={setModal} />}
-
+      {modal.type === "delete" && (
+        <DeleteTask 
+          modal={modal} 
+          setModal={setModal} 
+          onDeleteSuccess={() => getData(pagination?.currentPage || 1)}
+        />
+      )}
     </div>
   );
 };
@@ -198,10 +218,21 @@ console.log("modal",modal)
 TaskTable.propTypes = {
   data: PropTypes.array.isRequired,
   getData: PropTypes.func.isRequired,
-  pagination: PropTypes.object,
+  pagination: PropTypes.shape({
+    currentPage: PropTypes.number,
+    lastPage: PropTypes.number,
+    total: PropTypes.number
+  }),
   paginate: PropTypes.bool,
-  currentUserId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  currentUserId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   viewButton: PropTypes.bool,
   updateButton: PropTypes.bool,
   deleteButton: PropTypes.bool
+};
+
+TaskTable.defaultProps = {
+  paginate: true,
+  viewButton: true,
+  updateButton: true,
+  deleteButton: true
 };

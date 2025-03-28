@@ -204,7 +204,7 @@ const dispatch = useDispatch()
           )}
 
           {loading ? (
-            <TableSkeleton heads={["Name", "Status", "Creator", "Action"]} />
+                 <TableSkeleton heads={["Name", "Status", "Creator"]}/>
           ) : projects.length > 0 ? (
             <Table
               heads={["Name", "Status", "Creator"]}

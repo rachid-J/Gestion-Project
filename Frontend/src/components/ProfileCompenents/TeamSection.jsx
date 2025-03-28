@@ -70,69 +70,72 @@ export const TeamSection = ({ contacts, isMyProfile }) => {
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-gray-700">Contact</h3>
-          <div className="relative header-dropdown">
-            <button 
-              onClick={handleHeaderDropdownToggle}
-              className="p-1.5 hover:bg-gray-50 rounded-lg menu-button"
-            >
-              <EllipsisVerticalIcon className="w-5 h-5 text-gray-400" />
-            </button>
-            
-            {showHeaderDropdown && (
-              <div className="absolute left-5 z-10 w-48 origin-top-right rounded-md bg-white shadow-lg ring-black ring-opacity-5 focus:outline-none">
-                <div>
-                  <button
-                    onClick={handleSeeAllContacts}
-                    className="flex items-center w-full p-3 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    <ArrowRightIcon className="w-5 h-5 mr-2 text-gray-400" />
-                    See All Contacts
-                  </button>
+          {isMyProfile && (  // Only show dropdown menu for owner
+            <div className="relative header-dropdown">
+              <button 
+                onClick={handleHeaderDropdownToggle}
+                className="p-1.5 hover:bg-gray-50 rounded-lg menu-button"
+              >
+                <EllipsisVerticalIcon className="w-5 h-5 text-gray-400" />
+              </button>
+              
+              {showHeaderDropdown && (
+                <div className="absolute left-5 z-10 w-48 origin-top-right rounded-md bg-white shadow-lg ring-black ring-opacity-5 focus:outline-none">
+                  <div>
+                    <button
+                      onClick={handleSeeAllContacts}
+                      className="flex items-center w-full p-3 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <ArrowRightIcon className="w-5 h-5 mr-2 text-gray-400" />
+                      See All Contacts
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
         
-        <div className="space-y-3">
-          {contacts.length === 0 ? (
-            <div className="text-center py-4 text-gray-500 text-sm">
-              No contacts found
-            </div>
-          ) : (
-            contacts.map(contact => (
-              <div key={contact.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg group">
-                <div>
-                  <h4 className="text-sm font-medium">{contact.name}</h4>
-                  <p className="text-xs text-gray-500">{contact.members_count} members</p>
-                </div>
-                <div className="relative">
-                  <button 
-                    onClick={() => handleDropdownToggle(contact.id)}
-                    className="p-1 hover:bg-gray-100 rounded menu-button"
-                  >
-                    <EllipsisVerticalIcon className="w-5 h-5 text-gray-400 hover:text-gray-600" />
-                  </button>
-                  
-                  {openDropdown === contact.id && (
-                    <div className="contact-dropdown absolute left-4 z-10 w-48 origin-top-right rounded-md bg-white shadow-lg ring-black ring-opacity-5 focus:outline-none">
-                      <div>
-                        <button
-                          onClick={() => navigate(`/profile/${contact.username}`)}
-                          className="flex items-center h-full w-full p-3 text-sm rounded-md text-gray-700 hover:bg-gray-100"
-                        >
-                          <UserCircleIcon className="w-5 h-5 mr-2 text-gray-400" />
-                          See Profile
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+        {isMyProfile ? (  // Only show contacts if it's the owner's profile
+          <div className="space-y-3">
+            {contacts.length === 0 ? (
+              <div className="text-center py-4 text-gray-500 text-sm">
+                No contacts found
               </div>
-            ))
-          )}
+            ) : (
+              contacts.map(contact => (
+               
+                  <div key={contact.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg group">
+                    <div>
+                      <h4 className="text-sm font-medium">{contact.name}</h4>
+                      <p className="text-xs text-gray-500">{contact.members_count} members</p>
+                    </div>
+                    <div className="relative">
+                      <button 
+                        onClick={() => handleDropdownToggle(contact.id)}
+                        className="p-1 hover:bg-gray-100 rounded menu-button"
+                      >
+                        <EllipsisVerticalIcon className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+                      </button>
+                      
+                      {openDropdown === contact.id && (
+                        <div className="contact-dropdown absolute left-4 z-10 w-48 origin-top-right rounded-md bg-white shadow-lg ring-black ring-opacity-5 focus:outline-none">
+                          <div>
+                            <button
+                              onClick={() => navigate(`/profile/${contact.username}`)}
+                              className="flex items-center h-full w-full p-3 text-sm rounded-md text-gray-700 hover:bg-gray-100"
+                            >
+                              <UserCircleIcon className="w-5 h-5 mr-2 text-gray-400" />
+                              See Profile
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+              ))
+            )}
 
-          {isMyProfile && (
             <button 
               onClick={() => setShowModal(true)} 
               className="w-full flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium p-2 hover:bg-blue-50 rounded-lg transition-colors"
@@ -140,16 +143,25 @@ export const TeamSection = ({ contacts, isMyProfile }) => {
               <PlusIcon className="w-5 h-5" />
               Add New Contact
             </button>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="text-center py-4 text-gray-500 text-sm">
+            <SparklesIcon className="w-6 h-6 mx-auto mb-2 text-gray-400" />
+            Contacts are private
+          </div>
+        )}
       </div>
 
-      <InviteModal
-        show={showModal}
-        handleClose={() => setShowModal(false)}
-        handleInvite={handleInvite}
-      />
+      {/* Only show invite modal for profile owner */}
+      {isMyProfile && (
+        <InviteModal
+          show={showModal}
+          handleClose={() => setShowModal(false)}
+          handleInvite={handleInvite}
+        />
+      )}
 
+      {/* Notifications can stay global */}
       {notification && (
         <Notification
           type={notification.type} 

@@ -16,6 +16,7 @@ import {
 import { Modal } from '../components/UI/Modal';
 import { logOut } from '../Redux/features/authSlice';
 import { Notification } from '../components/layouts/Notification';
+import { PasswordRequirements, PasswordStrengthIndicator } from '../components/modals/checkPassword';
 
 
 export const Settings = () => {
@@ -108,7 +109,26 @@ export const Settings = () => {
     }
   };
 
-
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
+  
+  const checkPasswordStrength = (password) => {
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[!@#$%^&*]/.test(password)) strength++;
+    if (password.length >= 12) strength++;
+    
+    setPasswordStrength(Math.min(5, Math.max(1, strength)));
+    setIsPasswordValid(
+      password.length >= 8 &&
+      /[A-Z]/.test(password) &&
+      /\d/.test(password) &&
+      /[!@#$%^&*]/.test(password) &&
+      password === passwordData.confirmPassword
+    );
+  };
 
   return (
     <>
@@ -171,7 +191,7 @@ export const Settings = () => {
                     onClick={handleProfileUpdate}
                     className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-500 hover:to-blue-600 
                              text-white font-medium rounded-lg transition-all duration-200 shadow-xs
-                             flex items-center gap-2"
+                             flex items-center gap-2 cursor-pointer"
                   >
                     Save Changes
                   </button>
@@ -180,64 +200,85 @@ export const Settings = () => {
             )}
 
             {activeTab === 'security' && (
-              <div className="space-y-8">
-                <div className="pb-4 border-b border-gray-100">
-                  <h2 className="text-xl font-semibold text-gray-900">Security Settings</h2>
-                  <p className="text-sm text-gray-500 mt-1">Manage your password and account security</p>
-                </div>
-                
-                <div className="bg-gray-50/50 p-6 rounded-xl border border-gray-100">
-                  <h3 className="font-semibold text-gray-900 mb-5 flex items-center gap-2">
-                    <LockClosedIcon className="w-5 h-5 text-gray-600" />
-                    Change Password
-                  </h3>
-                  <div className="space-y-5">
-                    <div className="space-y-2.5">
-                      <label className="text-sm font-medium text-gray-700">Current Password</label>
-                      <input
-                        type="password"
-                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg outline-none 
-                                  focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500
-                                  transition-all duration-200 placeholder:text-gray-400"
-                        value={passwordData.currentPassword}
-                        onChange={(e) => setPasswordData(p => ({...p, currentPassword: e.target.value}))}
-                      />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div className="space-y-2.5">
-                        <label className="text-sm font-medium text-gray-700">New Password</label>
-                        <input
-                          type="password"
-                          className="w-full px-4 py-2.5 border border-gray-200 rounded-lg outline-none 
-                                  focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500
-                                  transition-all duration-200 placeholder:text-gray-400"
-                          value={passwordData.newPassword}
-                          onChange={(e) => setPasswordData(p => ({...p, newPassword: e.target.value}))}
-                        />
-                      </div>
-                      <div className="space-y-2.5">
-                        <label className="text-sm font-medium text-gray-700">Confirm Password</label>
-                        <input
-                          type="password"
-                          className="w-full px-4 py-2.5 border border-gray-200 rounded-lg outline-none 
-                                  focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500
-                                  transition-all duration-200 placeholder:text-gray-400"
-                          value={passwordData.confirmPassword}
-                          onChange={(e) => setPasswordData(p => ({...p, confirmPassword: e.target.value}))}
-                        />
-                      </div>
-                    </div>
-                    <div className="pt-4">
-                      <button 
-                        onClick={handlePasswordUpdate}
-                        className="w-full py-2.5 px-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:to-blue-600 
-                                 text-white font-medium rounded-lg transition-all duration-200 shadow-xs"
-                      >
-                        Update Password
-                      </button>
-                    </div>
-                  </div>
-                </div>
+  <div className="space-y-8">
+    <div className="pb-4 border-b border-gray-100">
+      <h2 className="text-xl font-semibold text-gray-900">Security Settings</h2>
+      <p className="text-sm text-gray-500 mt-1">Manage your password and account security</p>
+    </div>
+    
+    <div className="bg-gray-50/50 p-6 rounded-xl border border-gray-100">
+      <h3 className="font-semibold text-gray-900 mb-5 flex items-center gap-2">
+        <LockClosedIcon className="w-5 h-5 text-gray-600" />
+        Change Password
+      </h3>
+      <div className="space-y-5">
+        <div className="space-y-2.5">
+          <label className="text-sm font-medium text-gray-700">Current Password</label>
+          <div className="relative">
+            <input
+              type="password"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg outline-none 
+                        focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500
+                        transition-all duration-200 placeholder:text-gray-400"
+              value={passwordData.currentPassword}
+              onChange={(e) => setPasswordData(p => ({...p, currentPassword: e.target.value}))}
+              placeholder="Enter current password"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="space-y-2.5">
+            <label className="text-sm font-medium text-gray-700">New Password</label>
+            <div className="relative">
+              <input
+                type="password"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg outline-none 
+                          focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500
+                          transition-all duration-200 placeholder:text-gray-400"
+                value={passwordData.newPassword}
+                onChange={(e) => {
+                  setPasswordData(p => ({...p, newPassword: e.target.value}));
+                  checkPasswordStrength(e.target.value);
+                }}
+                placeholder="At least 8 characters"
+              />
+              <PasswordStrengthIndicator strength={passwordStrength} />
+            </div>
+          </div>
+          
+          <div className="space-y-2.5">
+            <label className="text-sm font-medium text-gray-700">Confirm Password</label>
+            <input
+              type="password"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg outline-none 
+                        focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500
+                        transition-all duration-200 placeholder:text-gray-400"
+              value={passwordData.confirmPassword}
+              onChange={(e) => setPasswordData(p => ({...p, confirmPassword: e.target.value}))}
+              placeholder="Re-enter new password"
+            />
+          </div>
+        </div>
+
+        <PasswordRequirements 
+          password={passwordData.newPassword} 
+          confirmPassword={passwordData.confirmPassword}
+        />
+
+        <div className="pt-4 flex justify-end">
+          <button 
+            onClick={handlePasswordUpdate}
+            disabled={!isPasswordValid}
+            className="px-5 py-2.5 bg-gradient-to-r  from-blue-600 to-blue-500 hover:to-blue-600 
+                             text-white font-medium rounded-lg transition-all duration-200 shadow-xs cursor-pointer
+                             flex items-center gap-2"
+          >
+            Update Password
+          </button>
+        </div>
+      </div>
+    </div>
 
                 <div className="bg-red-50/30 p-6 rounded-xl border border-red-100">
                   <h3 className="font-semibold text-red-700 mb-4 flex items-center gap-2">
@@ -254,7 +295,7 @@ export const Settings = () => {
                       onClick={() => setShowDeleteModal(true)}
                       className="px-5 py-2.5 bg-gradient-to-r from-red-600 to-red-500 hover:to-red-600 
                                text-white font-medium rounded-lg transition-all duration-200 shadow-xs
-                               whitespace-nowrap"
+                               whitespace-nowrap cursor-pointer"
                     >
                       Delete Account
                     </button>

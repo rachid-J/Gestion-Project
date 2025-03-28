@@ -148,8 +148,10 @@ class ProjectInviteController extends Controller
     if ($invitation->status !== 'pending') {
         return response()->json(['error' => 'Only pending invitations can be declined'], 400);
     }
+    
 
     $invitation->update(['status' => 'declined']);
+
 
     return response()->json([
         'message' => 'Invitation declined successfully',
