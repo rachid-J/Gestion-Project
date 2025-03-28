@@ -89,7 +89,6 @@ export const Summary = () => {
     </div>
   );
 
-  // Statistics calculations
   const stats = {
     totalTasks: tasks.length,
     completed: tasks.filter(t => t.status === 'done').length,
@@ -147,7 +146,6 @@ export const Summary = () => {
     return (
       <div className="p-6 min-h-screen bg-slate-50">
         <div className="max-w-7xl mx-auto">
-          {/* Enhanced Header */}
           <div className="flex items-center justify-between mb-8 p-6 bg-slate-900 rounded-2xl shadow-xl">
             <div>
               <h1 className="text-2xl font-bold text-white">Project Overview</h1>
@@ -158,7 +156,7 @@ export const Summary = () => {
            
           </div>
   
-          {/* Modern Stats Grid */}
+          
           <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
             {[
               { 
@@ -200,11 +198,8 @@ export const Summary = () => {
             ))}
           </div>
   
-          {/* Modern Layout Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Left Column */}
             <div className="lg:col-span-4 space-y-6">
-              {/* Status Distribution Card */}
               <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200/60">
                 <h3 className="text-lg font-semibold text-slate-900 mb-5">Workflow Status</h3>
                 <div className="space-y-4">
@@ -230,7 +225,6 @@ export const Summary = () => {
                 </div>
               </div>
   
-              {/* Team Workload Card */}
               <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200/60">
                 <h3 className="text-lg font-semibold text-slate-900 mb-5">Team Workload</h3>
                 <div className="space-y-4">
@@ -255,7 +249,6 @@ export const Summary = () => {
                 </div>
               </div>
               <div className="lg:col-span-4 space-y-6">
-                {/* Priority Distribution Card */}
                 <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200/60">
                   <h3 className="text-lg font-semibold text-slate-900 mb-6">Priority Distribution</h3>
                   <div className="space-y-5">
@@ -288,7 +281,6 @@ export const Summary = () => {
                 </div>
                 
   
-                {/* Upcoming Deadlines Card */}
                 <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200/60">
                   <h3 className="text-lg font-semibold text-slate-900 mb-6">Upcoming Deadlines</h3>
                   <div className="space-y-4">
@@ -324,9 +316,7 @@ export const Summary = () => {
               </div>
             </div>
   
-            {/* Right Column */}
             <div className="lg:col-span-8 space-y-6">
-              {/* Activity Feed Card */}
               <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200/60">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold text-slate-900">Recent Activity</h3>
@@ -379,16 +369,15 @@ export const Summary = () => {
     </h3>
   </div>
 
-  {/* Chart Container */}
-  <div className="h-48 relative mx-auto w-full max-w-[400px]"> {/* Added max-width and centered */}
+  <div className="h-48 relative mx-auto w-full max-w-[400px]"> 
     <ResponsiveContainer width="100%" height="100%">
       <PieChart margin={{ top: 0, right: 20, bottom: 0, left: 20 }}>
         <Pie
           data={pieData}
           cx="50%"
           cy="50%"
-          innerRadius={55}  // Reduced from 75
-          outerRadius={75} // Reduced from 95
+          innerRadius={55}  
+          outerRadius={75} 
           paddingAngle={2}
           dataKey="value"
           animationDuration={400}
@@ -398,18 +387,18 @@ export const Summary = () => {
               key={`cell-${index}`} 
               fill={entry.color}
               stroke="white"
-              strokeWidth={2} // Reduced from 4
+              strokeWidth={2}
             />
           ))}
         </Pie>
         
-        {/* Center Label */}
+       
         <text
           x="50%"
           y="50%"
           textAnchor="middle"
           dominantBaseline="middle"
-          className="text-lg font-semibold text-slate-900" // Reduced text size
+          className="text-lg font-semibold text-slate-900" 
         >
           {stats.totalTasks}
         </text>
@@ -417,7 +406,6 @@ export const Summary = () => {
     </ResponsiveContainer>
   </div>
 
-  {/* Enhanced Legend */}
   <div className="grid grid-cols-3 gap-4 mt-6">
     {pieData.map((entry, index) => (
       <div 
@@ -425,7 +413,7 @@ export const Summary = () => {
         className="flex items-center gap-3 p-3 rounded-xl bg-slate-50/50 hover:bg-slate-100/50 transition-colors"
       >
         <div 
-          className="w-3 h-3 rounded-full shadow-sm" // Smaller indicator
+          className="w-3 h-3 rounded-full shadow-sm" 
           style={{ backgroundColor: entry.color }}
         />
         <div className="flex-1">
@@ -445,7 +433,7 @@ export const Summary = () => {
 </div>
 
   
-              {/* Data Visualization Row */}
+             
              
             </div>
           </div>

@@ -28,7 +28,6 @@ export const Settings = () => {
  
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   
-  // Profile State
   const [profileData, setProfileData] = useState({
     name: currentUser?.name || '',
     email: currentUser?.email || '',
@@ -40,7 +39,6 @@ export const Settings = () => {
   });
   console.log(currentUser)
 
-  // Password State
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -98,7 +96,7 @@ export const Settings = () => {
 
   const handleAccountDeletion = async (password) => {
     try {
-      await deleteAccount(password); // Pass password directly as string
+      await deleteAccount(password); 
       dispatch(logOut());
       window.location.href = '/redirect';
     } catch (error) {
@@ -122,7 +120,6 @@ export const Settings = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Navigation Sidebar */}
           <div className="lg:col-span-1 space-y-2">
             {[
               { id: 'profile', icon: UserCircleIcon, label: 'Profile' },
@@ -143,7 +140,6 @@ export const Settings = () => {
             ))}
           </div>
 
-          {/* Main Content */}
           <div className="lg:col-span-3 bg-white rounded-2xl shadow-xs p-8 border border-gray-100">
             {activeTab === 'profile' && (
               <div className="space-y-8">
@@ -190,7 +186,6 @@ export const Settings = () => {
                   <p className="text-sm text-gray-500 mt-1">Manage your password and account security</p>
                 </div>
                 
-                {/* Password Update Card */}
                 <div className="bg-gray-50/50 p-6 rounded-xl border border-gray-100">
                   <h3 className="font-semibold text-gray-900 mb-5 flex items-center gap-2">
                     <LockClosedIcon className="w-5 h-5 text-gray-600" />
@@ -244,7 +239,6 @@ export const Settings = () => {
                   </div>
                 </div>
 
-                {/* Danger Zone Card */}
                 <div className="bg-red-50/30 p-6 rounded-xl border border-red-100">
                   <h3 className="font-semibold text-red-700 mb-4 flex items-center gap-2">
                     <TrashIcon className="w-5 h-5 text-red-600" />
@@ -269,7 +263,6 @@ export const Settings = () => {
               </div>
             )}
 
-            {/* Delete Account Modal */}
            
           </div>
           

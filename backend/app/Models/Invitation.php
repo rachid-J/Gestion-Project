@@ -27,7 +27,7 @@ class Invitation extends Model
     {
         return $this->belongsTo(User::class, 'receiver_id')->withDefault([
             'name' => 'Deleted User',
-            'email' => $this->email // Fallback to invitation email
+            'email' => $this->email 
         ]);
     }
 }

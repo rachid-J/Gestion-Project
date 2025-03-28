@@ -39,13 +39,13 @@ class Attachment extends Model
 
 
 
-    // Add URL accessor
+  
     public function getUrlAttribute()
     {
         return Storage::url($this->file_path);
     }
 
-    // Add validation rules
+    
     public static function rules()
     {
         return [
@@ -55,7 +55,7 @@ class Attachment extends Model
         ];
     }
 
-    // Automatically delete file when model is deleted
+    
     protected static function booted()
     {
         static::deleted(function ($attachment) {

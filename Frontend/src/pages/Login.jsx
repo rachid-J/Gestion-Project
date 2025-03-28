@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
-import { Input } from '../components/UI/Input';
 import { Button } from '../components/UI/Button';
 import { login } from '../services/authServices';
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from 'react-redux';
 import { setAuth } from '../Redux/features/authSlice';
 import { Notification } from '../Components/layouts/Notification';
+import { EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { Input } from '../components/UI/Input';
 
 export const Login = ({ onSwitch }) =>  {
   const navigate = useNavigate()
@@ -58,9 +59,10 @@ export const Login = ({ onSwitch }) =>  {
             value={formData.email}
             onChange={handleChange}
             icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
+              <EnvelopeIcon 
+                className="h-5 w-5 text-gray-400" 
+                strokeWidth={2}
+              />
             }
             required
           />
@@ -74,19 +76,21 @@ export const Login = ({ onSwitch }) =>  {
             value={formData.password}
             onChange={handleChange}
             icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
+              <LockClosedIcon
+                className="h-5 w-5 text-gray-400" 
+                strokeWidth={2}
+              />
             }
             required
           />
+      
         </div>
 
         <Button
           type="submit"
           text="Continue"
           loading={loading}
-          className="w-full bg-gradient-to-r from-blue-600 to-purple-500 hover:from-blue-700 hover:to-purple-600 text-white font-semibold py-3 rounded-lg transition-all transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-500 hover:from-blue-700 hover:to-purple-600 text-white font-semibold py-3 rounded-lg hover:rounded-lg transition-all transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
         />
       </form>
 

@@ -17,7 +17,7 @@ class Task extends Model
         'due_date',
         'project_id',
         'assigned_to',
-        'created_by' // Add this line
+        'created_by' 
     ];
 
     public function project()

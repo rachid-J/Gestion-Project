@@ -26,7 +26,6 @@ class TaskCreatedNotification extends Notification
 
     public function toArray($notifiable)
     {
-        // Check if the notification is for the assigned user
         $isAssignee = $notifiable->id === $this->task->assigned_to;
 
         return [

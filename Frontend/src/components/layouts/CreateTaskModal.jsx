@@ -72,7 +72,6 @@ export const CreateTaskModal = ({ isOpen, onClose, onCreate, projectId ,getData 
               />
             </div>
 
-            {/* Description Field */}
             <div className="space-y-1">
               <label className="text-sm font-medium text-gray-700">
                 Description
@@ -85,9 +84,7 @@ export const CreateTaskModal = ({ isOpen, onClose, onCreate, projectId ,getData 
               />
             </div>
 
-            {/* Priority and Assignee Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Priority Dropdown */}
               <div className="space-y-1">
                 <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                   <FlagIcon className="w-5 h-5 text-gray-500" />
@@ -107,7 +104,6 @@ export const CreateTaskModal = ({ isOpen, onClose, onCreate, projectId ,getData 
                 </div>
               </div>
 
-              {/* Assignee Dropdown */}
               <div className="space-y-1">
                 <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                   <UserCircleIcon className="w-5 h-5 text-gray-500" />
@@ -131,7 +127,6 @@ export const CreateTaskModal = ({ isOpen, onClose, onCreate, projectId ,getData 
               </div>
             </div>
 
-            {/* Due Date Field */}
             <div className="space-y-1">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                 <CalendarDaysIcon className="w-5 h-5 text-gray-500" />
@@ -149,7 +144,6 @@ export const CreateTaskModal = ({ isOpen, onClose, onCreate, projectId ,getData 
             </div>
           </div>
 
-          {/* Form Actions */}
           <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
             <button
               type="button"

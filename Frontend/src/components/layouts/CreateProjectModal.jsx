@@ -39,7 +39,6 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
 
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="space-y-6 ">
-              {/* Project Name Field */}
               <div className="group relative">
                 <input
                   type="text"
@@ -54,7 +53,6 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                 </label>
               </div>
 
-              {/* Description Field */}
               <div className="group relative">
                 <textarea
                   value={description}
@@ -68,7 +66,6 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                 </label>
               </div>
 
-              {/* Template Selection */}
               <div className="flex justify-between gap-4 ">
               
               <div className="space-y-4">
@@ -100,7 +97,6 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                 </div>
               </div>
 
-              {/* Project Type */}
               <div className="space-y-4">
                 <h3 className="text-sm font-semibold text-gray-900">Project Type</h3>
                 <div className="grid gap-4 ">
@@ -134,7 +130,6 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
             </div>
           
 
-            {/* Action Buttons */}
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <button
                 type="button"

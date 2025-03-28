@@ -6,7 +6,6 @@ export const CreatorHoverModal = ({ creator }) => {
   console.log(creator)
   return (
     <div className="w-72 bg-white shadow-xl border border-gray-200">
-      {/* Header Section */}
       <div className="p-4 flex items-center border-b border-gray-200 bg-gray-50">
         <div className="relative mr-4">
           {creator?.avatar ? (
@@ -30,7 +29,6 @@ export const CreatorHoverModal = ({ creator }) => {
         </div>
       </div>
 
-      {/* Information Section */}
       <div className="p-4 space-y-3">
         <div className="flex items-center text-gray-700 text-sm">
           <EnvelopeIcon className="h-4 w-4 mr-3 text-gray-500" />
@@ -42,7 +40,6 @@ export const CreatorHoverModal = ({ creator }) => {
         </div>
       </div>
 
-      {/* Footer Section */}
       <div className="border-t border-gray-200 p-2">
         <button onClick={()=> navigate(`/profile/${creator.creator.username}`)} className="w-full flex items-center justify-center px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 transition-colors">
           <UserCircleIcon className="h-4 w-4 mr-2" />

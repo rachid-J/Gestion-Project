@@ -14,8 +14,8 @@ export const getRecentActivity = async(username)=>{
   return response
 }
 
-export const getContact = async()=>{
-  const response = await axiosClient.get(`/user/getContact`)
+export const getContact = async(username)=>{
+  const response = await axiosClient.get(`/user/${username}/getContact`)
   return response
 }
 

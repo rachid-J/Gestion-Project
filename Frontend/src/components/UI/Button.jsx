@@ -29,7 +29,7 @@ export const Button = ({
         className,
         {
           "opacity-75 cursor-not-allowed": loading,
-          "hover:bg-blue-700": bg === "bg-blue-600" && !disabled && !loading,
+          "hover:bg-blue-700 ": bg === "bg-blue-600" && !disabled && !loading,
         }
       )}
     >

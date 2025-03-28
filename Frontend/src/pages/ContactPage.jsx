@@ -109,12 +109,10 @@ export const ContactsPage = () => {
     
     try {
       await ContactAccept(token);
-      // Remove the accepted invitation from the receivedInvites state
       setReceivedInvites(prev => ({
         ...prev,
         data: prev.data.filter(invite => invite.id !== inviteId)
       }));
-      // Optionally, refresh the contacts list
       const contactsRes = await getContact();
       setContacts(contactsRes.data);
     } catch (err) {
@@ -201,7 +199,6 @@ export const ContactsPage = () => {
         </div>
       )}
 
-      {/* Contacts Tab */}
       {tabValue === 0 && (
         <div className="space-y-2">
           {contacts.data.map(contact => (
@@ -241,7 +238,6 @@ export const ContactsPage = () => {
         </div>
       )}
 
-      {/* Pending Requests Tab */}
       {tabValue === 1 && (
         <div className="space-y-2">
           {receivedInvites.data.map(invite => (
@@ -303,7 +299,6 @@ export const ContactsPage = () => {
         </div>
       )}
 
-      {/* Sent Invitations Tab */}
       {tabValue === 2 && (
         <div className="space-y-2">
           {sentInvites.data.map(invite => (

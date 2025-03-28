@@ -86,7 +86,6 @@ export const Update = ({ modal, setModal }) => {
           <form className="space-y-8" onSubmit={update_FUNCTION}>
           {modal.toUpdateOrDelete === "project" && (
             <div className="space-y-6">
-              {/* Project Name Field */}
               <div className="group relative">
                 <Input
                   className="peer w-full rounded-xl border-0 outline-none bg-gray-100/50 px-4 py-3.5 text-gray-900 ring-1 ring-gray-200 transition-all placeholder:text-transparent focus:ring-2 focus:ring-blue-500 focus:bg-white"
@@ -99,7 +98,6 @@ export const Update = ({ modal, setModal }) => {
                 />
               </div>
 
-              {/* Description Field */}
               <div className="group relative">
                 <textarea
                   className="peer w-full rounded-xl border-0 outline-none bg-gray-100/50 px-4 py-3.5 text-gray-900 ring-1 ring-gray-200 transition-all placeholder:text-transparent focus:ring-2 focus:ring-blue-500 focus:bg-white"
@@ -141,7 +139,6 @@ export const Update = ({ modal, setModal }) => {
             </div>
           )}
 
-            {/* Action Buttons */}
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <button
                 type="button"

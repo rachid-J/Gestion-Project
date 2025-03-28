@@ -19,7 +19,6 @@ class NotificationController extends Controller
     {
         $user = auth("api")->user();
 
-        // Get project invitations as array
         $projectInvitations = Invitation::with(['sender', 'project'])
             ->where('email', $user->email)
             ->where('status', 'pending')
@@ -36,7 +35,6 @@ class NotificationController extends Controller
                 ];
             })->all();
 
-        // Get contact invitations as array
         $contactInvitations = ContactInvitations::with(['sender'])
             ->where('recipient_email', $user->email)
             ->where('status', 'pending')
@@ -72,10 +70,10 @@ class NotificationController extends Controller
             $TaskNotifications = $user->notifications()
             ->whereIn('type', [
                
-                TaskCreatedNotification::class,       // Added
-                TaskUpdatedNotification::class,       // Added
-                CommentAddedNotification::class,      // Added
-                AttachmentAddedNotification::class    // Added
+                TaskCreatedNotification::class,       
+                TaskUpdatedNotification::class,       
+                CommentAddedNotification::class,      
+                AttachmentAddedNotification::class    
             ])
             ->get()
             ->map(function ($notification) {
@@ -89,7 +87,7 @@ class NotificationController extends Controller
                 ];
             });
 
-        // Merge all notifications
+        
         $notifications = array_merge(
             $projectInvitations,
             $contactInvitations,
@@ -97,7 +95,6 @@ class NotificationController extends Controller
             $TaskNotifications->toArray()
         );
 
-        // Sort by timestamp
         usort(
             $notifications,
             fn($a, $b) =>
@@ -129,7 +126,6 @@ class NotificationController extends Controller
                         ContactInvitations::where('id', $id)->update(['read' => true]);
                         break;
                     
-                    // Handle all database notifications (including new task notifications)
                     default:
                         $user->notifications()
                             ->where('id', $id)

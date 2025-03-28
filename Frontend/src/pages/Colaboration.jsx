@@ -95,7 +95,6 @@ export const Collaboration = () => {
       return (
         <div className="min-h-screen bg-gray-50">
           <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {/* Header Tabs */}
             <div className="flex border-b border-gray-200 mb-8">
               {isCreator ? (
                 <div className="flex gap-1">
@@ -132,7 +131,6 @@ export const Collaboration = () => {
     
             {activeTab === 'collaborators' && (
               <div className="space-y-6">
-                {/* Current User Card */}
                 <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
                   <div className="flex items-center gap-4">
                     <div className="relative">
@@ -162,7 +160,6 @@ export const Collaboration = () => {
                   </div>
                 </div>
     
-                {/* Team Members Section */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h2 className="text-lg font-semibold text-gray-900">
@@ -182,7 +179,6 @@ export const Collaboration = () => {
                     )}
                   </div>
     
-                  {/* Members Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {collaborators
                       .filter(user => user.username !== Infouser.username)
@@ -231,7 +227,6 @@ export const Collaboration = () => {
                         </div>
                       ))}
     
-                    {/* Empty State */}
                     {collaborators.filter(user => user.username !== Infouser.username).length === 0 && (
                       <div className="col-span-full py-12 text-center space-y-4">
                         <div className="mx-auto w-24 h-24 bg-gray-100 rounded-xl flex items-center justify-center">
@@ -252,7 +247,6 @@ export const Collaboration = () => {
               </div>
             )}
     
-            {/* Invitations Tab */}
             {isCreator && activeTab === 'invitations' && (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -296,7 +290,6 @@ export const Collaboration = () => {
                   ))}
                 </div>
     
-                {/* Empty State */}
                 {invitations.length === 0 && (
                   <div className="py-12 text-center space-y-4">
                     <div className="mx-auto w-24 h-24 bg-gray-100 rounded-xl flex items-center justify-center">
@@ -315,7 +308,6 @@ export const Collaboration = () => {
               </div>
             )}
     
-            {/* Invite Modal */}
             <ColaabInvite
               show={showInviteModal}
               onClose={() => setShowInviteModal(false)}

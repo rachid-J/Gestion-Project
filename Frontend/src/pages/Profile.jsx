@@ -76,14 +76,13 @@ export const Profile = () => {
     fetchProfileData();
   }, [isMyProfile, currentUser, routeUsername]);
 
-  // Fetch additional data
   useEffect(() => {
     const fetchAdditionalData = async () => {
       try {
         const [projectsRes, activityRes, contactsRes] = await Promise.all([
           Userprojects(routeUsername),
           getRecentActivity(routeUsername),
-          getContact()
+          getContact(routeUsername)
         ]);
         
         setProjects(projectsRes.data.projects);
@@ -182,11 +181,9 @@ export const Profile = () => {
 
   return (
     <div className="min-h-screen bg-[#f5f6fa]">
-      {/* Background Section */}
       <div className="relative bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] h-full">
         <div className="max-w-full mx-auto">
           <div className="relative h-64 flex items-end pb-12">
-            {/* Background Image Upload */}
             <div
               className="absolute inset-0 overflow-hidden group cursor-pointer transition-all"
               onClick={() => isMyProfile && document.getElementById('backgroundInput').click()}
@@ -211,7 +208,6 @@ export const Profile = () => {
               />
             </div>
 
-            {/* Profile Picture */}
             <div className="relative -mb-24 ml-12 group">
               <div
                 className="w-40 h-40 rounded-2xl border-4 border-white bg-gray-100 shadow-xl overflow-hidden cursor-pointer transition-transform hover:scale-105"
@@ -241,12 +237,10 @@ export const Profile = () => {
         </div>
       </div>
 
-      {/* Main Content */}
+     
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Left Sidebar */}
           <div className="lg:col-span-1 space-y-6">
-            {/* Profile Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="p-6">
                 <div className="mb-6">
@@ -278,11 +272,11 @@ export const Profile = () => {
               </div>
             </div>
 
-            {/* Teams Card */}
+          
             <TeamSection contacts={contacts} isMyProfile={isMyProfile} />
           </div>
 
-          {/* Main Content */}
+      
           <div className="lg:col-span-3 space-y-6">
             <ProjectSection projects={projects} formatRelativeTime={formatRelativeTime} />
             <ActivitySection activities={activities} formatRelativeTime={formatRelativeTime} />

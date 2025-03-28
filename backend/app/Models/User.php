@@ -41,10 +41,10 @@ class User extends Authenticatable implements JWTSubject
     public function collaboratingProjects()
     {
         return $this->belongsToMany(Project::class, 'project_user', 'user_id', 'project_id')
-            ->withPivot('role'); // Include role if needed
+            ->withPivot('role'); 
     }
 
-    // Combine both relationships
+
     public function allProjects()
     {
         $created = $this->createdProjects()->selectRaw('projects.*, "creator" as role');

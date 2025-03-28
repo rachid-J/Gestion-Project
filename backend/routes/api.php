@@ -36,7 +36,7 @@ Route::middleware('api')->prefix('/user')->group(function () {
     Route::get('/{username}/profile', [UserInfoController::class, 'getUserProfile']);
     Route::get('/{username}/activity', [UserInfoController::class, 'getRecentActivity']);
     Route::put('/update', [UserInfoController::class, 'update']);
-    Route::get('/getContact', [UserInfoController::class, 'getContact']);
+    Route::get('/{username}/getContact', [UserInfoController::class, 'getContact']);
 
 });
 

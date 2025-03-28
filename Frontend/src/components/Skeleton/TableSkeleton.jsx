@@ -3,7 +3,6 @@ import React from 'react';
 export const TableSkeleton = ({ heads }) => {
   return (
     <div className="animate-pulse p-6 space-y-4">
-      {/* Header */}
       <div className="hidden md:grid grid-cols-4 gap-4 mb-4">
         {heads.map((_, i) => (
           <div key={i} className="h-4 bg-gray-200 rounded-full w-1/4" />
@@ -11,7 +10,6 @@ export const TableSkeleton = ({ heads }) => {
         <div className="h-4 bg-gray-200 rounded-full w-1/4" />
       </div>
 
-      {/* Rows */}
       {[...Array(5)].map((_, i) => (
         <div key={i} className="grid grid-cols-4 gap-4 py-4">
           {heads.map((_, j) => (

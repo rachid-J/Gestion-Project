@@ -78,11 +78,7 @@ class TaskController extends Controller
                 return response()->json(["message" => "Access denied"], 403);
             }
     
-            // $tasks = $project->tasks()
-            //     ->with(['assignedTo', 'creator' => function($q) {
-            //         $q->select('id', 'name', 'email');
-            //     }])
-            //     ->get();
+          
 
             $tasks = $project->tasks()
             ->with([
@@ -128,7 +124,6 @@ class TaskController extends Controller
                 return response()->json(['message' => 'User not found'], 404);
             }
     
-            // Validate project ownership
             $project = Project::where('id', $projectId)
                 ->where('created_by', $user->id)
                 ->first();
@@ -137,7 +132,6 @@ class TaskController extends Controller
                 return response()->json(['message' => 'Project not found or unauthorized'], 404);
             }
     
-            // Enhanced validation
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
                 'description' => 'required|string',
@@ -152,7 +146,6 @@ class TaskController extends Controller
                 return response()->json(['message' => 'Assigned user is not a project member'], 400);
             }
     
-            // Create task with default values
             $task = Task::create([
                 'title' => $validated['title'],
                 'description' => $validated['description'],
@@ -164,7 +157,6 @@ class TaskController extends Controller
                 'created_by' => $user->id
             ]);
     
-            // Send notifications to all project members except creator
             $task->project->users()
             ->where('users.id', '!=', $user->id)
             ->each(function ($user) use ($task) {
@@ -216,10 +208,8 @@ class TaskController extends Controller
                 "due_date" => "nullable|date",
             ]);
     
-            // Handle empty due_date
             $validation['due_date'] = $validation['due_date'] ?? null;
             
-            // Update the task with validated data
             $task->update($validation);
             $task->project->users()
             ->where('users.id', '!=', $user->id)
@@ -227,7 +217,6 @@ class TaskController extends Controller
                 $user->notify(new TaskUpdatedNotification($task, auth("api")->user()));
             });
     
-            // Notify project members except updater
          
             return response()->json([
                 "message" => "Task updated successfully",
@@ -301,7 +290,6 @@ class TaskController extends Controller
             return response()->json(["message" => "Task not found"], 404);
         }
 
-        // Verify user has access to the task's project
         $project = Project::where('id', $task->project_id)
             ->where(function($query) use ($user) {
                 $query->where('created_by', $user->id)

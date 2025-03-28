@@ -52,7 +52,6 @@ export const Table = ({
     await getData(pagination.currentPage - 1);
   };
 
-  // Handle hover on creator name
   const handleCreatorHover = (creator, event) => {
 
     if (hideTimeoutRef.current) {
@@ -67,15 +66,13 @@ export const Table = ({
     setModalVisible(true);
   };
 
-  // Delay hiding modal when mouse leaves
   const handleMouseLeave = () => {
     hideTimeoutRef.current = setTimeout(() => {
       setModalVisible(false);
       setCurrentCreator(null);
-    }, 300); // 300ms delay; adjust as needed
+    }, 300); 
   };
 
-  // Cancel hide when mouse enters modal
   const handleModalMouseEnter = () => {
     if (hideTimeoutRef.current) {
       clearTimeout(hideTimeoutRef.current);
@@ -84,10 +81,8 @@ export const Table = ({
 
   return (
     <div className="relative rounded-xl border border-gray-100 bg-white shadow-sm">
-      {/* Table content */}
       <div className="overflow-x-auto pb-2">
         <table className="w-full">
-          {/* Header */}
           <thead className="sticky top-0 bg-gray-50">
             <tr className="border-b border-gray-200">
               {heads.map((head) => (
@@ -106,7 +101,6 @@ export const Table = ({
             </tr>
           </thead>
 
-          {/* Rows */}
           <tbody className="divide-y divide-gray-100">
             {data.map((dataVar, rowIndex) => (
               <tr
@@ -148,7 +142,6 @@ export const Table = ({
                     );
                   }
 
-                  // Add special formatting for status
                   if (key === "status") {
                     return (
                       <td key={colIndex} className="px-6 py-4 text-sm">
@@ -176,8 +169,8 @@ export const Table = ({
                       {viewButton && (
                         <button
                           onClick={() => {
-                            dispatch(setselectedProject(dataVar)); // Dispatch action to set selected project
-                            navigate(`/projects/${dataVar.id}/board`); // Navigate to the project board
+                            dispatch(setselectedProject(dataVar)); 
+                            navigate(`/projects/${dataVar.id}/board`); 
                           }}
                           className="p-2 hover:bg-gray-100 rounded-lg transition-colors tooltip"
                           data-tip="View"
@@ -215,7 +208,6 @@ export const Table = ({
         </table>
       </div>
 
-      {/* Hover Modal */}
       {modalVisible && currentCreator && (
         <div
           onMouseEnter={handleModalMouseEnter}

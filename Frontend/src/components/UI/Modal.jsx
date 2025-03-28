@@ -15,7 +15,6 @@ export const Modal = ({ isOpen, onClose, title, children, actions }) => {
   return (
     <div className="fixed inset-0 z-50 bg-gray-900/30 backdrop-blur-md flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg transform transition-all">
-        {/* Header */}
         <div className="flex items-center justify-between p-6 pb-4">
           <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
           <button
@@ -26,14 +25,12 @@ export const Modal = ({ isOpen, onClose, title, children, actions }) => {
           </button>
         </div>
 
-        {/* Content */}
         <div className="px-6 py-4">
           <div className="text-gray-600 leading-relaxed">
             {children}
           </div>
         </div>
 
-        {/* Footer */}
         {actions && (
           <div className="p-6 pt-4 flex justify-end gap-3">
             {actions}

@@ -23,7 +23,6 @@ export const Delete = ({ modal, setModal }) => {
           message: response.data?.message || "Deleted successfully"
         });
         
-        // Close modal after 2 seconds
         setTimeout(() => {
           setModal({ type: "" });
         }, 2000);
@@ -72,7 +71,6 @@ export const Delete = ({ modal, setModal }) => {
           </h1>
         </div>
 
-        {/* Warning Message */}
         <div className="mb-6">
           <p className="text-gray-600 text-sm leading-relaxed">
             You are about to permanently delete {getContent()}. This action:
@@ -83,7 +81,6 @@ export const Delete = ({ modal, setModal }) => {
           </ul>
         </div>
 
-        {/* Buttons */}
         <div className="flex flex-col sm:flex-row justify-end gap-3">
           <Button
             type="button"

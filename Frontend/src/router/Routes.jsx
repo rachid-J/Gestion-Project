@@ -1,8 +1,6 @@
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
-import { Dashboard } from '../pages/Dashboard';
+
 import { Project } from '../pages/Project';
-import { Team } from '../pages/Team';
-import { Task } from '../pages/Task';
 import { Profile } from '../pages/Profile';
 
 
@@ -90,10 +88,7 @@ export const Router = () => {
                     index: true,
                     element: <Navigate to="/projects" replace />
                 },
-                { path: "dashboard", element: <Dashboard /> },
-                { path: "task", element: <Task /> },
                 { path: "projects", element: <Project /> },
-                { path: "team", element: <Team /> },
                 { path: "profile/:username", element: <Profile /> },
                 { path :"settings", element : <Settings/>},
                 { path: "contact", element: <ContactsPage /> },

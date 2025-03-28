@@ -41,7 +41,6 @@ export const DeleteTask = ({ modal, setModal }) => {
 
   const getContent = () => {
     if (!modal.data) return "this task";
-    // Check for task's title or name based on your data structure
     return modal.data.title ? (
       <span className="font-medium text-red-600">"{modal.data.title}"</span>
     ) : (

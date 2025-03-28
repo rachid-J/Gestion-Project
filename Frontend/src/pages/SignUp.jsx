@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Input } from '../components/UI/Input';
 import { Button } from '../components/UI/Button';
 import { register } from '../services/authServices';
 import { useNavigate } from "react-router-dom";
 import { Notification } from '../Components/layouts/Notification';
 import { useDispatch } from 'react-redux';
 import { setAuth } from '../Redux/features/authSlice';
+import { Input } from '../components/UI/Input';
+import { AtSymbolIcon, CheckIcon, EnvelopeIcon, LockClosedIcon, UserIcon } from '@heroicons/react/24/outline';
 
 export const SignUp = ({ onSwitch }) => {
   const navigate = useNavigate();
@@ -65,11 +66,7 @@ export const SignUp = ({ onSwitch }) => {
             placeholder="John Doe"
             value={formData.name}
             onChange={handleChange}
-            icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            }
+            icon={<UserIcon className="h-5 w-5 text-gray-400" strokeWidth={2} />}
             required
           />
 
@@ -81,11 +78,7 @@ export const SignUp = ({ onSwitch }) => {
             placeholder="john@example.com"
             value={formData.email}
             onChange={handleChange}
-            icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            }
+            icon={<EnvelopeIcon className="h-5 w-5 text-gray-400" strokeWidth={2} />}
             required
           />
 
@@ -97,11 +90,7 @@ export const SignUp = ({ onSwitch }) => {
             placeholder="johndoe123"
             value={formData.username}
             onChange={handleChange}
-            icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-              </svg>
-            }
+            icon={<AtSymbolIcon className="h-5 w-5 text-gray-400" strokeWidth={2} />}
             required
           />
 
@@ -113,11 +102,7 @@ export const SignUp = ({ onSwitch }) => {
             placeholder="••••••••"
             value={formData.password}
             onChange={handleChange}
-            icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            }
+            icon={<LockClosedIcon className="h-5 w-5 text-gray-400" strokeWidth={2} />}
             required
           />
 
@@ -129,16 +114,13 @@ export const SignUp = ({ onSwitch }) => {
             placeholder="••••••••"
             value={formData.password_confirmation}
             onChange={handleChange}
-            icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            }
+            icon={<CheckIcon className="h-5 w-5 text-gray-400" strokeWidth={2} />}
             required
           />
+        </div>
 
        
-        </div>
+      
 
         <Button
           type="submit"

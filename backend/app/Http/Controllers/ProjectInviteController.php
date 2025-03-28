@@ -110,12 +110,10 @@ class ProjectInviteController extends Controller
     {
         $user = JWTAuth::user();
     
-        // Verify invitation exists and isn't already soft-deleted
         if (!$invitation->exists || $invitation->trashed()) {
             return response()->json(['error' => 'Invitation not found'], 404);
         }
     
-        // Validate ownership
         if ($invitation->sender_id !== $user->id) {
             return response()->json(['error' => 'Unauthorized action'], 403);
         }
@@ -124,7 +122,6 @@ class ProjectInviteController extends Controller
             return response()->json(['error' => 'Accepted invitations cannot be canceled'], 400);
         }
     
-        // Perform soft delete
         $invitation->delete();
     
         return response()->json([
@@ -144,17 +141,14 @@ class ProjectInviteController extends Controller
 
     $user = JWTAuth::user();
 
-    // Validate recipient
     if ($invitation->email !== $user->email) {
         return response()->json(['error' => 'You are not the intended recipient'], 403);
     }
 
-    // Check invitation status
     if ($invitation->status !== 'pending') {
         return response()->json(['error' => 'Only pending invitations can be declined'], 400);
     }
 
-    // Update the invitation status
     $invitation->update(['status' => 'declined']);
 
     return response()->json([

@@ -95,7 +95,6 @@ export const ViewModal = ({ task, statusGroups, onClose}) => {
         />
       )}
       <div className="bg-white rounded-lg w-full max-w-2xl shadow-jira transform transition-all max-h-[90vh] overflow-hidden flex flex-col">
-        {/* Header */}
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 flex items-center">
             <span className="mr-2">📌</span>
@@ -111,11 +110,8 @@ export const ViewModal = ({ task, statusGroups, onClose}) => {
           </button>
         </div>
 
-        {/* Content */}
         <div className="p-6 space-y-6 flex-1 overflow-y-auto">
-          {/* Task Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left Column */}
             <div className="space-y-4">
               <div>
                 <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Status</label>
@@ -151,7 +147,6 @@ export const ViewModal = ({ task, statusGroups, onClose}) => {
               </div>
             </div>
 
-            {/* Right Column */}
             <div className="space-y-4">
               <div>
                 <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Creator</label>
@@ -192,7 +187,6 @@ export const ViewModal = ({ task, statusGroups, onClose}) => {
             </div>
           </div>
 
-          {/* Description */}
           <div>
             <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Description</label>
             <div className="mt-1.5 p-3 bg-gray-50 rounded-md border border-gray-200 prose max-w-none">
@@ -202,7 +196,6 @@ export const ViewModal = ({ task, statusGroups, onClose}) => {
             </div>
           </div>
 
-          {/* Metadata */}
           <div className="grid grid-cols-2 gap-4 text-sm border-t border-gray-200 pt-4 text-gray-600">
             <div className="flex items-center space-x-2">
               <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,7 +215,6 @@ export const ViewModal = ({ task, statusGroups, onClose}) => {
             </div>
           </div>
 
-          {/* Tabs */}
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8">
               <button
@@ -248,7 +240,6 @@ export const ViewModal = ({ task, statusGroups, onClose}) => {
             </nav>
           </div>
 
-          {/* Comments Tab */}
           {activeTab === "comments" && (
             <div className="space-y-6 pt-4">
               <form onSubmit={handleCommentSubmit} className="space-y-4">
@@ -296,7 +287,6 @@ export const ViewModal = ({ task, statusGroups, onClose}) => {
             </div>
           )}
 
-          {/* Attachments Tab */}
           {activeTab === "attachments" && (
             <div className="space-y-6 pt-4">
               <form onSubmit={handleFileUpload} className="space-y-4">

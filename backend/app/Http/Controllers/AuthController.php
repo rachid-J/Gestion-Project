@@ -121,7 +121,7 @@ class AuthController extends Controller
     public function deleteAccount(Request $request)
     {
         $request->validate([
-            'password' => 'required|string', // Ensure validation passes
+            'password' => 'required|string',
         ]);
     
         $user = JWTAuth::user();
@@ -148,10 +148,8 @@ public function updateAccount(Request $request)
         'city' => 'nullable|string|max:255',
     ]);
 
-    // Update User model
     $user->update($request->only(['name', 'email', 'username']));
 
-    // Update UsersInfo using updateOrCreate to handle missing records
     $user->usersInfo()->updateOrCreate(
         ['user_id' => $user->id],
         $request->only(['job', 'phone', 'address', 'city'])

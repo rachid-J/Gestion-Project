@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Login } from "./Login";
 import { SignUp } from "./SignUp";
+import { BoltIcon, ChartBarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+
 
 const FeatureItem = ({ icon, title, description }) => (
   <div className="flex items-start space-x-4 group">
@@ -15,74 +17,34 @@ const FeatureItem = ({ icon, title, description }) => (
 );
 
 export const Auth = () => {
-
-    const [activeTab, setActiveTab] = useState("login");
-    const [animationKey, setAnimationKey] = useState(0);
-  
+  const [activeTab, setActiveTab] = useState("login");
+  const [animationKey, setAnimationKey] = useState(0);
 
   const features = [
     {
-      icon: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6 text-white"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.4145.414A1 1 0 0119 5.414V21a2 2 0 01-2 2z" />
-        </svg>
-      ),
+      icon: <ChartBarIcon className="h-6 w-6 text-white" strokeWidth={2} />,
       title: "Task Management",
-      description:
-        "Create, assign, and track tasks with priorities and deadlines",
+      description: "Create, assign, and track tasks with priorities and deadlines",
     },
     {
-      icon: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6 text-white"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-      ),
+      icon: <UserGroupIcon className="h-6 w-6 text-white" strokeWidth={2} />,
       title: "Team Collaboration",
       description: "Work together with your team members on projects",
     },
     {
-      icon: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6 text-white"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      ),
+      icon: <BoltIcon className="h-6 w-6 text-white" strokeWidth={2} />,
       title: "Real-time Updates",
       description: "Get notified of task updates and project progress",
     },
   ];
 
-
-  
-    const handleTabChange = (newTab) => {
-      setAnimationKey(prevKey => prevKey + 1);
-      setActiveTab(newTab);
-    };
-
+  const handleTabChange = (newTab) => {
+    setAnimationKey((prevKey) => prevKey + 1);
+    setActiveTab(newTab);
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-500">
     <div className="flex min-h-screen max-w-7xl mx-auto">
-      {/* Auth Section */}
       <div className="flex flex-col justify-center items-center flex-1 p-8">
         <div className="w-full max-w-md space-y-8 backdrop-blur-sm bg-white/70 rounded-3xl p-8 shadow-xl">
 
@@ -96,7 +58,6 @@ export const Auth = () => {
               </p>
             </div>
 
-            {/* Tab Navigation */}
             <div className="flex border-b-2 border-gray-200">
               <button
                 onClick={() => handleTabChange("login")}
@@ -120,7 +81,6 @@ export const Auth = () => {
               </button>
             </div>
 
-            {/* Animated Form Content */}
             <div className="relative overflow-hidden min-h-[400px] transition-all duration-300">
               <div key={animationKey} className="animate-fade-in-up">
                 {activeTab === "login" ? (
@@ -133,7 +93,6 @@ export const Auth = () => {
           </div>
         </div>
 
-        {/* Features Section */}
         <div className="hidden lg:flex flex-1 p-8 text-white flex-col justify-center">
           <div className="max-w-md mx-auto space-y-8">
             <h2 className="text-4xl font-bold leading-tight">

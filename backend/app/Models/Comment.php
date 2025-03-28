@@ -34,7 +34,7 @@ class Comment extends Model
 }
 
 
-    // Add validation rules
+  
     public static function rules()
     {
         return [

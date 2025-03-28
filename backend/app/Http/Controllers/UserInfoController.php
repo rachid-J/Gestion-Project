@@ -38,7 +38,6 @@ class UserInfoController extends Controller
 
         $userInfo = $user->usersInfo ?? new UsersInfo(['user_id' => $user->id]);
 
-        // Only update fields that are present in the request
         foreach (['job', 'phone', 'address', 'city'] as $field) {
             if (array_key_exists($field, $validated)) {
                 $userInfo->$field = $validated[$field] !== ''
@@ -47,14 +46,11 @@ class UserInfoController extends Controller
             }
         }
 
-        // Handle file uploads
         foreach (['background', 'profile_photo'] as $fileField) {
             if ($request->hasFile($fileField)) {
-                // Delete old file if exists
                 if ($userInfo->$fileField) {
                     Storage::disk('public')->delete($userInfo->$fileField);
                 }
-                // Store new file
                 $userInfo->$fileField = $request->file($fileField)->store($fileField . 's', 'public');
             }
         }
@@ -85,7 +81,6 @@ class UserInfoController extends Controller
             $collaboratingProjects = $user->projects()
                 ->selectRaw('projects.*, project_user.role as role');
 
-            // Combine results using SQL UNION and get all records
             $allProjects = $createdProjects->union($collaboratingProjects)->get();
 
             return response()->json(["projects" => $allProjects], 200);
@@ -101,7 +96,7 @@ class UserInfoController extends Controller
         $user = User::with([
             'usersInfo',
             'tasks',
-            'assignedTasks',  // Load assigned tasks
+            'assignedTasks',  
             'projects'
         ])
             ->where('username', $username)
@@ -126,7 +121,6 @@ class UserInfoController extends Controller
             return response()->json(['error' => 'User not found'], 404);
         }
 
-        // Project creation activities
         $projectActivities = Project::where('created_by', $user->id)
             ->with(['creator:id,name'])
             ->orderByDesc('created_at')
@@ -146,7 +140,6 @@ class UserInfoController extends Controller
                 ];
             });
 
-        // Task creation activities
         $taskActivities = Task::where('created_by', $user->id)
             ->with(['project:id,name', 'creator:id,name'])
             ->orderByDesc('created_at')
@@ -167,7 +160,7 @@ class UserInfoController extends Controller
                 ];
             });
 
-        // Comment activities
+
         $commentActivities = $user->comments()
             ->with(['task.project:id,name'])
             ->orderByDesc('created_at')
@@ -188,7 +181,6 @@ class UserInfoController extends Controller
                 ];
             });
 
-        // Attachment activities
         $attachmentActivities = $user->attachments()
             ->with(['task.project:id,name'])
             ->orderByDesc('created_at')
@@ -210,7 +202,7 @@ class UserInfoController extends Controller
                 ];
             });
 
-        // Merge and sort all activities
+        
         $merged = $projectActivities
             ->merge($taskActivities)
             ->merge($commentActivities)
@@ -236,13 +228,13 @@ class UserInfoController extends Controller
             ]
         ]);
     }
-    public function getContact()
+    public function getContact($username)
     {
-        $user = auth("api")->user();
+        $user = User::where('username', $username)->first();
 
 
         $contacts = $user->acceptedContacts()
-            ->select('users.id', 'name', 'email')
+            ->select('users.id', 'name', 'email','username')
             ->take(3)->get();
 
         return response()->json($contacts);

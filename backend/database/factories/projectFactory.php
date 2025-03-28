@@ -25,10 +25,8 @@ class ProjectFactory extends Factory
     public function configure()
     {
         return $this->afterCreating(function (Project $project) {
-            // Always attach creator with 'creator' role first
             $project->users()->attach($project->created_by, ['role' => 'creator']);
 
-            // Randomly attach other members (0-4 users)
             $otherUsers = User::where('id', '!=', $project->created_by)
                 ->inRandomOrder()
                 ->take(rand(0, 4))

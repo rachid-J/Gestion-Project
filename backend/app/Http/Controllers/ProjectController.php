@@ -32,7 +32,6 @@ class ProjectController extends Controller
             $collaboratingProjects = $user->projects()
                 ->selectRaw('projects.*, project_user.role as role');
     
-            // Combine results using SQL UNION and get all records
             $allProjects = $createdProjects->union($collaboratingProjects)->get();
     
             return response()->json(["projects" => $allProjects], 200);
@@ -62,7 +61,6 @@ class ProjectController extends Controller
             $collaboratingProjects = $user->projects()
                 ->selectRaw('projects.*, project_user.role as role');
 
-            // Combine results using SQL UNION
             $allProjects = $createdProjects->union($collaboratingProjects)->paginate(5);
 
             return response()->json(["projects" => $allProjects], 200);
@@ -84,19 +82,16 @@ class ProjectController extends Controller
     
             $searchTerm = '%' . $name . '%';
     
-            // Get projects created by user matching name
             $createdProjects = Project::where("created_by", $user->id)
                 ->where("name", "LIKE", $searchTerm)
                 ->with(["users", "creator:id,email,name,username"])
                 ->selectRaw('projects.*, "creator" as role');
     
-            // Get projects where user is collaborator matching name
             $collaboratingProjects = $user->projects()
                 ->where("projects.name", "LIKE", $searchTerm)
                 ->with(["users", "creator:id,email,name,username"])
                 ->selectRaw('projects.*, project_user.role as role');
     
-            // Combine results with union and paginate
             $combinedProjects = $createdProjects->union($collaboratingProjects)
                 ->orderBy('created_at', 'desc')
                 ->paginate(5);
@@ -125,13 +120,11 @@ class ProjectController extends Controller
             ->with(["users", "creator:id,email,name,username"])
             ->selectRaw('projects.*, "creator" as role');
 
-        // Get projects where user is collaborator matching name
         $collaboratingProjects = $user->projects()
             ->where("projects.status", "LIKE", $status)
             ->with(["users", "creator:id,email,name,username"])
             ->selectRaw('projects.*, project_user.role as role');
 
-        // Combine results with union and paginate
         $combinedProjects = $createdProjects->union($collaboratingProjects)
             ->orderBy('created_at', 'desc')
             ->paginate(5);

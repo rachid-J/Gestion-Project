@@ -19,7 +19,7 @@ export const DynamicSelect = ({
   const handleOptionSelect = (selected) => {
     onChange({ 
       target: { 
-        name: name,  // Use prop name here
+        name: name,  
         value: selected 
       } 
     });
@@ -58,7 +58,7 @@ export const DynamicSelect = ({
                 onClick={() => handleOptionSelect(option)}
                 className="flex items-center w-full px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md transition-colors gap-2"
               >
-                <span>{option}</span> {/* Fixed this line */}
+                <span>{option}</span> 
               </button>
             ))}
           </div>

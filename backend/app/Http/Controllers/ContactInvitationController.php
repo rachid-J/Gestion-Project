@@ -16,12 +16,10 @@ class ContactInvitationController extends Controller
         $request->validate(['email' => 'required|email']);
         $sender = auth("api")->user();
 
-        // Check if already a contact
         if ($sender->acceptedContacts()->where('email', $request->email)->exists()) {
             return response()->json(['error' => 'User is already in your contacts.'], 400);
         }
 
-        // Check existing pending invitation
         if (
             ContactInvitations::where('sender_id', $sender->id)
                 ->where('recipient_email', $request->email)
@@ -54,7 +52,6 @@ class ContactInvitationController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        // Add to contacts
         $sender = User::find($invitation->sender_id);
         $sender->contacts()->syncWithoutDetaching([$recipient->id => ['status' => 'accepted']]);
         $recipient->contacts()->syncWithoutDetaching([$sender->id => ['status' => 'accepted']]);

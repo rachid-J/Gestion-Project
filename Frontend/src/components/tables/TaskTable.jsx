@@ -89,7 +89,6 @@ console.log("modal",modal)
                       onDragEnd={handleDragEnd}
                       className="bg-white rounded-lg shadow-sm p-3 border border-gray-200 cursor-move transition-transform hover:scale-[1.005] active:scale-100"
                     >
-                      {/* Task card content */}
                       <div className="flex justify-between items-start mb-2">
                         <div className="text-gray-400">⁝</div>
                         <div className="flex space-x-1">

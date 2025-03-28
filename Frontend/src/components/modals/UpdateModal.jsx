@@ -36,7 +36,7 @@ export const UpdateModal = ({ task, statusGroups, onClose, onUpdateSuccess }) =>
       onUpdateSuccess();
       onClose();
     } catch (error) {
-      // Handle error messages from backend
+
       console.error("Update failed:", error.response?.data?.error || error.message);
       alert(error.response?.data?.error || "Update failed. Please try again.");
     } finally {
@@ -47,7 +47,6 @@ export const UpdateModal = ({ task, statusGroups, onClose, onUpdateSuccess }) =>
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
       <div className="bg-white rounded-lg w-full max-w-xl shadow-jira animate-slide-up">
-        {/* Header */}
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">
             <span className="mr-2">✏️</span>
@@ -64,10 +63,8 @@ export const UpdateModal = ({ task, statusGroups, onClose, onUpdateSuccess }) =>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Title */}
           <div>
             <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">
-              Issue Title *
             </label>
             <input
               type="text"
@@ -78,7 +75,6 @@ export const UpdateModal = ({ task, statusGroups, onClose, onUpdateSuccess }) =>
             />
           </div>
 
-          {/* Description */}
           <div>
             <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">
               Description
@@ -92,9 +88,7 @@ export const UpdateModal = ({ task, statusGroups, onClose, onUpdateSuccess }) =>
             />
           </div>
 
-          {/* Form Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Status */}
             <div>
               <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">
                 Status *
@@ -116,7 +110,6 @@ export const UpdateModal = ({ task, statusGroups, onClose, onUpdateSuccess }) =>
               </select>
             </div>
 
-            {/* Assignee */}
             <div>
               <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">
                 Assignee
@@ -136,7 +129,6 @@ export const UpdateModal = ({ task, statusGroups, onClose, onUpdateSuccess }) =>
               </select>
             </div>
 
-            {/* Due Date */}
             <div>
               <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">
                 Due Date
@@ -155,7 +147,6 @@ export const UpdateModal = ({ task, statusGroups, onClose, onUpdateSuccess }) =>
             </div>
           </div>
 
-          {/* Actions */}
           <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
             <button
               type="button"

@@ -19,17 +19,13 @@ class ContactInvitations extends Model
         'status'
     ];
 
-    /**
-     * Get the user who sent the invitation
-     */
+   
     public function sender(): BelongsTo
     {
         return $this->belongsTo(User::class, 'sender_id');
     }
 
-    /**
-     * Get the recipient user (if registered)
-     */
+   
     public function recipient(): BelongsTo
     {
         return $this->belongsTo(User::class, 'recipient_email', 'email');

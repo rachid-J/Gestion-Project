@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 export const Switch = ({ enabled, onChange }) => {
