@@ -119,8 +119,8 @@ export const SignUp = ({ onSwitch }) => {
           />
         </div>
 
-       
-      
+
+
 
         <Button
           type="submit"
@@ -144,8 +144,8 @@ export const SignUp = ({ onSwitch }) => {
       </div>
 
       {notification && (
-        <Notification 
-          type={notification.type} 
+        <Notification
+          type={notification.type}
           message={notification.message}
           className="mt-4 animate-fade-in-up"
         />

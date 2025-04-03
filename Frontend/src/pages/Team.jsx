@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  UserCircleIcon, 
-  UserPlusIcon, 
-  ShieldCheckIcon, 
+import {
+  UserCircleIcon,
+  UserPlusIcon,
+  ShieldCheckIcon,
   ArrowPathIcon,
   ChevronDownIcon,
   SparklesIcon,
@@ -34,7 +34,7 @@ const RoleBadge = ({ role }) => {
 };
 
 const UserAvatar = ({ name, color }) => (
-  <div 
+  <div
     className="h-10 w-10 rounded-full flex items-center justify-center text-white font-medium shadow-sm"
     style={{ backgroundColor: color }}
   >
@@ -47,7 +47,7 @@ const UserCard = ({ user, role }) => {
   const hashCode = str => str.split('').reduce((hash, char) => char.charCodeAt(0) + ((hash << 5) - hash), 0);
   const colorIndex = Math.abs(hashCode(user.email)) % avatarColors.length;
   const color = avatarColors[colorIndex];
-  
+
   return (
     <div className="bg-white p-4 rounded-lg border border-gray-200 hover:border-indigo-200 transition-all duration-200 hover:shadow-md">
       <div className="flex items-center space-x-3">
@@ -69,12 +69,12 @@ const ProjectSection = ({ project }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const collaborators = project.users.filter(user => user.id !== project.creator.id);
-  
+
   const formatDate = (dateString) => {
     const options = { month: 'short', day: 'numeric', year: 'numeric' };
     return new Date(dateString).toLocaleDateString('en-US', options);
   };
-  
+
   const handleInvite = async (e) => {
     e.preventDefault();
     setError('');
@@ -91,7 +91,7 @@ const ProjectSection = ({ project }) => {
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
-      <div 
+      <div
         className="p-5 cursor-pointer flex items-center justify-between hover:bg-gray-50 rounded-t-xl transition-colors"
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -141,13 +141,13 @@ const ProjectSection = ({ project }) => {
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Team Members</h3>
               <span className="text-xs text-gray-500">{collaborators.length} members</span>
             </div>
-        
+
             {collaborators.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {collaborators.map((user) => (
-                  <UserCard 
-                    key={user.id} 
-                    user={user} 
+                  <UserCard
+                    key={user.id}
+                    user={user}
                     role={user.pivot?.role || 'member'}
                   />
                 ))}
@@ -158,8 +158,8 @@ const ProjectSection = ({ project }) => {
                 <p className="text-xs text-gray-500 mb-4">Build your team by inviting collaborators</p>
               </div>
             )}
-            
-            <button 
+
+            <button
               onClick={() => setShowInviteModal(true)}
               className="w-full text-sm font-medium text-indigo-600 hover:text-indigo-800 flex items-center justify-center p-2.5 border border-dashed border-indigo-200 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors duration-200"
             >
@@ -169,7 +169,7 @@ const ProjectSection = ({ project }) => {
           </div>
         </div>
       )}
-      
+
       <ColaabInvite
         show={showInviteModal}
         onClose={() => setShowInviteModal(false)}
@@ -189,12 +189,12 @@ const StatusMessage = ({ type, message }) => {
     success: <CheckCircleIcon className="h-5 w-5 text-green-500" />,
     error: <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
   };
-  
+
   const styles = {
     success: "bg-green-50 text-green-700 border-green-100",
     error: "bg-red-50 text-red-700 border-red-100"
   };
-  
+
   return message ? (
     <div className={`flex items-center space-x-2 p-3 rounded-lg border ${styles[type]} transition-opacity duration-300`}>
       {icons[type]}
@@ -240,11 +240,11 @@ export const Team = () => {
   if (loading) {
     return (
       <div className="p-8 flex items-center mt-12 justify-center gap-3 text-indigo-600">
-                    <div className="animate-spin">
-                      <ArrowPathIcon className="w-6 h-6" />
-                    </div>
-                    <span className="font-medium">Loading Teams...</span>
-                  </div>
+        <div className="animate-spin">
+          <ArrowPathIcon className="w-6 h-6" />
+        </div>
+        <span className="font-medium">Loading Teams...</span>
+      </div>
     );
   }
 
@@ -257,8 +257,8 @@ export const Team = () => {
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">Unable to Load Teams</h3>
           <p className="text-sm text-gray-600 mb-4">{error}</p>
-          <button 
-            onClick={() => {setError(''); fetchProjects();}}
+          <button
+            onClick={() => { setError(''); fetchProjects(); }}
             className="text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg shadow-sm transition-colors"
           >
             <ArrowPathIcon className="h-4 w-4 inline mr-2" />
@@ -284,7 +284,7 @@ export const Team = () => {
             <h1 className="text-2xl font-bold text-gray-900">Team Directory</h1>
             <p className="text-sm text-gray-600 mt-1">Manage your organization's collaborative projects</p>
           </div>
-          <button 
+          <button
             onClick={() => setShowCreateModal(true)}
             className="mt-4 sm:mt-0 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-5 py-2.5 rounded-lg shadow-sm flex items-center justify-center transition-colors duration-200"
           >
@@ -292,7 +292,7 @@ export const Team = () => {
             Create New Project
           </button>
         </div>
-        
+
         {/* Status Messages */}
         {statusMessage.message && (
           <StatusMessage type={statusMessage.type} message={statusMessage.message} />
@@ -313,7 +313,7 @@ export const Team = () => {
               <p className="text-sm text-gray-500 mb-6 max-w-md mx-auto">
                 Get started by creating your first collaborative project and invite team members
               </p>
-              <button 
+              <button
                 onClick={() => setShowCreateModal(true)}
                 className="text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-5 py-2.5 rounded-lg shadow-sm flex items-center justify-center mx-auto transition-colors"
               >

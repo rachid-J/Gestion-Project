@@ -16,8 +16,11 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
+import { Notification } from '../Components/layouts/Notification';
+import { setselectedProject } from '../Redux/features/projectSlice';
+import { useDispatch } from 'react-redux';
 
-// More professional color palette
+
 const COLORS = ['#3b82f6', '#f97316', '#10b981']; 
 const PRIORITY_COLORS = { 
   low: '#0ea5e9',   
@@ -32,7 +35,8 @@ export const Dashboard = () => {
         invitations: [],
         loading: true
     });
-
+  const [notification, setNotification] = useState(null);
+ const disp = useDispatch()
     const fetchData = async () => {
         try {
             const [projectsRes, invitationsRes] = await Promise.all([
@@ -64,11 +68,11 @@ export const Dashboard = () => {
         try {
             if (accept) {
                 await ProjectAccept(token);
-                // Use toast notification instead of alert in a production app
-                alert('Invitation accepted successfully');
+                setNotification({type:"success",message:'Invitation accepted successfully'});
             } else {
                 await ProjectDecline(token);
-                alert('Invitation declined');
+              
+                 setNotification({type:"error",message:'Invitation declined'});
             }
             fetchData();
         } catch (error) {
@@ -110,7 +114,6 @@ export const Dashboard = () => {
         );
     }
 
-    // Calculate additional metrics
     const completedProjects = stats.projects.filter(p => p.status === 'completed').length;
     const completionRate = stats.projects.length > 0 
         ? Math.round((completedProjects / stats.projects.length) * 100) 
@@ -120,6 +123,13 @@ export const Dashboard = () => {
 
     return (
         <div className="bg-gray-50 mt-12 min-h-screen">
+              {notification && (
+              <Notification 
+                type={notification.type} 
+                message={notification.message}
+                className="fixed top-4 right-4 z-50"
+              />
+            )}
             <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
                
                 <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
@@ -364,11 +374,12 @@ export const Dashboard = () => {
                         </div>
                         <div className="divide-y divide-gray-100">
                             {stats.projects.slice(0, 5).map(project => (
-                                <Link
-                                    key={project.id}
-                                    to={`/projects/${project.id}`}
-                                    className="flex items-center justify-between p-5 hover:bg-blue-50/50 transition-colors"
-                                >
+                              <Link
+                              key={project.id}
+                              to={`/projects/${project.id}/board`}
+                              className="flex items-center justify-between p-5 hover:bg-blue-50/50 transition-colors rounded-lg"
+                              onClick={() => disp(setselectedProject(project))}
+                            >
                                     <div className="flex items-center gap-4">
                                         <div className="p-3 bg-blue-100 rounded-lg">
                                             <FolderIcon className="w-5 h-5 text-blue-600" />

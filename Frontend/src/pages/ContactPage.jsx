@@ -140,7 +140,7 @@ export const ContactsPage = () => {
   
 
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-gray-50 min-h-screen">
+    <div className="p-6 max-w-6xl mt-12 mx-auto bg-gray-50 min-h-screen">
       <div className="flex flex-col md:flex-row justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0 flex items-center">
           <UserIcon className="w-6 h-6 mr-2 text-blue-600" />

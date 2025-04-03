@@ -45,7 +45,7 @@ export const Auth = () => {
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-500">
-       <div className="absolute top-6 left-6">
+       <div className="absolute top-4 left-8 z-20">
   <Link
     to="/home"
     className="inline-flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 hover:border-indigo-200 text-indigo-600 hover:text-indigo-700 font-medium text-sm"

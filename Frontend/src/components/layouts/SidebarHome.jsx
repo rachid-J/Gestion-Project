@@ -94,10 +94,10 @@ import {
         </nav>
   
         {/* Footer Section */}
-        <div className="px-3 py-4 mb-4 border-t border-gray-100 bg-gray-50">
+        <div className="px-3 py-4  border-t border-gray-100 bg-gray-50">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-gray-600 hover:text-red-600 rounded-lg transition-all hover:bg-red-50 group"
+            className="w-full flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:text-red-600 rounded-lg transition-all hover:bg-red-50 group"
             aria-label="Logout"
           >
             <ArrowLeftEndOnRectangleIcon className="h-5 w-5 mr-3 text-gray-400 group-hover:text-red-500 transition-colors" />

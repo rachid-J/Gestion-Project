@@ -10,7 +10,6 @@ import { Auth } from "../pages/Auth";
 import { Default } from "../pages/Default";
 import { DefaultSkeleton } from "../components/Skeleton/DefaultSkeleton";
 import { useEffect, useState } from "react";
-import Redirect from "../pages/Redirect";
 
 import { user } from "../services/authServices";
 
@@ -29,6 +28,7 @@ import { Settings } from "../pages/Settings";
 import { Dashboard } from "../pages/Dashboard";
 import { Team } from "../pages/Team";
 import { LandingPage } from "../pages/LandingPage";
+import { Redirect } from "../pages/Redirect";
 
 
 
@@ -90,7 +90,7 @@ export const Router = () => {
             children: [
                 {
                     index: true,
-                    element: <Navigate to="/projects" replace />
+                    element: <Navigate to="/Dashboard" replace />
                 },
                 { path: "projects", element: <Project /> },
                 { path: "Dashboard", element: <Dashboard /> },

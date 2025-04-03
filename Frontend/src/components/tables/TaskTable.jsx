@@ -103,7 +103,7 @@ export const TaskTable = ({
                         }`}
                       >
                         <div className="flex justify-between items-start mb-2">
-                          <div className="text-gray-400">⁝</div>
+                          <div className={`text-white text-xs px-2 py-1  rounded-full ${task.priority === "high" ? "bg-red-600" : task.priority==="medium" ? "bg-yellow-500" : "bg-green-500" }`}>{task.priority}</div>
                           <div className="flex space-x-1">
                             {viewButton && (
                               <button
