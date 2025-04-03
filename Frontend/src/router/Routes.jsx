@@ -26,6 +26,10 @@ import { Collaboration } from "../pages/Colaboration";
 import { logOut, setUser } from "../Redux/features/authSlice";
 
 import { Settings } from "../pages/Settings";
+import { Dashboard } from "../pages/Dashboard";
+import { Team } from "../pages/Team";
+import { LandingPage } from "../pages/LandingPage";
+
 
 
 
@@ -49,7 +53,7 @@ export const Router = () => {
             } catch (error) {
                 console.error("Error fetching user:", error);
                 if (error.response && error.response.status === 401) {
-                    dispatch(logOut()); // Dispatch logout to clear invalid token
+                    dispatch(logOut()); 
                 }
             } finally {
                 setIsLoading(false);
@@ -70,11 +74,12 @@ export const Router = () => {
     const guestRoutes = [
         {
             index: true,
-            element: <Navigate to="/auth" replace />
+            element: <Navigate to="/home" replace />
         },
         { path: "/auth", element: <Auth /> },
         { path: "*", element: <NotFound /> },
         { path: "/redirect", element: <Redirect /> },
+        { path: "/home", element: <LandingPage />, },
 
     ];
 
@@ -88,9 +93,14 @@ export const Router = () => {
                     element: <Navigate to="/projects" replace />
                 },
                 { path: "projects", element: <Project /> },
+                { path: "Dashboard", element: <Dashboard /> },
                 { path: "profile/:username", element: <Profile /> },
                 { path :"settings", element : <Settings/>},
                 { path: "contact", element: <ContactsPage /> },
+                { path: "teams", element: <Team /> },
+
+               
+
 
 
             ]
@@ -103,7 +113,9 @@ export const Router = () => {
                 { path: "board", element: <Board /> },
                 { path: "List", element: <List /> },
                 { path: "collaboration", element: <Collaboration />, },
+              
 
+            
             ]
         },
 

@@ -132,7 +132,7 @@ export const Settings = () => {
 
   return (
     <>
-    <div className="min-h-screen bg-gray-50/50 backdrop-blur-lg">
+    <div className="min-h-screen mt-12 bg-gray-50/50 backdrop-blur-lg">
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3 mb-8">
           <Cog6ToothIcon className="w-9 h-9 text-gray-700 p-1.5 bg-gray-100 rounded-lg" />

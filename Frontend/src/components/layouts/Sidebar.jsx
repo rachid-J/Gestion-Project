@@ -20,26 +20,32 @@ export const Sidebar = ({ user }) => {
     { name: 'Summary', path: 'Summary', icon: ChartPieIcon },
     { name: 'Board', path: 'board', icon: ClipboardDocumentIcon },
     { name: 'List', path: 'List', icon: ListBulletIcon },
-    { name: 'Collaboration', path: 'Collaboration', icon: UserGroupIcon },
-    { name: 'Settings', path: 'settings', icon: Cog6ToothIcon },
+    { name: 'Collaboration', path: 'Collaboration', icon: UserGroupIcon }
   ];
 
   return (
     <>
       <button
         type="button"
-        className={`md:hidden p-3 fixed top-4 left-4 z-50 ${
+        className={`md:hidden p-2 fixed top-3 left-3 z-50 ${
           isMobileMenuOpen ? 'hidden' : 'visible'
-        } bg-white backdrop-blur-sm rounded-lg shadow-lg shadow-gray-200/50 hover:shadow-gray-300/50 transition-all hover:scale-105`}
+        } bg-white rounded-lg shadow-sm`}
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
-        <Bars3Icon className="h-6 w-6 text-gray-800" />
+        <Bars3Icon className="h-5 w-5 text-gray-800" />
       </button>
 
+    
+      {isMobileMenuOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/30 z-30"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       <aside
-        className={`fixed top-0 left-0 z-40 w-64 h-screen bg-white/90 backdrop-blur-xl shadow-xl transition-transform duration-300 border-r border-gray-100/50 ${
-          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-        }`}
+        className={`fixed top-0 left-0 z-40 w-64 h-screen bg-white/95 backdrop-blur-xl transition-transform duration-300 border-r border-gray-100/50
+          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
         <div className="flex flex-col h-full">
           <button

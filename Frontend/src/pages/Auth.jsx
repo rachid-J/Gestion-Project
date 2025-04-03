@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Login } from "./Login";
 import { SignUp } from "./SignUp";
-import { BoltIcon, ChartBarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, BoltIcon, ChartBarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import { Link } from "react-router-dom";
 
 
 const FeatureItem = ({ icon, title, description }) => (
@@ -44,6 +45,15 @@ export const Auth = () => {
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-500">
+       <div className="absolute top-6 left-6">
+  <Link
+    to="/home"
+    className="inline-flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 hover:border-indigo-200 text-indigo-600 hover:text-indigo-700 font-medium text-sm"
+  >
+    <ArrowLeftIcon className="w-5 h-5" />
+    <span className="hidden sm:inline">Back to Home</span>
+  </Link>
+</div>
     <div className="flex min-h-screen max-w-7xl mx-auto">
       <div className="flex flex-col justify-center items-center flex-1 p-8">
         <div className="w-full max-w-md space-y-8 backdrop-blur-sm bg-white/70 rounded-3xl p-8 shadow-xl">

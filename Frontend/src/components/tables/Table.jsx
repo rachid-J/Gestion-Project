@@ -24,8 +24,6 @@ export const Table = ({
   paginate,
   getData,
   toUpdateOrDelete,
-  headerStyle,
-  rowStyle,
   currentUserId
 }) => {
   const [modal, setModal] = useState({

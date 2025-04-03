@@ -7,10 +7,12 @@ import { errors } from "../constants/Errors";
 import { TableSkeleton } from "../components/Skeleton/TableSkeleton";
 import { useDebounce } from "../hooks/useDebounce";
 import { Table } from "../components/tables/Table";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { ChartBarIcon, Cog6ToothIcon, DocumentPlusIcon, FolderIcon, MagnifyingGlassIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { useDispatch, useSelector } from "react-redux";
 import { CreateProjectModal } from "../components/layouts/CreateProjectModal";
 import { setProject } from "../Redux/features/projectSlice";
+import { NavLink } from "react-router-dom";
+import { SidebarHome } from "../components/layouts/SidebarHome";
 
 
 
@@ -151,6 +153,7 @@ const dispatch = useDispatch()
     fetchProjects(debouncedSearchTerm, 1);
   }, [debouncedSearchTerm]);
 
+ 
   return (
     <>
       <CreateProjectModal
@@ -161,17 +164,21 @@ const dispatch = useDispatch()
           console.log("Creating project:", projectData);
         }}
       />
-      <div className="p-6 bg-white-900 text-black min-h-screen">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-1">Projects</h1>
-          <p className="text-gray-500">Manage and track your ongoing projects</p>
-        </div>
+      
+      <div className="flex mt-12 min-h-screen">
+    
+        
+        <div className="flex-1 p-6 bg-gray-50">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">Project Management</h1>
+            <p className="text-gray-600">Manage and track your ongoing projects</p>
+          </div>
 
         <div className="flex w-full items-center gap-3 mt-4">
           <div className="relative flex-1 max-w-xl">
             <MagnifyingGlassIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
             <Input
-              className="w-full p-2 pl-10 border border-white-700 rounded-md bg-white-800 text-black"
+              className="w-full ml-2 p-2 pl-10 border border-white-700 rounded-md bg-white-800 text-black"
               placeholder="Search projects..."
               type="text"
               value={searchTerm}
@@ -179,23 +186,24 @@ const dispatch = useDispatch()
             />
           </div>
 
-          <DynamicSelect
-          title="All Statuses"
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-          options={["All Statuses","pending", "in_progress", "completed"]}
-          width={"w-48"}
-          className="w-auto"
-        />
+     
 
-          <Button
-            text="+ New Project"
-            width="w-auto"
-            onClick={() => setIsModalCreateOpen(true)}
-            className="bg-gradient-to-r from-blue-600 to-purple-500 cursor-pointer "
-          />
-        </div>
+            <DynamicSelect
+              title="All Statuses"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              options={["All Statuses","pending", "in_progress", "completed"]}
+              width={"w-48"}
+              className="w-auto"
+            />
 
+            <Button
+              text="+ New Project"
+              width="w-auto"
+              onClick={() => setIsModalCreateOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+            />
+          </div>
         <div className="mt-4 px-2">
           {errorMessage && (
             <span className="text-red-300 text-xl font-semibold">
@@ -244,9 +252,8 @@ const dispatch = useDispatch()
             )
           )}
         </div>
-
+        </div>
       </div>
     </>
   );
 };
-

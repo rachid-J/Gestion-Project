@@ -25,7 +25,7 @@ class TaskController extends Controller
             if (!$user) return response()->json(["message" => "User not found"], 404);
     
             $project = Project::with(['creator' => function($q) {
-                $q->select('id', 'name', 'email'); // Add this
+                $q->select('id', 'name', 'email'); 
             }])->find($id);
     
             if (!$project) return response()->json(["message" => "Project not found"], 404);
@@ -39,9 +39,9 @@ class TaskController extends Controller
     
             $tasks = $project->tasks()
                 ->with(['assignedTo', 'creator' => function($q) {
-                    $q->select('id', 'name', 'email'); // Explicit select
+                    $q->select('id', 'name', 'email'); 
                 }])
-                ->paginate(3);
+                ->paginate(9);
     
             $tasks->getCollection()->transform(function ($task) use ($isCreator) {
                 $task->role = $isCreator ? 'creator' : 'member';
@@ -60,14 +60,14 @@ class TaskController extends Controller
             return response()->json(["error" => $e->getMessage()], 500);
         }
     }
-    public function getAllTasks($projectId) {  // Changed parameter name from $id to $projectId
+    public function getAllTasks($projectId) {  
         try {
             $user = JWTAuth::parseToken()->authenticate();
             if (!$user) return response()->json(["message" => "User not found"], 404);
     
             $project = Project::with(['creator' => function($q) {
                 $q->select('id', 'name', 'email');
-            }])->find($projectId);  // Use correct parameter name
+            }])->find($projectId);  
     
             if (!$project) return response()->json(["message" => "Project not found"], 404);
     
@@ -141,7 +141,7 @@ class TaskController extends Controller
                 'status' => 'sometimes|string|in:to_do,in_progress,done'
             ]);
     
-            // Verify assigned user is a project member
+         
             if (!$project->users()->where('user_id', $validated['assigned_to'])->exists()) {
                 return response()->json(['message' => 'Assigned user is not a project member'], 400);
             }

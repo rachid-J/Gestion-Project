@@ -68,8 +68,8 @@ export const ProjectLayouts = () => {
       <Header user={user} />
       <div className="flex flex-1 mt-16">
         <Sidebar user={user} />
-        <main className="flex-1 md:ml-72 overflow-auto p-8">
-          <div className="max-w-7xl mx-auto space-y-8">
+        <main className="flex-1 md:ml-72 overflow-auto p-4 md:p-8">
+          <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
             <Outlet />
           </div>
         </main>
