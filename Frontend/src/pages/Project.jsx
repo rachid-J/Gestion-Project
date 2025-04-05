@@ -7,12 +7,11 @@ import { errors } from "../constants/Errors";
 import { TableSkeleton } from "../components/Skeleton/TableSkeleton";
 import { useDebounce } from "../hooks/useDebounce";
 import { Table } from "../components/tables/Table";
-import { ChartBarIcon, Cog6ToothIcon, DocumentPlusIcon, FolderIcon, MagnifyingGlassIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import {  MagnifyingGlassIcon} from "@heroicons/react/24/outline";
 import { useDispatch, useSelector } from "react-redux";
 import { CreateProjectModal } from "../components/layouts/CreateProjectModal";
 import { setProject } from "../Redux/features/projectSlice";
-import { NavLink } from "react-router-dom";
-import { SidebarHome } from "../components/layouts/SidebarHome";
+
 
 
 
