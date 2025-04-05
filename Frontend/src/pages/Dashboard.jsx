@@ -3,17 +3,17 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 import { getTasks } from '../services/tasksServices';
 import { getAllProject } from '../services/projectServices';
 import { ProjectAccept, ProjectDecline, ProjectReceived } from '../services/ProjectCollab';
-import { 
-  ArrowPathIcon, 
-  ArrowRightIcon, 
-  CheckCircleIcon, 
-  ClipboardDocumentIcon, 
-  EnvelopeIcon, 
-  FolderIcon, 
-  UserGroupIcon,
-  CalendarIcon,
-  CheckIcon,
-  XMarkIcon
+import {
+    ArrowPathIcon,
+    ArrowRightIcon,
+    CheckCircleIcon,
+    ClipboardDocumentIcon,
+    EnvelopeIcon,
+    FolderIcon,
+    UserGroupIcon,
+    CalendarIcon,
+    CheckIcon,
+    XMarkIcon
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import { Notification } from '../Components/layouts/Notification';
@@ -21,11 +21,11 @@ import { setselectedProject } from '../Redux/features/projectSlice';
 import { useDispatch } from 'react-redux';
 
 
-const COLORS = ['#3b82f6', '#f97316', '#10b981']; 
-const PRIORITY_COLORS = { 
-  low: '#0ea5e9',   
-  medium: '#f59e0b', 
-  high: '#ef4444'    
+const COLORS = ['#3b82f6', '#f97316', '#10b981'];
+const PRIORITY_COLORS = {
+    low: '#0ea5e9',
+    medium: '#f59e0b',
+    high: '#ef4444'
 };
 
 export const Dashboard = () => {
@@ -35,15 +35,15 @@ export const Dashboard = () => {
         invitations: [],
         loading: true
     });
-  const [notification, setNotification] = useState(null);
- const disp = useDispatch()
+    const [notification, setNotification] = useState(null);
+    const disp = useDispatch()
     const fetchData = async () => {
         try {
             const [projectsRes, invitationsRes] = await Promise.all([
                 getAllProject(),
                 ProjectReceived()
             ]);
-            
+
             const tasksPromises = projectsRes.data.projects.map(project =>
                 getTasks(1, project.id)
             );
@@ -68,11 +68,11 @@ export const Dashboard = () => {
         try {
             if (accept) {
                 await ProjectAccept(token);
-                setNotification({type:"success",message:'Invitation accepted successfully'});
+                setNotification({ type: "success", message: 'Invitation accepted successfully' });
             } else {
                 await ProjectDecline(token);
-              
-                 setNotification({type:"error",message:'Invitation declined'});
+
+                setNotification({ type: "error", message: 'Invitation declined' });
             }
             fetchData();
         } catch (error) {
@@ -105,33 +105,33 @@ export const Dashboard = () => {
 
     if (stats.loading) {
         return (
-           <div className="p-8 flex mt-12 items-center justify-center gap-3 text-indigo-600">
-                         <div className="animate-spin">
-                           <ArrowPathIcon className="w-6 h-6" />
-                         </div>
-                         <span className="font-medium">Loading dashboard...</span>
-                       </div>
+            <div className="p-8 flex mt-12 items-center justify-center gap-3 text-indigo-600">
+                <div className="animate-spin">
+                    <ArrowPathIcon className="w-6 h-6" />
+                </div>
+                <span className="font-medium">Loading dashboard...</span>
+            </div>
         );
     }
 
     const completedProjects = stats.projects.filter(p => p.status === 'completed').length;
-    const completionRate = stats.projects.length > 0 
-        ? Math.round((completedProjects / stats.projects.length) * 100) 
+    const completionRate = stats.projects.length > 0
+        ? Math.round((completedProjects / stats.projects.length) * 100)
         : 0;
-    
+
     const highPriorityTasks = stats.tasks.filter(t => t.priority === 'high').length;
 
     return (
         <div className="bg-gray-50 mt-12 min-h-screen">
-              {notification && (
-              <Notification 
-                type={notification.type} 
-                message={notification.message}
-                className="fixed top-4 right-4 z-50"
-              />
+            {notification && (
+                <Notification
+                    type={notification.type}
+                    message={notification.message}
+                    className="fixed top-4 right-4 z-50"
+                />
             )}
             <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-               
+
                 <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
                     <div className="mb-4 md:mb-0">
                         <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Dashboard</h1>
@@ -139,11 +139,11 @@ export const Dashboard = () => {
                             Overview of your projects, tasks and collaborations
                         </p>
                     </div>
-                    
-                 
+
+
                 </div>
 
-              
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
                     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                         <div className="p-5">
@@ -162,8 +162,8 @@ export const Dashboard = () => {
                                     <span className="font-medium">{completionRate}%</span>
                                 </div>
                                 <div className="mt-1 w-full bg-gray-200 rounded-full h-1.5">
-                                    <div 
-                                        className="bg-blue-600 h-1.5 rounded-full" 
+                                    <div
+                                        className="bg-blue-600 h-1.5 rounded-full"
                                         style={{ width: `${completionRate}%` }}
                                     ></div>
                                 </div>
@@ -188,8 +188,8 @@ export const Dashboard = () => {
                                     <span className="font-medium">{highPriorityTasks} tasks</span>
                                 </div>
                                 <div className="mt-1 w-full bg-gray-200 rounded-full h-1.5">
-                                    <div 
-                                        className="bg-red-500 h-1.5 rounded-full" 
+                                    <div
+                                        className="bg-red-500 h-1.5 rounded-full"
                                         style={{ width: stats.tasks.length ? `${(highPriorityTasks / stats.tasks.length) * 100}%` : '0%' }}
                                     ></div>
                                 </div>
@@ -211,7 +211,7 @@ export const Dashboard = () => {
                             <div className="mt-4 flex items-center">
                                 <span className="text-xs text-gray-500">Across {stats.projects.length} projects</span>
                                 <Link to="/teams" className="ml-auto text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center">
-                                    View Team 
+                                    View Team
                                     <ArrowRightIcon className="w-3 h-3 ml-1" />
                                 </Link>
                             </div>
@@ -244,9 +244,9 @@ export const Dashboard = () => {
                     </div>
                 </div>
 
-          
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                   
+
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <div className="flex flex-col space-y-6">
                             <div className="flex justify-between items-center border-b border-gray-100 pb-4">
@@ -284,7 +284,7 @@ export const Dashboard = () => {
                                                     <p className="font-medium">{payload?.[0]?.name}</p>
                                                     <p className="text-sm">{payload?.[0]?.value} projects</p>
                                                     <p className="text-xs text-gray-500 mt-1">
-                                                        {payload?.[0]?.value > 0 && stats.projects.length > 0 
+                                                        {payload?.[0]?.value > 0 && stats.projects.length > 0
                                                             ? `${((payload?.[0]?.value / stats.projects.length) * 100).toFixed(1)}% of total`
                                                             : '0% of total'
                                                         }
@@ -298,7 +298,7 @@ export const Dashboard = () => {
                         </div>
                     </div>
 
-          
+
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-4 border-b border-gray-100">Task Priority Distribution</h3>
                         <div className="h-64">
@@ -324,7 +324,7 @@ export const Dashboard = () => {
                                                 <p className="font-medium">{payload?.[0]?.payload.name} Priority</p>
                                                 <p className="text-sm">{payload?.[0]?.value} tasks</p>
                                                 <p className="text-xs text-gray-500 mt-1">
-                                                    {payload?.[0]?.value > 0 && stats.tasks.length > 0 
+                                                    {payload?.[0]?.value > 0 && stats.tasks.length > 0
                                                         ? `${((payload?.[0]?.value / stats.tasks.length) * 100).toFixed(1)}% of total`
                                                         : '0% of total'
                                                     }
@@ -360,7 +360,7 @@ export const Dashboard = () => {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-               
+
                     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
                             <h3 className="text-lg font-semibold text-gray-900">Recent Projects</h3>
@@ -374,12 +374,12 @@ export const Dashboard = () => {
                         </div>
                         <div className="divide-y divide-gray-100">
                             {stats.projects.slice(0, 5).map(project => (
-                              <Link
-                              key={project.id}
-                              to={`/projects/${project.id}/board`}
-                              className="flex items-center justify-between p-5 hover:bg-blue-50/50 transition-colors rounded-lg"
-                              onClick={() => disp(setselectedProject(project))}
-                            >
+                                <Link
+                                    key={project.id}
+                                    to={`/projects/${project.id}/board`}
+                                    className="flex items-center justify-between p-5 hover:bg-blue-50/50 transition-colors rounded-lg"
+                                    onClick={() => disp(setselectedProject(project))}
+                                >
                                     <div className="flex items-center gap-4">
                                         <div className="p-3 bg-blue-100 rounded-lg">
                                             <FolderIcon className="w-5 h-5 text-blue-600" />
@@ -394,13 +394,12 @@ export const Dashboard = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                        project.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                        project.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                                        'bg-amber-100 text-amber-800'
-                                    }`}>
-                                        {project.status === 'in_progress' ? 'In Progress' : 
-                                         project.status === 'completed' ? 'Completed' : 'Pending'}
+                                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${project.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                            project.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                                                'bg-amber-100 text-amber-800'
+                                        }`}>
+                                        {project.status === 'in_progress' ? 'In Progress' :
+                                            project.status === 'completed' ? 'Completed' : 'Pending'}
                                     </span>
                                 </Link>
                             ))}

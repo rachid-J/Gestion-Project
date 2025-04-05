@@ -90,7 +90,7 @@ export const Login = ({ onSwitch }) =>  {
           type="submit"
           text="Continue"
           loading={loading}
-          className="w-full bg-gradient-to-r from-blue-600 to-purple-500 hover:from-blue-700 hover:to-purple-600 text-white font-semibold py-3 rounded-lg hover:rounded-lg transition-all transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-500 hover:from-blue-700 hover:to-purple-600 text-white font-semibold py-3 rounded-lg  transition-all transform shadow-lg hover:shadow-xl"
         />
       </form>
 

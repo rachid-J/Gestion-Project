@@ -14,25 +14,53 @@ import { addProject, getAllProject } from '../services/projectServices';
 import { ProjectInvite } from '../services/ProjectCollab';
 import { CreateProjectModal } from '../components/layouts/CreateProjectModal';
 import { ColaabInvite } from '../components/layouts/ColaabInvite';
+import { Notification } from '../Components/layouts/Notification';
 
-// Color palette for user avatars with more professional colors
-const avatarColors = ['#4f46e5', '#0891b2', '#0e7490', '#7c3aed', '#0369a1'];
+// Professional color palette for user avatars
+const AVATAR_COLORS = [
+  '#4f46e5', // Indigo
+  '#0891b2', // Cyan
+  '#0e7490', // Teal
+  '#7c3aed', // Violet
+  '#0369a1'  // Blue
+];
 
+// Role configuration with consistent styling
+const ROLE_CONFIG = {
+  owner: {
+    style: 'bg-indigo-50 text-indigo-700 border border-indigo-100',
+    icon: ShieldCheckIcon
+  },
+  admin: {
+    style: 'bg-purple-50 text-purple-700 border border-purple-100',
+    icon: null
+  },
+  member: {
+    style: 'bg-blue-50 text-blue-700 border border-blue-100',
+    icon: null
+  },
+  guest: {
+    style: 'bg-gray-50 text-gray-700 border border-gray-100',
+    icon: null
+  }
+};
+
+/**
+ * Role badge component for displaying user roles
+ */
 const RoleBadge = ({ role }) => {
-  const roleStyles = {
-    owner: 'bg-indigo-50 text-indigo-700 border border-indigo-100',
-    admin: 'bg-purple-50 text-purple-700 border border-purple-100',
-    member: 'bg-blue-50 text-blue-700 border border-blue-100',
-    guest: 'bg-gray-50 text-gray-700 border border-gray-100'
-  };
-
+  const roleInfo = ROLE_CONFIG[role.toLowerCase()] || ROLE_CONFIG.member;
+  
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium ${roleStyles[role] || roleStyles.member}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium ${roleInfo.style}`}>
       {role.charAt(0).toUpperCase() + role.slice(1)}
     </span>
   );
 };
 
+/**
+ * User avatar component with consistent styling
+ */
 const UserAvatar = ({ name, color }) => (
   <div
     className="h-10 w-10 rounded-full flex items-center justify-center text-white font-medium shadow-sm"
@@ -42,11 +70,14 @@ const UserAvatar = ({ name, color }) => (
   </div>
 );
 
+/**
+ * User card component for displaying team members
+ */
 const UserCard = ({ user, role }) => {
-  // Consistent color generation based on email to ensure same user always gets same color
+  // Generate consistent color based on email
   const hashCode = str => str.split('').reduce((hash, char) => char.charCodeAt(0) + ((hash << 5) - hash), 0);
-  const colorIndex = Math.abs(hashCode(user.email)) % avatarColors.length;
-  const color = avatarColors[colorIndex];
+  const colorIndex = Math.abs(hashCode(user.email)) % AVATAR_COLORS.length;
+  const color = AVATAR_COLORS[colorIndex];
 
   return (
     <div className="bg-white p-4 rounded-lg border border-gray-200 hover:border-indigo-200 transition-all duration-200 hover:shadow-md">
@@ -62,12 +93,21 @@ const UserCard = ({ user, role }) => {
   );
 };
 
+/**
+ * Status message component for user feedback
+ */
+
+
+/**
+ * Project section component for each team project
+ */
 const ProjectSection = ({ project }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  
   const collaborators = project.users.filter(user => user.id !== project.creator.id);
 
   const formatDate = (dateString) => {
@@ -79,6 +119,7 @@ const ProjectSection = ({ project }) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    
     try {
       await ProjectInvite(project.id, email);
       setSuccess('Invitation sent successfully!');
@@ -91,6 +132,7 @@ const ProjectSection = ({ project }) => {
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
+      {/* Project Header */}
       <div
         className="p-5 cursor-pointer flex items-center justify-between hover:bg-gray-50 rounded-t-xl transition-colors"
         onClick={() => setIsOpen(!isOpen)}
@@ -116,6 +158,7 @@ const ProjectSection = ({ project }) => {
         </div>
       </div>
 
+      {/* Project Details (collapsible) */}
       {isOpen && (
         <div className="p-5 pt-2 space-y-5 border-t border-gray-100">
           {/* Project Owner Section */}
@@ -170,6 +213,7 @@ const ProjectSection = ({ project }) => {
         </div>
       )}
 
+
       <ColaabInvite
         show={showInviteModal}
         onClose={() => setShowInviteModal(false)}
@@ -183,25 +227,6 @@ const ProjectSection = ({ project }) => {
   );
 };
 
-// Status message component for feedback
-const StatusMessage = ({ type, message }) => {
-  const icons = {
-    success: <CheckCircleIcon className="h-5 w-5 text-green-500" />,
-    error: <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
-  };
-
-  const styles = {
-    success: "bg-green-50 text-green-700 border-green-100",
-    error: "bg-red-50 text-red-700 border-red-100"
-  };
-
-  return message ? (
-    <div className={`flex items-center space-x-2 p-3 rounded-lg border ${styles[type]} transition-opacity duration-300`}>
-      {icons[type]}
-      <span className="text-sm">{message}</span>
-    </div>
-  ) : null;
-};
 
 export const Team = () => {
   const [projects, setProjects] = useState([]);
@@ -232,11 +257,15 @@ export const Team = () => {
       setStatusMessage({ type: 'success', message: 'Project created successfully!' });
       setTimeout(() => setStatusMessage({ type: '', message: '' }), 3000);
     } catch (err) {
-      setStatusMessage({ type: 'error', message: 'Failed to create project' });
+      setStatusMessage({ 
+        type: 'error', 
+        message: err.response?.data?.message || 'Failed to create project' 
+      });
     }
     setShowCreateModal(false);
   };
 
+  // Loading state
   if (loading) {
     return (
       <div className="p-8 flex items-center mt-12 justify-center gap-3 text-indigo-600">
@@ -248,6 +277,7 @@ export const Team = () => {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -269,6 +299,7 @@ export const Team = () => {
     );
   }
 
+  // Main content
   return (
     <div className="min-h-screen bg-gray-50 pt-12 pb-12">
       <CreateProjectModal
@@ -279,7 +310,7 @@ export const Team = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between  rounded-xl pt-6 ml-1">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Team Directory</h1>
             <p className="text-sm text-gray-600 mt-1">Manage your organization's collaborative projects</p>
@@ -295,7 +326,7 @@ export const Team = () => {
 
         {/* Status Messages */}
         {statusMessage.message && (
-          <StatusMessage type={statusMessage.type} message={statusMessage.message} />
+          <Notification type={statusMessage.type} message={statusMessage.message} />
         )}
 
         {/* Projects List */}

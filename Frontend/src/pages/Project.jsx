@@ -168,8 +168,8 @@ const dispatch = useDispatch()
       <div className="flex mt-12 min-h-screen">
     
         
-        <div className="flex-1 p-6 bg-gray-50">
-          <div>
+        <div className="flex-1  p-6 bg-gray-50">
+          <div className="ml-2">
             <h1 className="text-2xl font-bold text-gray-900 mb-1">Project Management</h1>
             <p className="text-gray-600">Manage and track your ongoing projects</p>
           </div>

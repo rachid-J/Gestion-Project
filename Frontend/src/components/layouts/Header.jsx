@@ -70,6 +70,9 @@ console.log(notifications)
       disp(logOut());
       navigate('/redirect');
     }
+    else {
+      navigate('/redirect');
+    }
   };
 
   const handleMarkAsRead = async (ids, types) => {
