@@ -21,7 +21,7 @@ class ProjectFactory extends Factory
             'created_by'  => User::factory(),
         ];
     }
-
+    
     public function configure()
     {
         return $this->afterCreating(function (Project $project) {
