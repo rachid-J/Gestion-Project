@@ -251,16 +251,9 @@ export const Dashboard = () => {
                         <div className="flex flex-col space-y-6">
                             <div className="flex justify-between items-center border-b border-gray-100 pb-4">
                                 <h3 className="text-lg font-semibold text-gray-900">Project Status Distribution</h3>
-                                <div className="flex gap-4">
-                                    {projectStatusData.map((entry, i) => (
-                                        <div key={entry.name} className="flex items-center gap-2">
-                                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[i] }} />
-                                            <span className="text-sm text-gray-600">{entry.name}</span>
-                                        </div>
-                                    ))}
-                                </div>
+                              
                             </div>
-                            <div className="h-64">
+                            <div className="h-64 mb-6">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
                                         <Pie
@@ -294,6 +287,14 @@ export const Dashboard = () => {
                                         />
                                     </PieChart>
                                 </ResponsiveContainer>
+                                <div className="flex justify-center gap-6 mt-2">
+                                    {projectStatusData.map((entry, i) => (
+                                        <div key={entry.name} className="flex items-center gap-2">
+                                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[i] }} />
+                                            <span className="text-sm text-gray-600">{entry.name}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>

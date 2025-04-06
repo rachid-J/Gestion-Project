@@ -222,6 +222,7 @@ const ProjectSection = ({ project }) => {
         setEmail={setEmail}
         error={error}
         success={success}
+        projectId={project.id}
       />
     </div>
   );

@@ -1,13 +1,63 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { axiosClient } from '../../services/axiosClient';
+import { ProjectColab } from '../../services/ProjectCollab';
 
-export const ColaabInvite = ({ show, onClose, onSubmit, email, setEmail, error, success }) => {
+
+export const ColaabInvite = ({ show, onClose, onSubmit, email, setEmail, error, success, projectId }) => {
+    const [contacts, setContacts] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [selectedContact, setSelectedContact] = useState(null);
+    const [projectCollab, setProjectCollab] = useState([]);
+
+    // Fetch data when component mounts or search term changes
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!show) return;
+            
+            setIsLoading(true);
+            try {
+                const [contactsResponse, collabResponse] = await Promise.all([
+                    axiosClient.get(`/contacts?search=${searchTerm}`),
+                    ProjectColab(projectId)
+                ]);
+
+                setContacts(contactsResponse.data?.data || []);
+                setProjectCollab(collabResponse?.data || []);
+            } catch (err) {
+                console.error("Data fetch error:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [show, searchTerm, projectId]);
+
+    // Filter out existing collaborators
+    const filteredContacts = contacts.filter(contact => 
+        !projectCollab.some(collab => collab.email === contact.email)
+    );
+
+    // Handle contact selection
+    const handleContactSelect = (contact) => {
+        setSelectedContact(contact);
+        setEmail(contact.email);
+    };
+
+    // Handle form submission
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSubmit(e);
+    };
+
     if (!show) return null;
 
     return (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-xl p-6 max-w-md w-full border border-gray-100 animate-scale-in">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-semibold text-gray-800">Invite Team Member</h2>
+                    <h2 className="text-xl font-semibold text-gray-800">Invite Collaborator</h2>
                     <button 
                         onClick={onClose}
                         className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -18,8 +68,70 @@ export const ColaabInvite = ({ show, onClose, onSubmit, email, setEmail, error, 
                     </button>
                 </div>
 
-                <form onSubmit={onSubmit} className="space-y-4">
-                    <div className="relative">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Search Input */}
+                    <div className="relative mb-4">
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Search contacts..."
+                            className="w-full px-4 py-3 pl-10 border-0 rounded-lg bg-gray-50 focus:ring-2 
+                                    focus:ring-blue-500 focus:bg-white transition-all"
+                        />
+                        <svg className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+
+                    {/* Contacts List */}
+                    <div className="max-h-64 overflow-y-auto rounded-lg border border-gray-100">
+                        {isLoading ? (
+                            <div className="flex items-center justify-center p-4">
+                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                            </div>
+                        ) : filteredContacts.length > 0 ? (
+                            <ul className="divide-y divide-gray-100">
+                                {filteredContacts.map((contact) => (
+                                    <li 
+                                        key={contact.id}
+                                        className={`p-3 hover:bg-gray-50 cursor-pointer transition-colors flex items-center ${
+                                            selectedContact?.id === contact.id ? 'bg-blue-50' : ''
+                                        }`}
+                                        onClick={() => handleContactSelect(contact)}
+                                    >
+                                        <div className="w-8 h-8 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mr-3">
+                                            <span className="text-blue-800 font-medium text-sm">
+                                                {contact.name.charAt(0)}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <p className="font-medium text-gray-800">{contact.name}</p>
+                                            <p className="text-sm text-gray-500">{contact.email}</p>
+                                        </div>
+                                        {selectedContact?.id === contact.id && (
+                                            <svg className="w-5 h-5 ml-auto text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                                            </svg>
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <div className="p-4 text-center text-gray-500">
+                                {searchTerm 
+                                    ? 'No matching contacts found' 
+                                    : contacts.length === 0 
+                                        ? 'No contacts available' 
+                                        : 'All contacts are already collaborating'}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Email Input */}
+                    <div className="relative mt-4">
                         <input
                             type="email"
                             value={email}
@@ -37,6 +149,7 @@ export const ColaabInvite = ({ show, onClose, onSubmit, email, setEmail, error, 
                         </label>
                     </div>
 
+                    {/* Error/Success Messages */}
                     {error && (
                         <div className="p-3 bg-red-50/80 rounded-xl border border-red-100 flex items-center gap-3 text-red-700">
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -55,6 +168,7 @@ export const ColaabInvite = ({ show, onClose, onSubmit, email, setEmail, error, 
                         </div>
                     )}
 
+                    {/* Action Buttons */}
                     <div className="flex gap-3 mt-6">
                         <button
                             type="button"
@@ -79,4 +193,3 @@ export const ColaabInvite = ({ show, onClose, onSubmit, email, setEmail, error, 
         </div>
     );
 };
-

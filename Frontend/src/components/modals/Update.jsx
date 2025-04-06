@@ -5,6 +5,7 @@ import { errors } from "../../constants/Errors";
 import { DynamicSelect } from "../UI/Select";
 import { updateProject } from "../../services/projectServices";
 import { Notification } from "../layouts/Notification";
+import { ArrowPathIcon, CheckCircleIcon, CheckIcon, ChevronUpDownIcon, ClockIcon } from "@heroicons/react/24/solid";
 
 export const Update = ({ modal, setModal }) => {
   const [loading, setLoading] = useState(false);
@@ -60,6 +61,21 @@ export const Update = ({ modal, setModal }) => {
       setLoading(false);
     }
   };
+  const [isOpen, setIsOpen] = useState(false);
+
+const getStatusIcon = (status) => {
+  const iconClass = "h-5 w-5";
+  switch(status) {
+    case 'pending':
+      return <ClockIcon className={`${iconClass} text-amber-500`} />;
+    case 'in_progress':
+      return <ArrowPathIcon className={`${iconClass} text-blue-500 animate-spin`} />;
+    case 'completed':
+      return <CheckCircleIcon className={`${iconClass} text-emerald-500`} />;
+    default:
+      return <ClockIcon className={`${iconClass} text-gray-400`} />;
+  }
+};
 
   if (!modal) return null;
 
@@ -68,7 +84,10 @@ export const Update = ({ modal, setModal }) => {
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="relative w-full max-w-2xl rounded-2xl bg-gradient-to-br from-white to-gray-50 p-8 shadow-2xl ring-1 ring-gray-900/5">
           <button
-            onClick={() => setModal(null)}
+            onClick={() => setModal({ 
+              type: "", 
+            
+            })}
             className="absolute right-6 top-6 rounded-full p-1 transition-all hover:bg-gray-100 hover:scale-105"
           >
             <XMarkIcon className="h-6 w-6 text-gray-500" />
@@ -125,16 +144,61 @@ export const Update = ({ modal, setModal }) => {
 
               />
 
-              <div className="group relative">
-                <DynamicSelect
-                  name="status"
-                  title="Status"
-                  value={projectData.status}
-                  onChange={handleChangeProject}
-                  options={["pending", "in_progress", "completed"]}
-                  width={"w-152"}
-                  className="w-auto "
-                />
+              <div className="group relative ">
+              <div className="relative w-full">
+  <div className="group relative">
+    <div className="flex flex-col gap-1">
+      <label className="text-sm font-medium text-gray-700 mb-1">Status</label>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="relative w-full cursor-default rounded-xl bg-white py-3 pl-3 pr-10 text-left ring-1 ring-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:ring-gray-300 transition-all"
+      >
+        <span className="flex items-center gap-2">
+          {getStatusIcon(projectData.status)}
+          <span className="capitalize">
+            {projectData.status.replace('_', ' ')}
+          </span>
+        </span>
+        <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+          <ChevronUpDownIcon
+            className="h-5 w-5 text-gray-400"
+            aria-hidden="true"
+          />
+        </span>
+      </button>
+    </div>
+
+    {isOpen && (
+      <div className="absolute z-10 mt-1 w-full rounded-xl bg-white shadow-lg ring-1 ring-gray-200 focus:outline-none animate-slideDown">
+        <ul className="max-h-60 overflow-auto rounded-xl py-2">
+          {["pending", "in_progress", "completed"].map((status) => (
+            <li
+              key={status}
+              onClick={() => {
+                handleChangeProject({ target: { name: "status", value: status } });
+                setIsOpen(false);
+              }}
+              className="relative cursor-default select-none py-3 pl-3 pr-9 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                {getStatusIcon(status)}
+                <span className="capitalize">
+                  {status.replace('_', ' ')}
+                  {projectData.status === status && (
+                    <span className="absolute inset-y-0 right-0 flex items-center pr-4">
+                      <CheckIcon className="h-5 w-5 text-blue-600" />
+                    </span>
+                  )}
+                </span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </div>
+</div>
               </div>
             </div>
           )}
@@ -142,7 +206,10 @@ export const Update = ({ modal, setModal }) => {
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <button
                 type="button"
-                onClick={() => setModal(null)}
+                onClick={() => setModal({ 
+                  type: "", 
+                
+                })}
                 className="rounded-xl px-6 py-3 font-medium text-gray-700 transition-all hover:bg-gray-100 hover:text-gray-900"
               >
                 Cancel

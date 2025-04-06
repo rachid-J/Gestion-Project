@@ -312,6 +312,7 @@ export const Collaboration = () => {
               setEmail={setEmail}
               error={error}
               success={success}
+              projectId={projectId}
             />
           </main>
         </div>

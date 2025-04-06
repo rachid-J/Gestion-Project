@@ -4,7 +4,17 @@ export const getContact = async (page = 1, search = '') => {
     const response = await axiosClient.get(`/contacts?page=${page}&search=${search}`);
     return response;
 };
+export const getAllContacts = async (search = '') => {
+    const response = await axiosClient.get(`/contacts?search=${search}&per_page=100`);
+    return response;
+};
 
+// Existing functions
+
+export const ProjectInvite = async (projectId, email) => {
+    const response = await axiosClient.post(`/projects/${projectId}/invite`, { email });
+    return response;
+};
 export const ContactReceived = async (page = 1, search = '') => {
     const response = await axiosClient.get(`/contact-invitations/received?page=${page}&search=${search}`);
     return response;

@@ -11,6 +11,7 @@ import {  MagnifyingGlassIcon} from "@heroicons/react/24/outline";
 import { useDispatch, useSelector } from "react-redux";
 import { CreateProjectModal } from "../components/layouts/CreateProjectModal";
 import { setProject } from "../Redux/features/projectSlice";
+import { XMarkIcon } from "@heroicons/react/24/solid";
 
 
 
@@ -28,6 +29,8 @@ export const Project = () => {
     lastPage: 0,
     total: 0,
   });
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  
 const dispatch = useDispatch()
   useEffect(() => {
     const fetchProjects = async () => {
@@ -158,22 +161,18 @@ const dispatch = useDispatch()
       <CreateProjectModal
         isOpen={isModalCreateOpen}
         onClose={() => setIsModalCreateOpen(false)}
-        onCreate={(projectData) => {
-          handleCreateProject(projectData)
-          console.log("Creating project:", projectData);
-        }}
+        onCreate={handleCreateProject}
       />
       
       <div className="flex mt-12 min-h-screen">
-    
-        
-        <div className="flex-1  p-6 bg-gray-50">
+        <div className="flex-1 p-3 bg-gray-50">
           <div className="ml-2">
             <h1 className="text-2xl font-bold text-gray-900 mb-1">Project Management</h1>
             <p className="text-gray-600">Manage and track your ongoing projects</p>
           </div>
 
-        <div className="flex w-full items-center gap-3 mt-4">
+          {/* Desktop Controls */}
+          <div className="hidden md:flex w-full items-center gap-3 mt-4">
           <div className="relative flex-1 max-w-xl">
             <MagnifyingGlassIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
             <Input
@@ -185,35 +184,91 @@ const dispatch = useDispatch()
             />
           </div>
 
-     
-
             <DynamicSelect
               title="All Statuses"
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
               options={["All Statuses","pending", "in_progress", "completed"]}
-              width={"w-48"}
+              width="w-48"
               className="w-auto"
             />
 
             <Button
               text="+ New Project"
-              width="w-auto"
               onClick={() => setIsModalCreateOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm px-6 py-2.5"
             />
           </div>
-        <div className="mt-4 px-2">
-          {errorMessage && (
-            <span className="text-red-300 text-xl font-semibold">
-              {errorMessage}
-            </span>
-          )}
 
-          {loading ? (
-                 <TableSkeleton heads={["Name", "Status", "Creator"]}/>
-          ) : projects.length > 0 ? (
-            <Table
+          {/* Mobile Controls */}
+          <div className="md:hidden flex flex-col gap-3 mt-4">
+            <div className="flex gap-3">
+              {/* Search Toggle Button */}
+              {!isMobileSearchOpen && (
+              
+                 <MagnifyingGlassIcon 
+                    onClick={() => setIsMobileSearchOpen(true)}
+                    className="h-10 w-10 p-2 text-gray-600 bg-white border border-gray-200 rounded-lg shadow-sm" />
+                
+              )}
+
+              {/* Status Select - Only shown when search is closed */}
+              {!isMobileSearchOpen && (
+                    <DynamicSelect
+                    title="All Statuses"
+                    value={selectedStatus}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    options={["All Statuses","pending", "in_progress", "completed"]}
+                    width={"w-48"}
+                    className="w-auto"
+                  />
+              )}
+
+              {/* New Project Button - Only shown when search is closed */}
+              {!isMobileSearchOpen && (
+                <Button
+                  text="+ New"
+                  onClick={() => setIsModalCreateOpen(true)}
+                  className=" ml-4 w-20 bg-blue-600 hover:bg-blue-700 text-white shadow-sm px-4 py-2.5"
+                />
+              )}
+            </div>
+
+            {/* Full-width Mobile Search */}
+            {isMobileSearchOpen && (
+  <div className="relative animate-slideIn">
+    <Input
+      className="w-full pl-10 pr-12 py-2.5 border border-gray-200 rounded-lg bg-white transition-all duration-300"
+      placeholder="Search projects..."
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      autoFocus
+    />
+    <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+    <XMarkIcon 
+      onClick={() => {
+        setIsMobileSearchOpen(false);
+        setSearchTerm("");
+      }}
+      className="h-5 w-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer hover:text-gray-700 transition-colors"
+    />
+  </div>
+)}
+          </div>
+
+          {/* Content Section */}
+          <div className="mt-4">
+            {/* Keep existing content rendering logic */}
+            {errorMessage && (
+              <span className="text-red-300 text-xl font-semibold">
+                {errorMessage}
+              </span>
+            )}
+
+            {loading ? (
+              <TableSkeleton heads={["Name", "Status", "Creator"]}/>
+            ) : projects.length > 0 ? (
+              <Table
               heads={["Name", "Status", "Creator"]}
               data={projects}
               keys={["name", "status", "creator.name"]}
@@ -232,27 +287,29 @@ const dispatch = useDispatch()
               deleteButton={true}
               currentUserId={user.id}
               toUpdateOrDelete={"project"}
-            />
-          ) : (
-            !loading && (
-              <div className="overflow-hidden rounded-xl border mt-3 border-gray-200 bg-white shadow-sm">
-                <div className="p-8 text-center">
-                  <div className="mx-auto max-w-md">
-                    <div className="mb-4 text-6xl">📭</div>
-                    <h3 className="mb-2 text-xl font-semibold text-gray-900">No projects found</h3>
-                    <p className="text-gray-500">
-                      {searchTerm ?
-                        "No results for your search criteria" :
-                        "Get started by creating a new project"}
-                    </p>
+              />
+            ) : (
+              !loading && (
+                <div className="overflow-hidden rounded-xl border mt-3 border-gray-200 bg-white shadow-sm">
+                  <div className="p-8 text-center">
+                    <div className="mx-auto max-w-md">
+                      <div className="mb-4 text-6xl">📭</div>
+                      <h3 className="mb-2 text-xl font-semibold text-gray-900">No projects found</h3>
+                      <p className="text-gray-500">
+                        {searchTerm ?
+                          "No results for your search criteria" :
+                          "Get started by creating a new project"}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )
-          )}
-        </div>
+              )
+            )}
+          </div>
         </div>
       </div>
     </>
   );
 };
+
+
