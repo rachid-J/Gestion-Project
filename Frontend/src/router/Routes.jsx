@@ -45,28 +45,42 @@ export const Router = () => {
 
 
  
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const response = await user(token);
+   useEffect(() => {
+    const fetchUser = async () => {
+        try {
+            const response = await user(token);
+            
+            // Check if the response has the expected user data structure
+            if (response && response.data && response.data.user) {
                 dispatch(setUser(response.data));
-            } catch (error) {
-                console.error("Error fetching user:", error);
-                if (error.response && error.response.status === 401) {
-                    dispatch(logOut()); 
-                }
-            } finally {
-                setIsLoading(false);
+            } else {
+                console.error("Invalid user data structure received");
+                dispatch(logOut());
             }
-        };
-
-        if (token) {
-            fetchUser();
-        } else {
+        } catch (error) {
+            console.error("Error fetching user:", error);
+            
+            // Any authentication error should log out the user
+            if (error.response && error.response.status === 401) {
+                const errorMessage = error.response.data?.error || "Authentication failed";
+                console.log(`Auth error: ${errorMessage}`);
+                dispatch(logOut());
+            } else {
+                // Handle other errors (like network issues, server errors)
+                console.error("Unexpected error during authentication");
+                dispatch(logOut());
+            }
+        } finally {
             setIsLoading(false);
         }
-    }, [token, dispatch]);
+    };
 
+    if (token) {
+        fetchUser();
+    } else {
+        setIsLoading(false);
+    }
+}, [token, dispatch]);
     if (isLoading) {
         return <DefaultSkeleton />;
     }
