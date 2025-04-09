@@ -29,6 +29,9 @@ import { Dashboard } from "../pages/Dashboard";
 import { Team } from "../pages/Team";
 import { LandingPage } from "../pages/LandingPage";
 import { Redirect } from "../pages/Redirect";
+import { AboutPage } from "../pages/AboutPage";
+import { Features } from "../pages/features";
+import { HomeLayouts } from "../components/layouts/HomeLayouts";
 
 
 
@@ -44,43 +47,43 @@ export const Router = () => {
 
 
 
- 
-   useEffect(() => {
-    const fetchUser = async () => {
-        try {
-            const response = await user(token);
-            
-            // Check if the response has the expected user data structure
-            if (response && response.data && response.data.user) {
-                dispatch(setUser(response.data));
-            } else {
-                console.error("Invalid user data structure received");
-                dispatch(logOut());
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await user(token);
+
+                // Check if the response has the expected user data structure
+                if (response && response.data && response.data.user) {
+                    dispatch(setUser(response.data));
+                } else {
+                    console.error("Invalid user data structure received");
+                    dispatch(logOut());
+                }
+            } catch (error) {
+                console.error("Error fetching user:", error);
+
+                // Any authentication error should log out the user
+                if (error.response && error.response.status === 401) {
+                    const errorMessage = error.response.data?.error || "Authentication failed";
+                    console.log(`Auth error: ${errorMessage}`);
+                    dispatch(logOut());
+                } else {
+                    // Handle other errors (like network issues, server errors)
+                    console.error("Unexpected error during authentication");
+                    dispatch(logOut());
+                }
+            } finally {
+                setIsLoading(false);
             }
-        } catch (error) {
-            console.error("Error fetching user:", error);
-            
-            // Any authentication error should log out the user
-            if (error.response && error.response.status === 401) {
-                const errorMessage = error.response.data?.error || "Authentication failed";
-                console.log(`Auth error: ${errorMessage}`);
-                dispatch(logOut());
-            } else {
-                // Handle other errors (like network issues, server errors)
-                console.error("Unexpected error during authentication");
-                dispatch(logOut());
-            }
-        } finally {
+        };
+
+        if (token) {
+            fetchUser();
+        } else {
             setIsLoading(false);
         }
-    };
-
-    if (token) {
-        fetchUser();
-    } else {
-        setIsLoading(false);
-    }
-}, [token, dispatch]);
+    }, [token, dispatch]);
     if (isLoading) {
         return <DefaultSkeleton />;
     }
@@ -91,10 +94,17 @@ export const Router = () => {
             element: <Navigate to="/home" replace />
         },
         { path: "/auth", element: <Auth /> },
-        { path: "*", element: <NotFound /> },
+        { 
+            path: "/home", 
+            element: <HomeLayouts />,
+            children: [
+                { index: true, element: <LandingPage /> },
+                { path: "about", element: <AboutPage /> },
+                { path: "features", element: <Features /> }
+            ]
+        },
         { path: "/redirect", element: <Redirect /> },
-        { path: "/home", element: <LandingPage />, },
-
+        { path: "*", element: <NotFound /> }
     ];
 
     const authenticatedRoutes = [
@@ -109,11 +119,11 @@ export const Router = () => {
                 { path: "projects", element: <Project /> },
                 { path: "Dashboard", element: <Dashboard /> },
                 { path: "profile/:username", element: <Profile /> },
-                { path :"settings", element : <Settings/>},
+                { path: "settings", element: <Settings /> },
                 { path: "contact", element: <ContactsPage /> },
                 { path: "teams", element: <Team /> },
 
-               
+
 
 
 
@@ -127,9 +137,9 @@ export const Router = () => {
                 { path: "board", element: <Board /> },
                 { path: "List", element: <List /> },
                 { path: "collaboration", element: <Collaboration />, },
-              
 
-            
+
+
             ]
         },
 

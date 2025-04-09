@@ -13,9 +13,6 @@ import { CreateProjectModal } from "../components/layouts/CreateProjectModal";
 import { setProject } from "../Redux/features/projectSlice";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 
-
-
-
 export const Project = () => {
   const user = useSelector(state => state.auth.user);
   const [projects, setProjects] = useState([]);
@@ -31,12 +28,11 @@ export const Project = () => {
   });
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   
-const dispatch = useDispatch()
+  const dispatch = useDispatch()
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const resp = await getAllProject();
-        console.log(resp.data.projects)
         dispatch(setProject(resp.data.projects));
       } catch (error) {
         console.error("Error fetching projects:", error);
@@ -48,267 +44,162 @@ const dispatch = useDispatch()
 
   const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
 
-
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
-
   const fetchProjects = async (searchQuery = "", page = 1) => {
-    setErrorMessage(null);
-    setLoading(true);
     try {
-      const response = searchQuery
-        ? await searchProjectbyName(searchQuery, page)
-        : await getProject(page);
-      setPaginate(true);
-      if (response.status === 200) {
-        if (response.data.projects.data?.length > 0) {
-          console.log(response.data)
-          setPagination({
-            currentPage: response.data.projects.current_page,
-            lastPage: response.data.projects.last_page,
-            total: response.data.projects.total
-          });
-          setProjects(response.data.projects.data);
-          setErrorMessage("");
-        } else {
-          setProjects([]);
-          setErrorMessage(errors.notFound);
-        }
+      setLoading(true);
+      setErrorMessage(null);
+      let response;
+      if (searchQuery) {
+        response = await searchProjectbyName(searchQuery, page);
+      } else {
+        response = await getAllProject(page);
       }
+      setProjects(response.data.projects);
+      setPagination({
+        currentPage: response.data.current_page,
+        lastPage: response.data.last_page,
+        total: response.data.total,
+      });
+      setPaginate(true);
     } catch (error) {
-      setErrorMessage(
-        error.response?.status === 404 ? errors.notFound : errors.tryAgain
-      );
-      setProjects([]);
+      setErrorMessage(errors.FETCH_ERROR);
+      console.error("Error fetching projects:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const filterProjectsByStatus_FUNCTION = async (page = 1) => {
-    setErrorMessage(null);
-    setLoading(true);
-  
     try {
+      setLoading(true);
+      setErrorMessage(null);
       const response = await filterProjectsByStatus(selectedStatus, page);
-      console.log(response)
+      setProjects(response.data.projects);
+      setPagination({
+        currentPage: response.data.current_page,
+        lastPage: response.data.last_page,
+        total: response.data.total,
+      });
       setPaginate(true);
-      if (response.status === 200) {
-        if (response.data.projects.data?.length > 0) {
-          setPagination({
-            currentPage: response.data.projects.current_page,
-            lastPage: response.data.projects.last_page,
-            total: response.data.projects.total
-          });
-          setProjects(response.data.projects.data);
-          setErrorMessage("");
-        } else {
-          setProjects([]);
-          setErrorMessage(errors.notFound);
-        }
-      }
     } catch (error) {
-      setErrorMessage(
-        error.response?.status === 404 ? errors.notFound : errors.tryAgain
-      );
-      setProjects([]);
+      setErrorMessage(errors.FETCH_ERROR);
+      console.error("Error filtering projects:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleCreateProject = async (data) => {
-    setErrorMessage(null);
-    setLoading(true);
     try {
-      const response = await addProject(data);
-      console.log(response.data);
-      if (response.status === 200) {
-        if (response.data.project) {
-          setProjects(((prevProjects) => [...prevProjects, response.data.project]));
-          setErrorMessage("");
-        } else {
-          setProjects([]);
-          setErrorMessage(errors.notFound);
-        }
-      }
+      setLoading(true);
+      setErrorMessage(null);
+      await addProject(data);
+      await fetchProjects();
+      setIsModalCreateOpen(false);
     } catch (error) {
-      setErrorMessage(
-        error.response?.status === 404 ? errors.notFound : errors.tryAgain
-      );
-      setProjects([]);
+      setErrorMessage(errors.CREATE_ERROR);
+      console.error("Error creating project:", error);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   useEffect(() => {
-    if (selectedStatus === "All Statuses") {
-      fetchProjects("", 1);
+    if (debouncedSearchTerm) {
+      fetchProjects(debouncedSearchTerm);
+    } else if (selectedStatus !== "All Statuses") {
+      filterProjectsByStatus_FUNCTION();
     } else {
-      filterProjectsByStatus_FUNCTION(1);
+      fetchProjects();
     }
-  }, [selectedStatus]);
+  }, [debouncedSearchTerm, selectedStatus]);
 
-  useEffect(() => {
-    fetchProjects(debouncedSearchTerm, 1);
-  }, [debouncedSearchTerm]);
+  const handlePageChange = (page) => {
+    if (searchTerm) {
+      fetchProjects(searchTerm, page);
+    } else if (selectedStatus !== "All Statuses") {
+      filterProjectsByStatus_FUNCTION(page);
+    } else {
+      fetchProjects("", page);
+    }
+  };
 
- 
   return (
-    <>
-      <CreateProjectModal
-        isOpen={isModalCreateOpen}
-        onClose={() => setIsModalCreateOpen(false)}
-        onCreate={handleCreateProject}
-      />
-      
-      <div className="flex mt-12 min-h-screen">
-        <div className="flex-1 p-3 bg-gray-50">
-          <div className="ml-2">
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">Project Management</h1>
-            <p className="text-gray-600">Manage and track your ongoing projects</p>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+          <div className="mb-4 md:mb-0">
+            <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
+            <p className="mt-1 text-sm text-gray-500">
+              Manage your projects and track their progress
+            </p>
           </div>
-
-          {/* Desktop Controls */}
-          <div className="hidden md:flex w-full items-center gap-3 mt-4">
-          <div className="relative flex-1 max-w-xl">
-            <MagnifyingGlassIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-            <Input
-              className="w-full ml-2 p-2 pl-10 border border-white-700 rounded-md bg-white-800 text-black"
-              placeholder="Search projects..."
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-
-            <DynamicSelect
-              title="All Statuses"
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              options={["All Statuses","pending", "in_progress", "completed"]}
-              width="w-48"
-              className="w-auto"
-            />
-
-            <Button
-              text="+ New Project"
+          <div className="flex items-center space-x-4">
+            <button
               onClick={() => setIsModalCreateOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm px-6 py-2.5"
-            />
-          </div>
-
-          {/* Mobile Controls */}
-          <div className="md:hidden flex flex-col gap-3 mt-4">
-            <div className="flex gap-3">
-              {/* Search Toggle Button */}
-              {!isMobileSearchOpen && (
-              
-                 <MagnifyingGlassIcon 
-                    onClick={() => setIsMobileSearchOpen(true)}
-                    className="h-10 w-10 p-2 text-gray-600 bg-white border border-gray-200 rounded-lg shadow-sm" />
-                
-              )}
-
-              {/* Status Select - Only shown when search is closed */}
-              {!isMobileSearchOpen && (
-                    <DynamicSelect
-                    title="All Statuses"
-                    value={selectedStatus}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                    options={["All Statuses","pending", "in_progress", "completed"]}
-                    width={"w-48"}
-                    className="w-auto"
-                  />
-              )}
-
-              {/* New Project Button - Only shown when search is closed */}
-              {!isMobileSearchOpen && (
-                <Button
-                  text="+ New"
-                  onClick={() => setIsModalCreateOpen(true)}
-                  className=" ml-4 w-20 bg-blue-600 hover:bg-blue-700 text-white shadow-sm px-4 py-2.5"
-                />
-              )}
-            </div>
-
-            {/* Full-width Mobile Search */}
-            {isMobileSearchOpen && (
-  <div className="relative animate-slideIn">
-    <Input
-      className="w-full pl-10 pr-12 py-2.5 border border-gray-200 rounded-lg bg-white transition-all duration-300"
-      placeholder="Search projects..."
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      autoFocus
-    />
-    <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-    <XMarkIcon 
-      onClick={() => {
-        setIsMobileSearchOpen(false);
-        setSearchTerm("");
-      }}
-      className="h-5 w-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer hover:text-gray-700 transition-colors"
-    />
-  </div>
-)}
-          </div>
-
-          {/* Content Section */}
-          <div className="mt-4">
-            {/* Keep existing content rendering logic */}
-            {errorMessage && (
-              <span className="text-red-300 text-xl font-semibold">
-                {errorMessage}
-              </span>
-            )}
-
-            {loading ? (
-              <TableSkeleton heads={["Name", "Status", "Creator"]}/>
-            ) : projects.length > 0 ? (
-              <Table
-              heads={["Name", "Status", "Creator"]}
-              data={projects}
-              keys={["name", "status", "creator.name"]}
-              getData={(page) => {
-                if (selectedStatus !== "All Statuses") {
-                  filterProjectsByStatus_FUNCTION(page);
-                } else {
-                  fetchProjects(debouncedSearchTerm, page);
-                }
-
-              }}
-              paginate={paginate}
-              pagination={pagination}
-              updateButton={true}
-              viewButton={true}
-              deleteButton={true}
-              currentUserId={user.id}
-              toUpdateOrDelete={"project"}
-              />
-            ) : (
-              !loading && (
-                <div className="overflow-hidden rounded-xl border mt-3 border-gray-200 bg-white shadow-sm">
-                  <div className="p-8 text-center">
-                    <div className="mx-auto max-w-md">
-                      <div className="mb-4 text-6xl">📭</div>
-                      <h3 className="mb-2 text-xl font-semibold text-gray-900">No projects found</h3>
-                      <p className="text-gray-500">
-                        {searchTerm ?
-                          "No results for your search criteria" :
-                          "Get started by creating a new project"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )
-            )}
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+            >
+              New Project
+            </button>
           </div>
         </div>
+
+        <div className="bg-white rounded-lg shadow-sm">
+          <div className="p-4 border-b border-gray-200">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <Input
+                    type="text"
+                    placeholder="Search projects..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <div className="w-full md:w-48">
+                <DynamicSelect
+                  value={selectedStatus}
+                  onChange={(value) => setSelectedStatus(value)}
+                  options={[
+                    { value: "All Statuses", label: "All Statuses" },
+                    { value: "active", label: "Active" },
+                    { value: "completed", label: "Completed" },
+                    { value: "on_hold", label: "On Hold" },
+                  ]}
+                />
+              </div>
+            </div>
+          </div>
+
+          {loading ? (
+            <TableSkeleton />
+          ) : errorMessage ? (
+            <div className="p-4 text-center text-red-600">{errorMessage}</div>
+          ) : (
+            <Table
+              data={projects}
+              pagination={pagination}
+              onPageChange={handlePageChange}
+              paginate={paginate}
+            />
+          )}
+        </div>
       </div>
-    </>
+
+      {isModalCreateOpen && (
+        <CreateProjectModal
+          onClose={() => setIsModalCreateOpen(false)}
+          onSubmit={handleCreateProject}
+        />
+      )}
+    </div>
   );
 };
 

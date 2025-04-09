@@ -20,7 +20,6 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 
-
 const formatRelativeTime = (dateString) => {
   const date = new Date(dateString);
   const now = new Date();
@@ -52,10 +51,13 @@ export const Summary = () => {
 
   const fetchTasks = async () => {
     try {
-      const { data } = await getAllTasks(projectId);
-      setTasks(data.tasks);
+      setLoading(true);
+      const response = await getAllTasks(projectId);
+      setTasks(response.data);
+      setError(null);
     } catch (err) {
-      setError(err.message);
+      setError('Failed to load tasks. Please try again later.');
+      console.error('Error fetching tasks:', err);
     } finally {
       setLoading(false);
     }
@@ -63,313 +65,146 @@ export const Summary = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [projectId]);
 
-  if (loading) return (
-    <div className="p-8 flex items-center justify-center gap-3 text-indigo-600">
-      <div className="animate-spin">
-        <ArrowPathIcon className="w-6 h-6" />
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <ArrowPathIcon className="h-8 w-8 text-indigo-600 animate-spin" />
       </div>
-      <span className="font-medium">Loading dashboard...</span>
-    </div>
-  );
+    );
+  }
 
-  if (error) return (
-    <div className="p-8 flex items-center gap-3 text-rose-600">
-      <ExclamationTriangleIcon className="w-5 h-5 flex-shrink-0" />
-      <span>Error loading data: {error}</span>
-    </div>
-  );
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
+        <ExclamationTriangleIcon className="h-12 w-12 text-red-500" />
+        <p className="text-lg text-gray-900">{error}</p>
+        <button
+          onClick={fetchTasks}
+          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
 
-  const stats = {
-    totalTasks: tasks.length,
-    completed: tasks.filter(t => t.status === 'done').length,
-    inProgress: tasks.filter(t => t.status === 'in_progress').length,
-    overdue: tasks.filter(t =>
-      t.due_date && new Date(t.due_date) < new Date() && t.status !== 'done'
-    ).length,
-  };
+  const completedTasks = tasks.filter(task => task.status === 'completed').length;
+  const inProgressTasks = tasks.filter(task => task.status === 'in_progress').length;
+  const pendingTasks = tasks.filter(task => task.status === 'pending').length;
+  const totalTasks = tasks.length;
 
-  const priorityStats = {
-    high: tasks.filter(t => t.priority === 'high' && t.status !== 'done').length,
-    medium: tasks.filter(t => t.priority === 'medium' && t.status !== 'done').length,
-    low: tasks.filter(t => t.priority === 'low' && t.status !== 'done').length,
-  };
-
-  const statusDistribution = {
-    todo: tasks.filter(t => t.status === 'to_do').length,
-    in_progress: stats.inProgress,
-    done: stats.completed,
-  };
-
-  const assigneeStats = tasks.reduce((acc, task) => {
-    if (task.assignee) {
-      if (!acc[task.assignee]) {
-        acc[task.assignee] = {
-          count: 1,
-          job: task.assigneejob
-        };
-      } else {
-        acc[task.assignee].count++;
-      }
-    }
-    return acc;
-  }, {});
-
-  const recentActivity = tasks
-    .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
-    .slice(0, 3)
-    .map(task => ({
-      id: task.id,
-      task: task.title,
-      status: task.status,
-      date: formatRelativeTime(task.updated_at),
-      user: task.assignee || task.creator.name,
-      comment: "Updated task status"
-    }));
-
-  const pieData = [
-    { name: 'Done', value: statusDistribution.done, color: '#10b981' },
-    { name: 'In Progress', value: statusDistribution.in_progress, color: '#f59e0b' },
-    { name: 'To Do', value: statusDistribution.todo, color: '#3b82f6' },
+  const statusData = [
+    { name: 'Completed', value: completedTasks, color: '#10B981' },
+    { name: 'In Progress', value: inProgressTasks, color: '#F59E0B' },
+    { name: 'Pending', value: pendingTasks, color: '#EF4444' }
   ];
 
-
- return (
-    <div className="p-6 min-h-screen bg-gray-50/95">
-      <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
-        <div className="flex items-center justify-between mb-8 p-6 bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl shadow-pro">
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Project Performance Dashboard</h1>
-            <p className="text-gray-300/90 mt-1 text-sm">
-              Comprehensive overview of {tasks.length} tasks • Updated {formatRelativeTime(new Date().toISOString())}
+            <h1 className="text-2xl font-bold text-gray-900">Project Summary</h1>
+            <p className="mt-1 text-sm text-gray-500">
+              Overview of project tasks and progress
             </p>
           </div>
         </div>
 
-        {/* Key Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
-          {[
-            { label: 'Total Tasks', value: stats.totalTasks, icon: ClipboardDocumentIcon, color: 'bg-indigo-500' },
-            { label: 'Completed', value: stats.completed, icon: CheckCircleIcon, color: 'bg-emerald-500' },
-            { label: 'In Progress', value: stats.inProgress, icon: ArrowPathIcon, color: 'bg-amber-500' },
-            { label: 'Overdue', value: stats.overdue, icon: ExclamationTriangleIcon, color: 'bg-rose-500' },
-          ].map((stat, idx) => (
-            <div key={idx} className="bg-white rounded-xl p-5 shadow-xs border border-gray-100 hover:border-gray-200 transition-all group">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">{stat.label}</p>
-                  <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
-                </div>
-                <div className={`${stat.color} p-2.5 rounded-lg text-white shadow-sm`}>
-                  <stat.icon className="w-5 h-5" />
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-green-100 rounded-lg">
+                <CheckCircleIcon className="h-6 w-6 text-green-600" />
               </div>
-              <div className="mt-3">
-              <div className="h-1 bg-gray-100 rounded-full overflow-hidden w-full">
-  <div 
-    className={`h-full ${stat.color} bg-opacity-75 transition-all duration-500`}
-    style={{ width: `${(stat.value / stats.totalTasks) * 100}%` }}
-  />
-</div>
-
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Column */}
-          <div className="lg:col-span-4 space-y-6">
-            {/* Workflow Status */}
-            <div className="bg-white rounded-xl p-5 shadow-xs border border-gray-100">
-              <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Workflow Distribution</h3>
-              <div className="space-y-3">
-                {Object.entries(statusDistribution).map(([status, count]) => (
-                  <div key={status} className="flex items-center justify-between p-2.5 hover:bg-gray-50/50 rounded-lg transition-colors">
-                    <div className="flex items-center gap-2.5">
-                      <div className={`w-2 h-2 rounded-full ${status === 'done' ? 'bg-emerald-500' : status === 'in_progress' ? 'bg-amber-500' : 'bg-indigo-500'}`} />
-                      <span className="text-sm text-gray-700 font-medium capitalize">
-                        {status.replace('_', ' ')}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-900">{count}</span>
-                      <span className="text-xs text-gray-400 font-medium">
-                        ({Math.round((count / stats.totalTasks) * 100 || 0)}%)
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Team Allocation */}
-            <div className="bg-white rounded-xl p-5 shadow-xs border border-gray-100">
-              <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Team Allocation</h3>
-              <div className="space-y-3">
-                {Object.entries(assigneeStats).map(([assignee, { count, job }]) => (
-                  <div key={assignee} className="flex items-center justify-between p-2.5 hover:bg-gray-50/50 rounded-lg transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-indigo-100/80 rounded-full flex items-center justify-center shadow-xs">
-                        <span className="text-sm font-medium text-indigo-600 uppercase">
-                          {assignee[0]}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{assignee}</p>
-                        <p className="text-xs text-gray-500 font-medium">{job}</p>
-                      </div>
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">
-                      {count} {count === 1 ? 'task' : 'tasks'}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Priority Matrix */}
-            <div className="bg-white rounded-xl p-5 shadow-xs border border-gray-100">
-              <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Priority Matrix</h3>
-              <div className="space-y-3">
-                {Object.entries(priorityStats).map(([priority, count]) => (
-                  <div key={priority} className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium text-gray-700 capitalize">{priority}</span>
-                      <span className="text-xs font-medium text-gray-500">{count} tasks</span>
-                    </div>
-                    <div className="relative pt-1.5">
-                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full ${priority === 'high' ? 'bg-rose-500' : priority === 'medium' ? 'bg-amber-500' : 'bg-emerald-500'} transition-all duration-500`}
-                          style={{ width: `${(count / stats.totalTasks) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Completed Tasks</p>
+                <p className="text-2xl font-semibold text-gray-900">{completedTasks}</p>
               </div>
             </div>
           </div>
 
-          {/* Right Column */}
-          <div className="lg:col-span-8 space-y-6">
-            {/* Activity Feed */}
-            <div className="bg-white rounded-xl p-5 shadow-xs border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">Recent Activity</h3>
-                <button className="text-gray-400 hover:text-gray-600 transition-colors">
-                  <ArrowRightIcon className="w-4 h-4" />
-                </button>
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-yellow-100 rounded-lg">
+                <ClockIcon className="h-6 w-6 text-yellow-600" />
               </div>
-              <div className="divide-y divide-gray-100">
-                {recentActivity.map(activity => (
-                  <div key={activity.id} className="py-3.5 first:pt-0 last:pb-0">
-                    <div className="flex items-start gap-3">
-                      <div className="mt-1 p-1.5 bg-indigo-100/50 rounded-lg">
-                        {activity.status === 'done' ? (
-                          <CheckCircleIcon className="w-4 h-4 text-emerald-500" />
-                        ) : activity.status === 'in_progress' ? (
-                          <ArrowPathIcon className="w-4 h-4 text-amber-500" />
-                        ) : (
-                          <DocumentTextIcon className="w-4 h-4 text-indigo-500" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <p className="text-sm font-medium text-gray-900 mb-0.5">
-                              {activity.user} updated task
-                            </p>
-                            <p className="text-xs text-gray-500 font-medium">
-                              {activity.task}
-                            </p>
-                          </div>
-                          <span className="text-xs text-gray-400 font-medium whitespace-nowrap">
-                            {activity.date}
-                          </span>
-                        </div>
-                        {activity.comment && (
-                          <div className="mt-2 px-3 py-2 bg-gray-50 rounded-lg text-xs text-gray-600 font-medium">
-                            "{activity.comment}"
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">In Progress</p>
+                <p className="text-2xl font-semibold text-gray-900">{inProgressTasks}</p>
               </div>
             </div>
+          </div>
 
-            {/* Data Visualization */}
-            <div className="bg-white rounded-xl p-5 shadow-xs border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
-                  Task Status Breakdown
-                </h3>
-                <div className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
-                  <span>Total Tasks</span>
-                  <span className="text-gray-900">{stats.totalTasks}</span>
-                </div>
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center">
+              <div className="p-3 bg-red-100 rounded-lg">
+                <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
               </div>
-              
-              <div className="flex flex-col lg:flex-row items-center gap-8">
-                <div className="w-full max-w-[240px] relative">
-                  <ResponsiveContainer width="100%" height={200}>
-                    <PieChart>
-                      <Pie
-                        data={pieData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={80}
-                        paddingAngle={2}
-                        dataKey="value"
-                      >
-                        {pieData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={entry.color}
-                            stroke="white"
-                            strokeWidth={2}
-                          />
-                        ))}
-                      </Pie>
-                      <text
-                        x="50%"
-                        y="50%"
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        className="text-xl font-semibold text-gray-900"
-                      >
-                        {stats.totalTasks}
-                      </text>
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Pending Tasks</p>
+                <p className="text-2xl font-semibold text-gray-900">{pendingTasks}</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                <div className="flex-1 grid grid-cols-1 gap-3 w-full">
-                  {pieData.map((entry, index) => (
-                    <div key={index} className="flex items-center justify-between p-2.5 bg-gray-50/50 rounded-lg">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                        <span className="text-sm font-medium text-gray-700">{entry.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-900">
-                          {entry.value}
-                        </span>
-                        <span className="text-xs font-medium text-gray-400">
-                          ({((entry.value / stats.totalTasks) * 100 || 0).toFixed(1)}%)
-                        </span>
-                      </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Task Distribution</h2>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={statusData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {statusData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Recent Activity</h2>
+            <div className="space-y-4">
+              {tasks.slice(0, 5).map((task) => (
+                <div key={task.id} className="flex items-start space-x-4">
+                  <div className="flex-shrink-0">
+                    <div className={`p-2 rounded-lg ${
+                      task.status === 'completed' ? 'bg-green-100' :
+                      task.status === 'in_progress' ? 'bg-yellow-100' :
+                      'bg-red-100'
+                    }`}>
+                      {task.status === 'completed' ? (
+                        <CheckCircleIcon className="h-5 w-5 text-green-600" />
+                      ) : task.status === 'in_progress' ? (
+                        <ClockIcon className="h-5 w-5 text-yellow-600" />
+                      ) : (
+                        <ExclamationTriangleIcon className="h-5 w-5 text-red-600" />
+                      )}
                     </div>
-                  ))}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900">{task.title}</p>
+                    <p className="text-xs text-gray-500">
+                      {formatRelativeTime(task.updated_at)}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>

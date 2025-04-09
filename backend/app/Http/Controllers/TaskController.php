@@ -50,16 +50,15 @@ class TaskController extends Controller
                     'name' => $task->creator->name,
                     'email' => $task->creator->email
                 ] : null;
-    
                 return $task;
             });
     
-            return response()->json(["tasks" => $tasks]);
-    
+            return response()->json($tasks, 200);
         } catch (Exception $e) {
-            return response()->json(["error" => $e->getMessage()], 500);
+            return response()->json(["message" => $e->getMessage()], 500);
         }
     }
+    
     public function getAllTasks($projectId) {  
         try {
             $user = JWTAuth::parseToken()->authenticate();
@@ -116,206 +115,159 @@ class TaskController extends Controller
             return response()->json(["error" => $e->getMessage()], 500);
         }
     }
+    
     public function create(Request $request, $projectId)
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
-            if (!$user) {
-                return response()->json(['message' => 'User not found'], 404);
-            }
+            if (!$user) return response()->json(["message" => "User not found"], 404);
     
-            $project = Project::where('id', $projectId)
-                ->where('created_by', $user->id)
-                ->first();
+            $project = Project::find($projectId);
+            if (!$project) return response()->json(["message" => "Project not found"], 404);
     
-            if (!$project) {
-                return response()->json(['message' => 'Project not found or unauthorized'], 404);
-            }
+            $isCreator = $project->created_by === $user->id;
+            $isCollaborator = $project->users()->where('user_id', $user->id)->exists();
     
-            $validated = $request->validate([
-                'title' => 'required|string|max:255',
-                'description' => 'required|string',
-                'priority' => 'sometimes|string|in:low,medium,high',
-                'due_date' => 'required|date|after_or_equal:today',
-                'assigned_to' => 'required|exists:users,id',
-                'status' => 'sometimes|string|in:to_do,in_progress,done'
-            ]);
-    
-         
-            if (!$project->users()->where('user_id', $validated['assigned_to'])->exists()) {
-                return response()->json(['message' => 'Assigned user is not a project member'], 400);
+            if (!$isCreator && !$isCollaborator) {
+                return response()->json(["message" => "Access denied"], 403);
             }
     
             $task = Task::create([
-                'title' => $validated['title'],
-                'description' => $validated['description'],
-                'priority' => strtolower($validated['priority'] ?? 'medium'),
-                'status' => strtolower($validated['status'] ?? 'to_do'),
-                'due_date' => Carbon::parse($validated['due_date']),
-                'assigned_to' => $validated['assigned_to'],
-                'project_id' => $project->id,
-                'created_by' => $user->id
+                'title' => $request->title,
+                'description' => $request->description,
+                'status' => $request->status,
+                'priority' => $request->priority,
+                'due_date' => $request->due_date,
+                'project_id' => $projectId,
+                'created_by' => $user->id,
+                'assigned_to' => $request->assigned_to
             ]);
     
-            $task->project->users()
-            ->where('users.id', '!=', $user->id)
-            ->each(function ($user) use ($task) {
-                $user->notify(new TaskCreatedNotification($task, auth("api")->user()));
-            });
-            return response()->json([
-                'message' => 'Task created successfully',
-                
-            ], 201);
+            if ($request->assigned_to) {
+                $assignedUser = User::find($request->assigned_to);
+                if ($assignedUser) {
+                    $assignedUser->notify(new TaskCreatedNotification($task, $project));
+                }
+            }
     
-        } catch (ValidationException $e) {
-            return response()->json([
-                'message' => 'Validation error',
-                'errors' => $e->errors()
-            ], 422);
-        } catch (JWTException $e) {
-            return response()->json(['message' => 'Invalid token'], 401);
+            return response()->json(["task" => $task], 201);
         } catch (Exception $e) {
-            Log::error('Task Creation Error: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Server error',
-                'error' => config('app.debug') ? $e->getMessage() : 'Please try again later'
-            ], 500);
+            return response()->json(["message" => $e->getMessage()], 500);
         }
     }
-
+    
     public function updateTask(Request $request, $projectId, $taskId) {
         try {
             $user = JWTAuth::parseToken()->authenticate();
-            if (!$user) {
-                return response()->json(["message" => "User not found"], 404);
+            if (!$user) return response()->json(["message" => "User not found"], 404);
+    
+            $project = Project::find($projectId);
+            if (!$project) return response()->json(["message" => "Project not found"], 404);
+    
+            $isCreator = $project->created_by === $user->id;
+            $isCollaborator = $project->users()->where('user_id', $user->id)->exists();
+    
+            if (!$isCreator && !$isCollaborator) {
+                return response()->json(["message" => "Access denied"], 403);
             }
     
-            $project = Project::where("created_by", $user->id)->find($projectId);
-            if (!$project) {
-                return response()->json(["message" => "Project not found"], 404);
-            }
+            $task = Task::find($taskId);
+            if (!$task) return response()->json(["message" => "Task not found"], 404);
     
-            $task = Task::where("project_id", $project->id)->find($taskId);
-            if (!$task) {
-                return response()->json(["message" => "Task not found"], 404);
-            }
-    
-            $validation = $request->validate([
-                "title" => "string|sometimes",
-                "description" => "string|sometimes",
-                "status" => "string|in:to_do,in_progress,done|sometimes",
-                "assigned_to" => "nullable|exists:users,id",
-                "due_date" => "nullable|date",
+            $task->update([
+                'title' => $request->title,
+                'description' => $request->description,
+                'status' => $request->status,
+                'priority' => $request->priority,
+                'due_date' => $request->due_date,
+                'assigned_to' => $request->assigned_to
             ]);
     
-            $validation['due_date'] = $validation['due_date'] ?? null;
-            
-            $task->update($validation);
-            $task->project->users()
-            ->where('users.id', '!=', $user->id)
-            ->each(function ($user) use ($task) {
-                $user->notify(new TaskUpdatedNotification($task, auth("api")->user()));
-            });
+            if ($request->assigned_to) {
+                $assignedUser = User::find($request->assigned_to);
+                if ($assignedUser) {
+                    $assignedUser->notify(new TaskUpdatedNotification($task, $project));
+                }
+            }
     
-         
-            return response()->json([
-                "message" => "Task updated successfully",
-                "task" => $task
-            ]);
-    
+            return response()->json(["task" => $task], 200);
         } catch (Exception $e) {
-            return response()->json([
-                "error" => $e->getMessage()
-            ], 500);
+            return response()->json(["message" => $e->getMessage()], 500);
         }
     }
-
+    
     public function deleteTask($id){
-        try{    
+        try {
             $user = JWTAuth::parseToken()->authenticate();
-
-            if(!$user){
-                return response()->json([
-                    "message"=>"user not found"
-                ],404);
-            }
+            if (!$user) return response()->json(["message" => "User not found"], 404);
+    
             $task = Task::find($id);
+            if (!$task) return response()->json(["message" => "Task not found"], 404);
+    
+            $project = Project::find($task->project_id);
+            if (!$project) return response()->json(["message" => "Project not found"], 404);
+    
+            $isCreator = $project->created_by === $user->id;
+            $isCollaborator = $project->users()->where('user_id', $user->id)->exists();
+    
+            if (!$isCreator && !$isCollaborator) {
+                return response()->json(["message" => "Access denied"], 403);
+            }
+    
             $task->delete();
-            return response()->json([
-                "message"=>"deleted successfully",
-            ]);
-
-        }catch(Exception $e){
-            return response()->json([
-                "error"=>$e->getMessage()
-            ],500);
+            return response()->json(["message" => "Task deleted successfully"], 200);
+        } catch (Exception $e) {
+            return response()->json(["message" => $e->getMessage()], 500);
         }
     }
+    
     public function memberOfProject($id){
         try {
             $user = JWTAuth::parseToken()->authenticate();
+            if (!$user) return response()->json(["message" => "User not found"], 404);
     
-            $project = Project::where("id", $id)
-                              ->whereHas("users", function ($query) use ($user) {
-                                  $query->where("created_by", $user->id);
-                              })
-                              ->with("users")
-                              ->first();
+            $project = Project::find($id);
+            if (!$project) return response()->json(["message" => "Project not found"], 404);
     
-            if (!$project) {
-                return response()->json([
-                    "message" => "Project not found or you are not a creator"
-                ], 404);
+            $isCreator = $project->created_by === $user->id;
+            $isCollaborator = $project->users()->where('user_id', $user->id)->exists();
+    
+            if (!$isCreator && !$isCollaborator) {
+                return response()->json(["message" => "Access denied"], 403);
             }
     
-            return response()->json([
-                "members" => $project->users
-            ]);
+            return response()->json(["isMember" => true], 200);
         } catch (Exception $e) {
-            return response()->json([
-                "message" => $e->getMessage()
-            ], 500);
+            return response()->json(["message" => $e->getMessage()], 500);
         }
     }
-    public function updateStatus(Request $request, $taskId)
-{
-    try {
-        $user = JWTAuth::parseToken()->authenticate();
-        if (!$user) {
-            return response()->json(["message" => "User not found"], 404);
-        }
-
-        $task = Task::find($taskId);
-        if (!$task) {
-            return response()->json(["message" => "Task not found"], 404);
-        }
-
-        $project = Project::where('id', $task->project_id)
-            ->where(function($query) use ($user) {
-                $query->where('created_by', $user->id)
-                      ->orWhereHas('users', function($q) use ($user) {
-                          $q->where('user_id', $user->id);
-                      });
-            })->first();
-
-        if (!$project) {
-            return response()->json(["message" => "Unauthorized access"], 403);
-        }
-
-        $validated = $request->validate([
-            'status' => 'required|string|in:to_do,in_progress,done'
-        ]);
-
-        $task->update(['status' => $validated['status']]);
-
-        return response()->json([
-            "message" => "Status updated successfully",
-            "task" => $task
-        ]);
-
-    } catch (Exception $e) {
-        return response()->json(["error" => $e->getMessage()], 500);
-    }
-}
     
+    public function updateStatus(Request $request, $taskId)
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+            if (!$user) return response()->json(["message" => "User not found"], 404);
+    
+            $task = Task::find($taskId);
+            if (!$task) return response()->json(["message" => "Task not found"], 404);
+    
+            $project = Project::find($task->project_id);
+            if (!$project) return response()->json(["message" => "Project not found"], 404);
+    
+            $isCreator = $project->created_by === $user->id;
+            $isCollaborator = $project->users()->where('user_id', $user->id)->exists();
+    
+            if (!$isCreator && !$isCollaborator) {
+                return response()->json(["message" => "Access denied"], 403);
+            }
+    
+            $task->update([
+                'status' => $request->status
+            ]);
+    
+            return response()->json(["task" => $task], 200);
+        } catch (Exception $e) {
+            return response()->json(["message" => $e->getMessage()], 500);
+        }
+    }
 }
